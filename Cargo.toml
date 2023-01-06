@@ -1,0 +1,22 @@
+[package]
+name = 'components'
+version = '0.1.0'
+edition = '2021'
+
+# See more keys and their definitions at
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = 'components'
+path = 'src/components.rs'
+
+[[bin]]
+name = 'spool'
+path = 'src/spool.rs'
+
+[[bin]]
+name = 'stage1'
+path = 'src/stage1.rs'
+
+[dependencies]
+stl_io = '*'
