@@ -1,7 +1,6 @@
-use stl_io::{self, Vertex};
-use std::fs::OpenOptions;
+use stl_io::Vertex;
 
-mod normal;
+use components::normal;
 
 fn munge(v: &mut Vertex) {
     if normal::near_xr(v, 265.7527, 28.0287204251542, 0.1) {
@@ -12,17 +11,14 @@ fn munge(v: &mut Vertex) {
     }
 }
 
-fn main() {
-    let path = "jet/files/LPT_Spool.stl";
-    let mut file = OpenOptions::new().read(true).open(path).unwrap();
-    let mesh = stl_io::read_stl(&mut file).unwrap();
-    let mut mesh = normal::reduce(&mesh);
+pub fn main() {
+    let mut mesh = normal::read_mesh("jet/files/LPT_Spool.stl");
+
     for t in mesh.iter_mut() {
         munge(&mut t.vertices[0]);
         munge(&mut t.vertices[1]);
         munge(&mut t.vertices[2]);
-        normal::renormal(t);
     }
-    let mut file = OpenOptions::new().write(true).create(true).open("spool.stl").unwrap();
-    stl_io::write_stl(&mut file, mesh.iter()).unwrap();
+
+    normal::write_mesh("spool.stl", &mut mesh);
 }

@@ -11,12 +11,10 @@ name = 'components'
 path = 'src/components.rs'
 
 [[bin]]
-name = 'spool'
-path = 'src/spool.rs'
+name = 'jet'
+path = 'src/jet.rs'
 
-[[bin]]
-name = 'stage1'
-path = 'src/stage1.rs'
+[lib]
 
 [dependencies]
 stl_io = '*'

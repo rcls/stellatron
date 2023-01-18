@@ -1,25 +1,28 @@
-use stl_io::{self, Vertex};
-use std::fs::OpenOptions;
+use stl_io::Vertex;
 
-mod normal;
+use components::normal::{delta_xr, near_xr, read_mesh, write_mesh};
 
 fn munge(v: &mut Vertex) {
-    if normal::near_xr(v, 265.72113, 28.0701692088578, 0.1) {
-        normal::delta_xr(v, -2.0, -2.0);
+    if near_xr(v, 265.72113, 28.0701692088578, 0.1) {
+        delta_xr(v, -2.0, -2.0);
+    }
+    else if near_xr(v, 260.6847 , 40.8171442799099, 0.1)
+        ||  near_xr(v, 261.1936 , 41.1349851260917, 0.1)
+        ||  near_xr(v, 264.88766, 43.4421881556437, 0.1)
+        ||  near_xr(v, 265.39658, 43.7600289393084, 0.1)
+    {
+        delta_xr(v, 0.0, -0.25);
     }
 }
 
-fn main() {
-    let path = "jet/files/LPT_Stage_1_No_Supports.stl";
-    let mut file = OpenOptions::new().read(true).open(path).unwrap();
-    let mesh = stl_io::read_stl(&mut file).unwrap();
-    let mut mesh = normal::reduce(&mesh);
+pub fn main() {
+    let mut mesh = read_mesh("jet/files/LPT_Stage_1_No_Supports.stl");
+
     for t in mesh.iter_mut() {
         munge(&mut t.vertices[0]);
         munge(&mut t.vertices[1]);
         munge(&mut t.vertices[2]);
-        normal::renormal(t);
     }
-    let mut file = OpenOptions::new().write(true).create(true).open("stage1.stl").unwrap();
-    stl_io::write_stl(&mut file, mesh.iter()).unwrap();
+
+    write_mesh("lp_stage1.stl", &mut mesh);
 }
