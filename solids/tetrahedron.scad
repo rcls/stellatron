@@ -13,4 +13,5 @@ echo(b);
 echo(side);
 d = [0, 0, height];
 
-scale(radius) polyhedron(points=[a,b,c,d], faces=[[0,1,2],[1,0,3],[2,1,3],[0,2,3]]);
+scale(radius) polyhedron(
+    points=[a,b,c,d], faces=[[0,1,2],[1,0,3],[2,1,3],[0,2,3]]);
