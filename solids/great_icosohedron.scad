@@ -2,7 +2,7 @@
 // Radial distance of 10 of the 12 icosohedral vertexes from the axis through
 // the other two.  I.e., standing on point, it fits in a vertical tube with
 // this radius.
-radius = 60;
+radius = 75;
 
 // Side of pentagon through 5 vertexes.
 side = 2 * radius * sin(36);
@@ -91,27 +91,29 @@ module half() {
 }
 
 module stand() {
-    $fn = 40;
+    $fn = 20;
     rad = radius / 6;
     difference() {
         for (i = [0:4]) {
             rotate(i * 72)
-                translate([rad, 0, 0]) cylinder(r=3, h=z1+z2);
+                translate([rad, 0, 0]) cylinder(r=3.75, h=z1+z2, $fn=$fn*2);
         }
         translate([0, 0, (z1+z2)+2]) great_icoso();
     }
     minkowski() {
         difference() {
-            cylinder(h=0.1, r=rad + 5, $fn=$fn * 3);
-            cylinder(h=0.1, r=5);
+            cylinder(h=0.1, r=rad + 5, $fn=$fn * 6);
+            cylinder(h=1, r=5, center=true);
         }
         intersection() {
             sphere(r=1.9);
-            cylinder(r=1.9, h=2);
+            cylinder(r=2, h=3);
         }
     }
 }
 
+//main();
+//spike();
 //half();
 stand();
 
