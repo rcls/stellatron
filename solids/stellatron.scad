@@ -223,13 +223,12 @@ module cell_g1() {
 
 module cell_e2() {
     $retrograde = true;
-    stellate_t
-        ([
-            [p1, p4b, p5, p4a],
-            [p1, p3a, p4a],
-            [p4b, p3b, p1],
-            [p5a, p4, p3a],
-            [p3b, mns(p4), p5b],
+    stellate(
+        [[p1, p4b, p5, p4a],
+         [p1, p3a, p4a],
+         [p4b, p3b, p1],
+         [p5a, p4, p3a],
+         [p3b, mns(p4), p5b],
             ]);
 }
 
