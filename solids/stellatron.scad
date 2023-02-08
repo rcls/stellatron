@@ -3,31 +3,27 @@ gold = (1 + sqrt(5)) / 2;
 // 0 = raw object, 1... = printable, 10 = stand.
 piece = 1;
 
-c7();
+c13();
 
-radius = 65; // * (1+2*gold) / 2.3839634168752983;
+// e1 has axial points. (hex points)
+// e2 has axial edge pairs. (rhombus prisms with point not underneath)
+// f1a is wedgy.
+// f2 has axial points.  (pentagonal spikes)
+// g1 is wedgy.
+// g2 is hollow pentagram spikes, made from wedges, should be ok.
+
+radius = 65; // * (1 + 2 * gold) / 2.3839634168752983;
 
 // When slicing, remove this much extra in the z direction.
 extra_z_remove=0.0;
 
 $fn=20;
 
-// By default ($retrograde == false), we assume that the object has no caves or
-// hollows, so that it is safe to extend components towards (and just beyond),
-// the center.
-//
-// Because we build the part out of surfaces, this makes it easier to extend a
-// surface to a 3d part.
-//
-// $retrograde needs to be set where there are caves or hollows.
-$retrograde = false;
-$pimple = 0.01;
-
 function mirror(p) = [p.x, p.z, p.y];
 function pls(p) = [p.z, p.x, p.y];
 function mns(p) = [p.y, p.z, p.x];
 
-function sum(v, n) = n + 1 < len(v) ? v[n] + sum(v, n + 1) : v[n];
+function sum(v, n=0) = n + 1 < len(v) ? v[n] + sum(v, n + 1) : v[n];
 
 // Center of a face.
 p0 = [1, 1, 1] / 3;
@@ -82,22 +78,103 @@ radius8 = 8.359584944780256;
 // Three of nine.
 p8 = [3 + 4 * gold, -1 - 2 * gold, -1 - 2 * gold];
 
-function apply(tri, p) = tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2];
+function u_apply(tri, p) = tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2];
 
-module wedge(tri, stellation) {
+function apply(tri, p) = canonv(u_apply(tri, p));
+
+// NUMERIC CANONICALIZATION - exact Q(ϕ) representation.
+
+// A table of the fractional parts of point co-ordinates, along with
+// decomposition in Q(ϕ).
+value_table = [
+    [-0.4 * gold + 0.2, -0.4, 0.2], // -0.44721359549995804
+    [1.0 * gold + -2.0, 1.0, -2.0], // -0.3819660112501051
+    [-1.2 * gold + 1.6, -1.2, 1.6], // -0.3416407864998736
+    [-7.0 * gold + 11.0, -7.0, 11.0], // -0.3262379212492643
+    [-0.5 * gold + 0.5, -0.5, 0.5], // -0.30901699437494745
+    [6.0 * gold + -10.0, 6.0, -10.0], // -0.2917960675006306
+    [0.2 * gold + -0.6, 0.2, -0.6], // -0.27639320225002095
+    [-2.0 * gold + 3.0, -2.0, 3.0], // -0.2360679774997898
+    [0.5 * gold + -1.0, 0.5, -1.0], // -0.19098300562505255
+    [-0.6 * gold + 0.8, -0.6, 0.8], // -0.1708203932499368
+    [3.0 * gold + -5.0, 3.0, -5.0], // -0.1458980337503153
+    [-1.0 * gold + 1.5, -1.0, 1.5], // -0.1180339887498949
+    [0.8 * gold + -1.4, 0.8, -1.4], // -0.10557280900008381
+    [-5.0 * gold + 8.0, -5.0, 8.0], // -0.09016994374947451
+    [-1.4 * gold + 2.2, -1.4, 2.2], // -0.06524758424985233
+    [-0.0 * gold + -0.0, -0.0, -0.0], // 0.0
+    [1.4 * gold + -2.2, 1.4, -2.2], // 0.06524758424985233
+    [5.0 * gold + -8.0, 5.0, -8.0], // 0.09016994374947451
+    [-0.8 * gold + 1.4, -0.8, 1.4], // 0.10557280900008381
+    [1.0 * gold + -1.5, 1.0, -1.5], // 0.1180339887498949
+    [-3.0 * gold + 5.0, -3.0, 5.0], // 0.1458980337503153
+    [0.6 * gold + -0.8, 0.6, -0.8], // 0.1708203932499368
+    [-0.5 * gold + 1.0, -0.5, 1.0], // 0.19098300562505255
+    [2.0 * gold + -3.0, 2.0, -3.0], // 0.2360679774997898
+    [-0.2 * gold + 0.6, -0.2, 0.6], // 0.27639320225002095
+    [-6.0 * gold + 10.0, -6.0, 10.0], // 0.2917960675006306
+    [0.5 * gold + -0.5, 0.5, -0.5], // 0.30901699437494745
+    [7.0 * gold + -11.0, 7.0, -11.0], // 0.3262379212492643
+    [1.2 * gold + -1.6, 1.2, -1.6], // 0.3416407864998736
+    [-1.0 * gold + 2.0, -1.0, 2.0], // 0.3819660112501051
+    [0.4 * gold + -0.2, 0.4, -0.2], // 0.44721359549995804
+    ];
+
+for (i = [1 : len(value_table) - 1])
+    assert(value_table[i-1][0] < value_table[i][0]);
+
+for (v = value_table)
+    assert(abs(v[0] - gold * v[1] - v[2]) < 1e-7);
+
+function canon_find(v, m, p) =
+    let (n = floor((m + p) / 2))
+    p - m <= 1 ? m : (
+        v <= value_table[n][0] ? canon_find(v, m, n) : canon_find(v, n, p));
+
+function canon(v) =
+    let (rv = round(v),
+         fv = v - rv,
+         m = canon_find(fv, 0, len(value_table) - 1),
+         mid = (value_table[m][0] + value_table[m+1][0]) / 2,
+         mm = fv < mid ? m : m + 1,
+         pp = value_table[mm][1],
+         ii = value_table[mm][2],
+         recalc = pp * gold + (rv + ii))
+    assert(abs(recalc - v) < 1e-7)
+    recalc;
+
+function canonv(v) = [for (x = v) canon(x)];
+function canonvv(vv) = [for (v = vv) canonv(v)];
+
+echo("Canon", gold, canon(gold));
+
+// PLAIN ICOSOHEDRON
+
+ico_faces_edged1 = [
+     [[-1, 0, gold], [ 1, 0, gold], [0, -gold, 1]],
+     [[ 1, 0, gold], [-1, 0, gold], [0,  gold, 1]]];
+ico_faces_edged = [ for (f = ico_faces_edged1)
+        each [f, [for (v = f) pls(v)], [for (v = f) mns(v)]]];
+ico_faces_oct = [
+    for (sx = [-1, 1]) for (sy = [-1, 1]) [
+        [sx, 0, sx * sy * gold], [0, sy * gold, sx * sy], [sx * gold, sy , 0]]];
+ico_faces_half = [ each ico_faces_edged, each ico_faces_oct ];
+ico_faces = [
+    each ico_faces_half,
+    for (f = ico_faces_half) [-f[2], -f[1], -f[0]] ];
+assert(len(ico_faces) == 20);
+
+// STELLATION LIBRARY
+
+module wedge(tri, stellation, anchor=[0, 0, 0]) {
     d = stellation[1] - stellation[0];
     e = stellation[2] - stellation[1];
     cross_sum = d.y * e.z - d.z * e.y
         +       d.z * e.x - d.x * e.z
         +       d.x * e.y - d.y * e.x;
 
-    midpoint = sum(stellation, 0) / len(stellation);
-    anchor_n = -0.01 * midpoint;
-    anchor_r = midpoint - $pimple * sign(cross_sum) * [1, 1, 1];
-    anchor = $retrograde ? anchor_r : anchor_n;
-
     points = [
-        apply(tri, anchor),
+        u_apply(tri, anchor),
         for (p = stellation) apply(tri, p),
         ];
     faces = [
@@ -117,33 +194,29 @@ module wedges(tri, stellations) {
     for (s = stellations) wedge(tri, s);
 }
 
-ico_scale = sqrt(6 + 3 * gold);
-
-function polar(r, theta, z) = [r * cos(theta), r * sin(theta), z] / ico_scale;
-
-function A(i) = polar(       2, i*120,     -gold - 1);
-function B(i) = polar(gold * 2, i*120 + 60, 1 - gold);
-function C(i) = polar(gold * 2, i*120,      gold - 1);
-function D(i) = polar(       2, i*120 + 60, gold + 1);
+// Radius to points with the vertex definitions above.
+ico_scale = sqrt(2 + gold);
 
 module stellate_sym(stellations) {
-    wedges([A(0), A(1), A(2)], stellations);
-
-    for (i = [0:2]) {
-        wedges([A(i+1), A(i  ), B(i  )], stellations);
-        wedges([A(i+1), B(i  ), C(i+1)], stellations);
-        wedges([C(i  ), B(i  ), A(i  )], stellations);
-
-        wedges([D(i  ), D(i+1), C(i+1)], stellations);
-        wedges([D(i  ), C(i+1), B(i  )], stellations);
-        wedges([B(i  ), C(i  ), D(i  )], stellations);
-    }
-
-    wedges([D(2), D(1), D(0)], stellations);
+    for (f = ico_faces)
+        wedges(f, stellations);
 }
 
 module stellate(stellations) {
     stellate_sym([ for (s = stellations) each triple(s) ]);
+}
+
+module stellate1(stellation, weights=[], normal=0) {
+    anchorw = len(weights) == 0 ? [0,0,0] :
+        sum([for (i = [0:len(weights)-1]) weights[i] * stellation[i]])
+        / sum(weights);
+    anchorn = normal * p0;
+    anchor = anchorw + anchorn;
+    for (f = ico_faces) {
+        wedge(f, stellation, anchor);
+        wedge(pls(f), stellation, anchor);
+        wedge(mns(f), stellation, anchor);
+    }
 }
 
 function triple(stellation) = [
@@ -164,9 +237,11 @@ module full_C() stellate_sym(
 module full_D() stellate([[mns(p1), p4a, p4, pls(p4b)]]);
 
 module full_E() stellate(
-    [[mns(p2), p5a, pls(p5), mns(p5b)],
-     [p6a, pls(p1), mns(p6b)],
-        ]);
+    [[p3a, p4a, p6a],
+     [p6b, p4b, p3b],
+     [p5a, p4, p3a],
+     [p3b, mns(p4), p5b],
+     [p1, p4b, p5, p4a]]);
 
 module full_F() stellate_sym(
     [[p6a, pls(p6a), mns(p6a)],
@@ -183,77 +258,54 @@ module full_H() stellate(
         ]);
 
 module cell_e1() {
-    $retrograde = true;
-    stellate(
-        [[p3a, p4a, p6a],
-         [p6b, p4b, p3b],
-         [p4, p3a, p2, pls(p3b)],
-            ]);
+    stellate1([p3a, p4a, p6a], weights=[1, 1, 0], normal=-0.7);
+    stellate1([p6b, p4b, p3b], weights=[0, 1, 1], normal=-0.7);
+    stellate1([p4, p3a, p2, pls(p3b)], weights=[1], normal=1);
 }
 
 module cell_f1a() {
-    $retrograde = true;
-    stellate(
-        [[p6a, p5a, p3a],
-         [p4a, p5, p6a],
-
-         [p3b, p4b, p6b],
-         [p5b, mns(p4), p3b],
-            ]);
+    stellate1([p6a, p5a, p3a], weights=[1, 4, 4], normal=-1/4);
+    stellate1([p4a, p5, p6a], weights=[1, 1, 0], normal=-1/5);
+    stellate1([p3b, p4b, p6b], weights=[1, 1, 1], normal=1/7);
+    stellate1([p5b, mns(p4), p3b], weights=[1, 1, 0], normal=1/2);
 }
 
-module cell_f1b() {
-    $retrograde = true;
-    stellate(
-        [[p6a, p4a, p3a],
-         [p3a, p4, p5a],
-         [p6b, p5, p4b],
-         [p3b, p5b, p6b],
-            ]);
-}
+module cell_f1b() scale(-1) cell_f1a();
 
 module cell_g1() {
-    $retrograde = true;
-    stellate(
-        [[p6a, p5, p6b],
-         [p3a, p5a, p6a],
-         [p6b, p5b, p3b],
-            ]);
+    stellate1([p6a, p5, p6b], weights=[1,4,1], normal=-0.48);
+    stellate1([p3a, p5a, p6a], weights=[-2,5,0], normal=0.8);
+    stellate1([p6b, p5b, p3b], weights=[0,5,-2], normal=0.8);
 }
 
 module cell_e2() {
-    $retrograde = true;
-    stellate(
-        [[p1, p4b, p5, p4a],
-         [p1, p3a, p4a],
-         [p4b, p3b, p1],
-         [p5a, p4, p3a],
-         [p3b, mns(p4), p5b],
-            ]);
+    stellate1([p1, p4b, p5, p4a], weights=[1,0,4,0], normal=-0.3);
+    stellate1([p5a, p4, p3a], weights=[1,2,3], normal=-0.55);
+    stellate1([p3b, mns(p4), p5b], weights=[3,2,1], normal=-0.55);
+
+    stellate1([p1, p3a, p4a], weights=[1,4,1], normal=0.33);
+    stellate1([p4b, p3b, p1], weights=[1,4,1], normal=0.33);
 }
 
 module cell_f2() {
-    $retrograde = true;
-    stellate
-        ([
-            [p4, p5a, p7, pls(p5b)],
-            [p1, p4a, p5, p4b],
-            ]);
+    stellate1([p4, p5a, p7, pls(p5b)], weights=[1,0,0,0], normal=-1);
+    stellate1([p1, p4a, p5, p4b], weights=[1,0,1,0], normal=1.5);
 }
 
 module cell_g2() {
-    $retrograde = true;
-    stellate
-        ([
-            [p5a, p6a, p7],
-            [mns(p7), p6b, p5b],
-            [p7, p5a, p4, pls(p5b)],
-            [p6a, p5, p4a],
-            [p4b, p5, p6b],
-            ]);
+    stellate1([p5a, p6a, p7], weights=[6,2,1], normal=-0.75);
+    stellate1([mns(p7), p6b, p5b], weights=[1,2,6], normal=-0.75);
+
+    stellate1([p7, p5a, p4, pls(p5b)], weights=[1,0,6,0], normal=1 /100);
+    stellate1([p6a, p5, p4a], weights=[1,1,1], normal=1.2);
+    stellate1([p4b, p5, p6b], weights=[1,1,1], normal=1.2);
 }
 
-module c1() full_A();                   // Icosohedron.
+module c1()                             // Icosohedron.
+    if (piece == 0)
+        full_A();
+    else if (piece == 1)
+        icoso_tb_whole(radius1) full_A();
 
 module c2() full_B();             // Small triambic / first stellation / triakis
 
@@ -266,10 +318,10 @@ module c5() full_E();
 module c6() full_F();                   // Second stellation.
 
 module c7()                             // Great.
-    dodeca_spikey(post=-0.1) full_G();
+    dodeca_spikey(post=0.1) full_G();
 
 module c8()                             // The mighty final stellation.
-    icoso_top_bottom(radius8, spoke=-0.5, inset=5) full_H();
+    icoso_top_bottom(radius8, post=-0.25, spoke=0.5, inset=5) full_H();
 
 module c9() cell_e1();               // Twelfth stellation, spikes point joined.
 
@@ -293,7 +345,7 @@ module c13() {                          // Dodec cage.
     cell_g1();
 }
 
-module c14() {                          // Dodec cage.
+module c14() {                          // Dodec cage, edge joins.
     cell_f1a();
     cell_f1b();
     cell_g1();
@@ -333,7 +385,8 @@ module c22() {                          // Ten tetrahedra.
 }
 
 module c23()                      // Sixth stellation.  Exc. dodec with spikes.
-    dodeca_spikey() stellate([[pls(p7), p6b, p6a]]);    // F g1
+    icoso_top_bottom(raw_radius=radius7, post=-1/3, inset=5)
+    stellate([[pls(p7), p6b, p6a]]);    // F g1
 
 module c24() {                          // Ten tetra, hollowed.
     full_D();
@@ -464,10 +517,9 @@ module c46() {                          // Hollow hex spikes, solid support.
     cell_f1a();
 }
 
-// E f1
-module c47()
-    icoso_top_bottom(radius6, spoke=-0.94, inset=18, jangle=36.4)
-    stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // Five tetrahedra.
+module c47()                            // Five tetrahedra.
+    icoso_top_bottom(radius6, spoke=-0.94, inset=18, jangle=96.4)
+    stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
 
 module c48() {                          // Hollowed chiral exc. dodec.
     cell_e2();
@@ -566,7 +618,6 @@ module dodeca_single(raw_radius) {
 }
 
 module dodeca_spikey(post=0.1, inset=0) {
-    echo("RCL", post);
     if (piece == 0) {
         children();
     }
@@ -586,57 +637,68 @@ module dodeca_spikey(post=0.1, inset=0) {
     }
 }
 
-module icoso_top_bottom(raw_radius, spoke=0, inset=5, jangle=0) {
+module icoso_top_bottom(raw_radius, spoke=0, inset=5, jangle=0, post=0) {
     if (piece == 0) {
         children();
     }
     else if (piece == 1) {
         difference() {
-            translate([0, 0, -1e-5])
-                icoso_tb_whole(raw_radius, spoke, inset, jangle)
+            translate([0, 0, -1e-3])
+                icoso_tb_whole(raw_radius, spoke, inset, jangle, post)
                 children();
             translate([0, 0, -radius * 1.1]) cube(radius * 2.2, center=true);
         }
     }
     else if (piece == 2) {
         difference() {
-            translate([0, 0, -1e-5]) rotate([0,180,0])
-                icoso_tb_whole(raw_radius, spoke, inset, jangle)
+            translate([0, 0, -1e-3]) rotate([0,180,0])
+                icoso_tb_whole(raw_radius, spoke, inset, jangle, post)
                 children();
             translate([0,0, -radius * 1.1]) cube(radius * 2.2, center=true);
         }
     }
 }
 
-module icoso_tb_whole(raw_radius, spoke, inset, jangle) {
-    offset = (1 + gold) / ico_scale;
+module icoso_tb_whole(raw_radius, spoke = 0, inset, jangle, post) {
+    offset = sqrt(1/3 + 2 / 3 / sqrt(5)) * ico_scale;
     difference() {
-        scale(radius / raw_radius)
-            translate([0, 0, offset]) children();
+        scale(radius / raw_radius / ico_scale)
+            translate([0, 0, offset]) faceup() children();
         if (spoke != 0) {                    // Spoke joiners.
             for (i = [0:2])
-                rotate(120 * i + jangle)
-                    rotate([0, 90 * sign(spoke), 0]) cylinder(
-                    r=1.1, h=abs(spoke) * radius - inset);
+                # rotate(120 * i + jangle)
+                    rotate([0, 90, 0]) cylinder(
+                    r=1.1, h=spoke * radius - inset);
         }
+        if (post != 0)
+            for (i = [0:2])
+                # rotate(120 * i + jangle)
+                translate([radius * post - inset * sign(post), 0, 0])
+                    cylinder(r=1.15, h=20, center=true);
     }
 }
 
-// Rotate so an icoshedral point is upwards.
-module pointup() {
-    c = 2 / sqrt(3 * gold + 6);
-    s = (gold + 1) / sqrt(3 * gold + 6);
-    multmatrix([[s, 0, c, 0], [0, 1, 0, 0], [-c, 0, s, 0]]) children();
+// Rotate so an icoshedral face is upwards.  Rotate by half the dodecahedron
+// dihedral angle.
+module faceup() {
+    c = sqrt(1/2 - sqrt(5) / 6);
+    s = sqrt(1/2 + sqrt(5) / 6);
+    multmatrix([[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0]]) children();
 }
 
 // Position so the 6a, 6b dodecahedron is resting on the x-y plane.
-module dodeca_pointup(raw_radius, post, inset) {
-    c = 2 / sqrt(3 * gold + 6);
-    s = (gold + 1) / sqrt(3 * gold + 6);
-    echo(post)
+module dodeca_pointup(raw_radius, post=0, inset=0) {
+    // Rotate by half the icosohedron dihedral angle.
+    c = sqrt(1/2 + 1/(2 * sqrt(5)));
+    s = sqrt(1/2 - 1/(2 * sqrt(5)));
+    magic = sqrt(1/3 + 2/15 * sqrt(5));
+    echo(magic);
+    echo(post);
     difference() {
-        scale(radius / raw_radius)
-            multmatrix([[s, 0, c, 0], [0, 1, 0, 0], [-c, 0, s, s * radius6]])
+        scale(radius / raw_radius / ico_scale)
+            multmatrix([[c, 0, s, 0],
+                        [0, 1, 0, 0],
+                        [-s, 0, c, radius6 * magic * ico_scale]])
             children();
         if (post != 0) {
             for (i = [0:4]) {

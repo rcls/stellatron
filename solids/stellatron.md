@@ -27,8 +27,8 @@ main piece of the object, and other pieces are typically spike or star shaped
 objects.
 
 10 may be a stand for the object.  Not all objects have stands defined.  The
-stands are designed so they do not need to be glued to the object&mdash;the
-object should balance just fine on the stand.
+stands are designed so they do not need to be glued to the object—the object
+should balance just fine on the stand.
 
 If there is no printable part defined, then you can always just use piece=0 and
 manually scale.  In that case you may need lots of support structures!
@@ -64,8 +64,7 @@ to loosen it up.
 
 'Spoke' joiners are place horizontally on the surface.  The indentation goes
 from the center to near the boundary of the surface.  You don't need to fill the
-entire length of the indentation&mdash;just 10mm or so near the extremity is
-fine.
+entire length of the indentation—just 10mm or so near the extremity is fine.
 
 Where there are five joiner indentations, you don't need to use all five.  Three
 is quite adequate, and is easier to assembly.
@@ -73,8 +72,8 @@ is quite adequate, and is easier to assembly.
 Support
 -------
 
-Many do not need supports&mdash;and in some cases that they print without
-support is at first sight surprising.
+Many do not need supports—and in some cases that they print without support is
+at first sight surprising.
 
 Your (or at least my) eyes are drawn to the angles of edges, while it seems that
 it is the angle of the faces that matters.  For spikey shapes in particular, a
@@ -96,10 +95,10 @@ print fine with no infill (0%).
 1 &dash; Icosohedron
 ---------------------
 
-Just a plain icosohedron.
+Just a plain icosohedron.  Prints as a single piece.
 
 
-7 &ndash; Great Icosohedron
+7 – Great Icosohedron
 ---------------------------
 
 Prints as two pieces with post joiners.  The main piece needs infill but the
@@ -112,17 +111,32 @@ The overhangs look really scary but it printed fine for me with no support.
 
 I set `radius=85`.
 
-26 &ndash; Excavated Dodecahedron
+8 – The Mighty Final Stellation
+-------------------------------
+
+Two pieces.  Provision for both spike and post joiners.  Print as large as
+possible.
+
+23 – Sixth stellation – Excavated Dodecahedron plus Spikes
+----------------------------------------------------------------------
+
+Prints as two pieces.  The main piece is best done with a raft, to avoid
+the points on the base plate warping upwards.
+
+For a matching pair, print with the dodecahedral part the same size as 26 (needs
+radius ratio r7/r6).
+
+26 – Excavated Dodecahedron
 ---------------------------------
 
-Prints as a single piece.  Slice with a Cura raft.  I set `radius=60`.  Needs
-infill.
+Prints as a single piece.  As it rests on edges, slice with a Cura raft.  I set
+`radius=60`.
 
-47 &ndash; Five Tetrahedra
+47 – Five Tetrahedra
 --------------------------
 
-Prints as two pieces with spoke joiners.  The main piece needs infill, the
-second piece does not.  I set `radius=65`.
+Prints as two pieces with spoke joiners.  I set `radius=65`.  The main piece
+needs infill, the second piece does not.
 
 Check the positioning of the joiners through the first few layers, and adjust if
 too close to the edges.

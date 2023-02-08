@@ -153,6 +153,8 @@ stell_points = set()
 for stell, n in raw_stell_points:
     for face in ico_faces:
         stell_points.add(canonv(applys(stell, face)))
+        stell_points.add(canonv(applys(stell, rott(face))))
+        stell_points.add(canonv(applys(stell, rott(rott(face)))))
 
 coords = []
 for stell, n in raw_stell_points:
@@ -177,3 +179,17 @@ for A in stell_points:
 print('Ratios')
 for r, i, o in ratios:
     print(describe(r), describe(i), describe(o), math.sqrt(i/o))
+
+for c in coords:
+    print(describe(c))
+
+rationals = { }
+for c in coords:
+    fc = c - round(c)
+    p, i = rational(fc)
+    rationals[p * gold + i] = (p, i)
+    rationals[-p * gold - i] = (-p, -i)
+
+for fx in sorted(rationals.keys()):
+    p, i = rationals[fx]
+    print(f'[{p} * gold + {i}, {p}, {i}], // {fx}')
