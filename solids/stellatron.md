@@ -26,7 +26,7 @@ defaults.
 Variables
 ---------
 
-### object ###
+### crennell ###
 
 Select which of the icosahedral stellations to print, using the Crennell
 numbering.
@@ -38,14 +38,16 @@ replace the call to `main` with the `cNN` module directly.
 
 Select which piece of the object to print.
 
-`piece=0` is always the raw object.
+`piece=0` is always the raw object, which will not be convenient for printing.
+If I haven't worked out a printing and assembly procedure for a particular
+stellation, then this is the only thing you get.
 
 `piece=1`, `piece=2` etc., are the printable pieces.  Typically there are two
 pieces, although some can be printed as a single piece.  `piece=1` is always the
 main piece of the object, and other pieces are typically spike or star shaped
 objects.
 
-`pidce=10` may be a stand for the object.  Not all objects have stands defined.
+`piece=10` may be a stand for the object.  Not all objects have stands defined.
 The stands are designed so they do not need to be glued to the object—the object
 should balance just fine on the stand.  A few have extra stands defined on 11.
 
@@ -74,25 +76,23 @@ Where an object has multiple pieces, there are guiding indentations in the
 mating surface.  These can have a smaller 'joiner' inserted as a mechanical
 guide.
 
-The joiner is just a few short segments of 1.75mm filament.  There are two types
-of these:
+The joiners are a few short segments of 1.75mm filament.  Each part has 2.3mm
+diameter holes in the mating faces.  Cut a short piece of filament to insert
+into each hole. You may need to poke filament into the holes a few times to
+loosen them up.
 
-'Post' joiners are placed vertically in the surface.  Each part has 2.3mm
-diameter holes going 10mm deep.  Cut a piece of filament just short of 20mm, and
-insert into a hole.  You may need to poke the joiner into the hole a few times
-to loosen it up.
-
-'Spoke' joiners are place horizontally on the surface.  The indentation goes
-from the center to near the boundary of the surface.  You don't need to fill the
-entire length of the indentation—just 10mm or so near the extremity is fine.
-
-Where there are five joiner indentations, you don't need to use all five.  Three
+Where there are five joiner holes, you don't need to use all five.  Three
 is quite adequate, and is easier to assembly.
+
+I generally find it is easiest to place the joiner segments and glue on the
+smaller of two pieces, and then fit the larger piece on top of the smaller.
+This may sound counter-intuitive, but spreading glue on the smaller surface
+avoids getting glue onto non-mating areas.
 
 Support
 -------
 
-Many do not need supports—and in some cases that they print without support is
+Most do not need supports—and in some cases that they print without support is
 at first sight surprising.
 
 Your (or at least my) eyes are drawn to the angles of edges, while it seems that
@@ -122,8 +122,8 @@ Just a plain icosahedron.  Prints as a single piece.
 6 – Second Stellation
 ---------------------
 
-Prints as two pieces.  Somewhat like object 23, except the dodecahedron is
-reduced to a second set of (small) spikes.  I prefer object 28.
+Prints as two pieces.  Somewhat like Crennell 23, except the dodecahedron is
+reduced to a second set of (small) spikes.  I prefer Crennell 28.
 
 Both parts need infil.  Has a stand.
 
@@ -155,14 +155,14 @@ high enough that only edges, not faces, get supported.
 I set Cura horizontal expansion to 0.1mm and hole horizontal expansion to -0.2mm
 to remove some internal artifacts.
 
-Use the same radius as 26 for matching objects.  Piece 11 gives a stand which
-will height match 23 at corresponding size.
+Use the same radius as Crennell 26 for matching objects.  Piece 11 gives a stand
+which will height match Crennell 23 at corresponding size.
 
 23 – Sixth stellation – Excavated Dodecahedron plus Spikes
 ----------------------------------------------------------
 
 Prints as two pieces.  For a matching pair, print with the dodecahedral part the
-same size as 26 (needs radius ratio r7/r6).
+same size as Crennell 26 (needs radius ratio r7/r6).
 
 26 – Excavated Dodecahedron
 ---------------------------
@@ -188,7 +188,8 @@ rectangular aspect.
 37 – Chiral Dodecahedral Cage
 ----------------------
 
-Chiral but otherwise very similar to 13.  Comments are repeated verbatim…
+Chiral but otherwise very similar to Crennell 13.  Comments are repeated
+verbatim…
 
 Some of the edges need support.  Use Cura tree support.  Set the support angle
 high enough that only edges, not faces, get supported.
@@ -196,25 +197,25 @@ high enough that only edges, not faces, get supported.
 I set Cura horizontal expansion to 0.1mm and hole horizontal expansion to -0.2mm
 to remove some internal artifacts.
 
-Use the same radius as 26 for matching objects.  Stand 10 is low profile while
-stand 11 height matches 23 with corresponding size.
+Use the same radius as Crennell 26 for matching objects.  Stand 10 is low
+profile while stand 11 height matches Crennell 23 with corresponding size.
 
 46 – Filled Fiftenth Stellation
 -------------------------------
 
-A printable version of object 45.  Object 45 is the fiftenth stellation and is
-hollow with pieces connected by corners, making it fairly unprintable.  Here, we
-fill in enough to make it printable.
+A printable version of Crennell 45.  Crennell 45 is the fiftenth stellation and
+is hollow with pieces connected by corners, making it fairly unprintable.  Here,
+we fill in enough to make it printable.
 
-Print six copies of the piece, they then fit together in a cubical arrangement.
+Print twelve copies of the piece, they then fit together in a dodecahedral
+arrangement.  The are multiple sets of joiner holes, allowing you to mate peices
+approaching each other from various directions—which is especially necessary for
+the last piece!
 
 Needs infill.  Has a stand.
 
 47 – Five Tetrahedra
 --------------------
 
-Prints as two pieces with spoke joiners.  I set `radius=65`.  The main piece
-needs infill, the second piece does not.
-
-Check the positioning of the joiners through the first few layers, and adjust if
-too close to the edges.
+Prints as two pieces.  I set `radius=65`.  The main piece needs infill, the
+second piece does not.
