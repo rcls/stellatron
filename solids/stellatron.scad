@@ -30,44 +30,44 @@ main();
 //one_twelfth(radius6_mm) c46();;
 
 module main() {
-    // Only the objects with a proper printable structure worked out are listed
-    // here.
     if (crennell == 1) {
         if (piece == 0) c1();
-        if (piece == 1) icosa_tb_whole(radius1_mm) c1();
+        if (piece == 1) icosa_tb_whole() c1();
         // For the icosohedron, pieces 2..8 are scaled to match the interior
         // icosahedron of match other objects at the same radius.
-        if (piece == 2) icosa_tb_whole(radius2_mm) c1();
-        if (piece == 3) icosa_tb_whole(radius3_mm) c1();
-        if (piece == 4) icosa_tb_whole(radius4_mm) c1();
-        if (piece == 5) icosa_tb_whole(radius5_mm) c1();
-        if (piece == 6) icosa_tb_whole(radius6_mm) c1();
-        if (piece == 7) icosa_tb_whole(radius7_mm) c1();
-        if (piece == 8) icosa_tb_whole(radius8_mm) c1();
+        //if (piece == 2) icosa_tb_whole(radius2_mm) c1();
+        //if (piece == 3) icosa_tb_whole(radius3_mm) c1();
+        //if (piece == 4) icosa_tb_whole(radius4_mm) c1();
+        //if (piece == 5) icosa_tb_whole(radius5_mm) c1();
+        //if (piece == 6) icosa_tb_whole(radius6_mm) c1();
+        //if (piece == 7) icosa_tb_whole(radius7_mm) c1();
+        //if (piece == 8) icosa_tb_whole(radius8_mm) c1();
+        if (piece == 2) one_twelfth(small=1/2,
+                                    mid=radius1_mm*inscribe,
+                                    top=radius1_mm*sqrt(inscribe)) c1();
+        if (piece == 4) three_twelfths() c1();
+        if (piece == 6) two_twelfths() c1();
     }
     if (crennell == 2) c2();
     if (crennell == 3) c3();
     if (crennell == 4) c4();
     if (crennell == 5) c5();
     if (crennell == 6) {
-        icosa_top_bottom(radius7_mm, post=-1/3) c6();
-        stand_tripod(
-            radius7_mm, height=inscribe,
-            strut=-1/ico_scale/6, base=radius/5)
-            c6();
+        icosa_top_bottom(post=-1/3) c6();
+        stand_tripod(height=inscribe, strut=-1/ico_scale/6, base=radius/5) c6();
     }
     if (crennell == 7) {
         dodeca_spikey(post=0.1) c7();
-        stand_pentapod(radius7_mm, strut=-0.153) c7();
+        stand_pentapod(strut=-0.153) c7();
     }
     if (crennell == 8)
-        icosa_top_bottom(radius8_mm, post=-0.25, inset=3) c8();
+        icosa_top_bottom(post=-0.25, inset=3) c8();
 
     if (crennell == 9) c9();
     if (crennell == 10) c10();
     if (crennell == 11) c11();
     if (crennell == 12) c12();
-    if (crennell == 13) dodeca_single(radius6_mm) c13();
+    if (crennell == 13) dodeca_single() c13();
     if (crennell == 14) c14();
     if (crennell == 15) c15();
     if (crennell == 16) c16();
@@ -78,50 +78,45 @@ module main() {
     if (crennell == 21) c21();
     if (crennell == 22) c22();
     if (crennell == 23) {
-        icosa_top_bottom(raw_radius=radius7_mm, post=-1/3, inset=5) c23();
-        stand_tripod(
-            radius7_mm, height=inscribe,
-            strut=-1/ico_scale/6, base=radius/5)
-            c23();
+        icosa_top_bottom(post=-1/3, inset=5) c23();
+        stand_tripod(height=inscribe,strut=-1/ico_scale/6, base=radius/5) c23();
     }
     if (crennell == 24) c24();
     if (crennell == 25) c25();
     if (crennell == 26) {
-        dodeca_single(radius6_mm) c26();
-        stand_tripod(radius6_mm, strut=-coscribe/radius6) c26();
+        dodeca_single() c26();
+        stand_tripod(strut=-coscribe/radius6) c26();
         // Piece 11 is a higher stand to match c23 when both have the same
         // size dodecahedron.
-        stand_tripod(radius6_mm, strut=-coscribe/radius6, length=1.2,
+        stand_tripod(strut=-coscribe/radius6, length=1.2,
                      height=inscribe * radius7 / radius6, p=11) c26();
     }
     if (crennell == 27) c27();
     if (crennell == 28) {
-        icosa_top_bottom(raw_radius=radius7_mm, post=-1/3, inset=10) c28();
+        icosa_top_bottom(post=-1/3, inset=10) c28();
         if (piece == 10)
-            stand_quad(radius7_mm, x=0.1, y=gold/10,
-                       height=gold/ico_scale) c28();
-        stand_tripod(radius7_mm, strut=gold-1.5, base=radius/5,
-                     height=inscribe, p=11) c28();
+            stand_quad(x=0.1, y=gold/10, height=gold/ico_scale) c28();
+        stand_tripod(strut=gold-1.5, base=radius/5, height=inscribe, p=11)
+            c28();
     }
     if (crennell == 29) c29();
     if (crennell == 30) {
-        icosa_top_bottom(raw_radius=radius7_mm,
-                         post=-radius4/radius7, inset=5) c30();
-        stand_pentapod(radius7_mm, strut=gold * 5 / 7 - 1, base=radius/4,
-                       hole=2) c30();
+        icosa_top_bottom(post=-radius4/radius7, inset=5) c30();
+        stand_pentapod(strut=gold * 5 / 7 - 1, base=radius/4, hole=2)
+            c30();
     }
     if (crennell == 31) c31();
-    if (crennell == 32) c33();
+    if (crennell == 32) c32();
     if (crennell == 33) c33();
     if (crennell == 34) c34();
     if (crennell == 35) c35();
     if (crennell == 36) c36();
     if (crennell == 37) {
-        dodeca_single(radius6_mm) c37();
+        dodeca_single() c37();
         // Default stand is low-profile.
-        stand_tripod(radius6_mm, strut=1/4, length=1/3, hole=2) c37();
+        stand_tripod(strut=1/4, length=1/3, hole=2) c37();
         // Piece 11 matches the height of c23.
-        stand_tripod(radius6_mm, strut=1/4, length=2/3,
+        stand_tripod(strut=1/4, length=2/3,
                      height=inscribe * radius7 / radius6, p=11) c37();
     }
     if (crennell == 38) c38();
@@ -135,15 +130,14 @@ module main() {
     if (crennell == 46) {
         if (piece == 0) c46();
         if (piece == 1)
-            one_twelfth(radius6_mm) c46();;
+            one_twelfth() c46();;
         if (piece == 2)
-            two_twelfths(raw_radius=radius6_mm, big=radius6_mm + 1,
-                         small=radius2_mm/sqrt(3)) c46();
-        stand_tripod(radius6_mm, strut=-coscribe/radius6, hole=2) c46();
+            two_twelfths(big=radius6_mm + 1, small=radius2_mm/sqrt(3)) c46();
+        stand_tripod(strut=-coscribe/radius6, hole=2) c46();
     }
     if (crennell == 47) {
-        icosa_top_bottom(radius6_mm, post=0.5, inset=5) c47();
-        stand_tripod(radius6_mm, strut=0.1, align=p6a, hole=2) c47();
+        icosa_top_bottom(post=0.5, inset=5) c47();
+        stand_tripod(strut=0.1, align=p6a, hole=2) c47();
     }
     if (crennell == 48) c48();
     if (crennell == 49) c49();
@@ -503,94 +497,101 @@ module cell_g2() {
 //
 // We use the Crennell numbering.
 
-module c1() full_A();                    // Icosahedron.
+module c1() scale(1/radius1_mm) full_A(); // Icosahedron.
 
-module c2() full_B();             // Small triambic / first stellation / triakis
+module c2()                      // Small triambic / first stellation / triakis.
+    scale(1/radius2_mm) full_B();
 
-module c3() full_C();                   // Compound five octohedra
+module c3() scale(1/radius3_mm) full_C(); // Compound five octohedra
 
-module c4() full_D();
+module c4() scale(1/radius4_mm) full_D();
 
-module c5() full_E();
+module c5() scale(1/radius6_mm) full_E();
 
-module c6() full_F();                   // Second stellation.
+module c6() scale(1/radius7_mm) full_F(); // Second stellation.
 
-module c7() full_G();                   // Great.
+module c7() scale(1/radius7_mm) full_G(); // Great.
 
-module c8() full_H();                   // The mighty final stellation.
+module c8() scale(1/radius8_mm) full_H(); // The mighty final stellation.
 
-module c9() cell_e1();               // Twelfth stellation, spikes point joined.
+module c9() scale(1/radius6_mm) cell_e1(); // Twelfth stellation, spikes point joined.
 
-module c10() {                          // Hex spike cage, edge joins.
+module c10() scale(1/radius6_mm) {      // Hex spike cage, edge joins.
     cell_f1a();
     cell_f1b();
 }
 
-module c11() cell_g1();                 // Fourth stellation, point join.
+module c11() scale(1/radius6_mm) cell_g1(); // Fourth stellation, point join.
 
-module c12() {                          // Hex spike cage, edge joins.
+module c12() scale(1/radius6_mm) {      // Hex spike cage, edge joins.
     cell_e1();
     cell_f1a();
     cell_f1b();
 }
 
-module c13() {                          // Dodec cage.
+module c13() scale(1/radius6_mm) {      // Dodec cage.
     cell_e1();
+    color("orange") cell_f1a();
+    color("green") cell_f1b();
+    cell_g1();
+}
+
+module c14() scale(1/radius6_mm) {      // Dodec cage, edge joins.
     cell_f1a();
     cell_f1b();
     cell_g1();
 }
 
-module c14() {                          // Dodec cage, edge joins.
-    cell_f1a();
-    cell_f1b();
-    cell_g1();
-}
+module c15() scale(1/radius5_mm) cell_e2(); // Quint dimples, point join.
 
-module c15() cell_e2();                 // Quint dimples, point join.
+module c16() scale(1/radius7_mm) cell_f2(); // Pentagonal spikes, floating.
 
-module c16() cell_f2();                 // Pentagonal spikes, floating.
+module c17()                            // Hollow star spikes, joined by points.
+    scale(1/radius7_mm) cell_g2();
 
-module c17() cell_g2();                 // Hollow star spikes, joined by points.
-
-module c18() {                          // Star spikes joined by points.
+module c18() scale(1/radius7_mm) {      // Star spikes joined by points.
     cell_e2();
     cell_f2();
 }
 
 module c19() {                    // Star spikes with two levels of point joins.
-    cell_e2();
+    scale(1/radius7_mm) {
+        cell_e2();
+        cell_f2();
+        cell_g2();
+    }
+}
+
+module c20() scale(1/radius7_mm)  // Fifth stellation, star spikes, point joins.
+{
     cell_f2();
     cell_g2();
 }
 
-module c20() {                    // Fifth stellation, star spikes, point joins.
-    cell_f2();
-    cell_g2();
-}
-
-module c21() {        // Seventh stellation, great dodecaisocron, 20 hex spikes.
+module c21() scale(1/radius6_mm) {
+    // Seventh stellation, great dodecaisocron, 20 hex spikes.
     full_D();
     cell_e1();
 }
 
-module c22() {                          // Ten tetrahedra.
+module c22() scale(1/radius6_mm) {      // Ten tetrahedra.
     full_E();
     cell_f1a();
     cell_f1b();
 }
 
 // Sixth stellation.  Exc. dodec with spikes. F g1
-module c23() stellate([[pls(p7), p6b, p6a]]);
+module c23() scale(1/radius7_mm) stellate([[pls(p7), p6b, p6a]]);
 
-module c24() {    // Ten tetra, with chucks out, edge joins but looks printable.
+module c24() scale(1/radius6_mm) {
+    // Ten tetra, with chucks out, edge joins but looks printable.
     full_D();
     cell_e1();
     cell_f1a();
     cell_f1b();
 }
 
-module c25() {                          // Sunken centers of exc. docec.
+module c25() scale(1/radius6_mm) {      // Sunken centers of exc. docec.
     full_D();
     cell_e1();
     cell_f1a();
@@ -598,171 +599,174 @@ module c25() {                          // Sunken centers of exc. docec.
     cell_g1();
 }
 
-module c26() stellate([[p6a, p1, p6b]]); // Excavated dodec., E f1 g1.
+module c26() scale(1/radius6_mm)        // Excavated dodec., E f1 g1.
+    stellate([[p6a, p1, p6b]]);
 
-module c27() {                          // Excavated turrets.
+module c27() scale(1/radius5_mm) {      // Excavated turrets.
     full_D();
     cell_e2();
 }
 
 // Twelve big spikes, twenty small.  Compound of triambic icosahedron and
 // seventh stellation.
-module c28() {
+module c28() scale(1/radius7_mm) {
     full_E();
     cell_f2();
 }
 
-module c29() {          // Eighth stellation, great with mid-edge removed.
+module c29() scale(1/radius7_mm) {
+    // Eighth stellation, great with mid-edge removed.
     full_F();
     cell_g2();
 }
 
 module c30()                    // Great triambic / medial triambic icosahedron.
-    stellate([[p2, p3a, p7, pls(p3b)]]); // D e2 f2.
+     scale(1/radius7_mm) stellate([[p2, p3a, p7, pls(p3b)]]); // D e2 f2.
 
-module c31() {                          // c29 but hollow.
+module c31() scale(1/radius7_mm) {      // c29 but with gaps.
     full_D();
     cell_e2();
     cell_f2();
     cell_g2();
 }
 
-module c32() {                          // c29 but hollow.
+module c32() scale(1/radius7_mm) {      // c29 but with gaps.
     full_E();
     cell_f2();
     cell_g2();
 }
 
-module c33() cell_f1a();                // Tenth stellation
+module c33() scale(1/radius6_mm) cell_f1a(); // Tenth stellation
 
-module c34() {                          // Eleventh stellation, point touch.
+module c34() scale(1/radius6_mm) {      // Eleventh stellation, point touch.
     cell_e1();
     cell_f1a();
 }
 
-module c35() {                          // Quint cube with chunks removed.
+module c35() scale(1/radius6_mm) {      // Quint cube with chunks removed.
     full_D();
     cell_e1();
     cell_f1a();
 }
 
-module c36() {                          // Only points touch.
+module c36() scale(1/radius6_mm) {      // Only points touch.
     cell_f1a();
     cell_g1();
 }
 
-module c37() {                      // Fourteenth stellation, chiral dodec cage.
+module c37() scale(1/radius6_mm) {  // Fourteenth stellation, chiral dodec cage.
     cell_e1();
     cell_f1a();
     cell_g1();
 }
 
-module c38() {                          // Exc. dodec with chiral chunks out.
+module c38() scale(1/radius6_mm) {      // Exc. dodec with chiral chunks out.
     full_D();
     cell_e1();
     cell_f1a();
     cell_g1();
 }
 
-module c39() {                          // Dodec cage, point join.
+module c39() scale(1/radius6_mm) {      // Dodec cage, point join.
     cell_f1a();
     cell_g1();
 }
 
-module c40() {                          // Twelve hex spikes, hollow.
+module c40() scale(1/radius7_mm) {      // Twelve hex spikes, hollow.
     cell_e1();
     cell_f1a();
     cell_g2();
 }
 
-module c41() {                          // Twelve hex spikes, chunks out.
+module c41() scale(1/radius7_mm) {      // Twelve hex spikes, chunks out.
     full_D();
     cell_e1();
     cell_f1a();
     cell_g2();
 }
 
-module c42() {                          // Hex spikes, point join.
+module c42() scale(1/radius7_mm) {      // Hex spikes, point join.
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c43() {                          // Hex spikes, hollow.
-    cell_e1();
-    cell_f1a();
-    cell_f2();
-    cell_g2();
-}
-
-module c44() {                          // Hex spikes, chunks out.
-    full_D();
+module c43() scale(1/radius7_mm) {      // Hex spikes, hollow.
     cell_e1();
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c45() {          // Fifteenth stellation, point join at dodec spike tips.
+module c44() scale(1/radius7_mm) {      // Hex spikes, chunks out.
+    full_D();
+    cell_e1();
+    cell_f1a();
+    cell_f2();
+    cell_g2();
+}
+
+module c45() scale(1/radius6_mm) {
+    // Fifteenth stellation, point join at dodec spike tips.
     cell_e2();
     cell_f1a();
 }
 
-module c46() {                          // Hollow hex spikes, solid support.
+module c46() scale(1/radius6_mm) {      // Hollow hex spikes, solid support.
     full_D();
     cell_e2();
     cell_f1a();
 }
 
-module c47()                            // Five tetrahedra.
+module c47() scale(1/radius6_mm)               // Five tetrahedra.
     stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
 
-module c48() {                          // Hollowed chiral exc. dodec.
+module c48() scale(1/radius6_mm) {      // Hollowed chiral exc. dodec.
     cell_e2();
     cell_f1a();
     cell_g1();
 }
 
-module c49() {                          // Exc. dodec, hollow spikes, solid.
+module c49() scale(1/radius6_mm) {      // Exc. dodec, hollow spikes, solid.
     full_D();
     cell_e2();
     cell_f1a();
     cell_g1();
 }
 
-module c50() {                          // Exc. dodec, chiral chunks out.
+module c50() scale(1/radius6_mm) {      // Exc. dodec, chiral chunks out.
     full_E();
     cell_f1a();
     cell_g1();
 }
 
-module c51() {                          // Thirteenth stellation
+module c51() scale(1/radius7_mm) {      // Thirteenth stellation
     cell_e2();                          // Spikes with crazy point joins.
     cell_f1a();
     cell_f2();
 }
 
-module c52() {                          // 12 + 20 spikes, some hollow.
+module c52() scale(1/radius7_mm) {      // 12 + 20 spikes, some hollow.
     full_D();
     cell_e2();
     cell_f1a();
     cell_f2();
 }
 
-module c53() {                          // No retro, crazy!
+module c53() scale(1/radius7_mm) {      // No retro, crazy!
     full_E();
     cell_f1a();
     cell_f2();
 }
 
-module c54() {                          // Spikes with joiners.
+module c54() scale(1/radius7_mm) {      // Spikes with joiners.
     cell_e2();
     cell_f1a();
     cell_f2();
     cell_g1();
 }
 
-module c55() {                          //12 + 20 spikes, some hollow.
+module c55() scale(1/radius7_mm) {      // 12 + 20 spikes, some hollow.
     full_D();
     cell_e2();
     cell_f1a();
@@ -770,21 +774,21 @@ module c55() {                          //12 + 20 spikes, some hollow.
     cell_g1();
 }
 
-module c56() {                          // Chiral exc. dodec with spikes.
+module c56() scale(1/radius7_mm) {      // Chiral exc. dodec with spikes.
     full_E();
     cell_f1a();
     cell_f2();
     cell_g1();
 }
 
-module c57() {                          // Hex spikes, point join.
+module c57() scale(1/radius7_mm) {      // Hex spikes, point join.
     cell_e2();
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c58() {                          // Hex spikes, crossed-edge join.
+module c58() scale(1/radius7_mm) {      // Hex spikes, crossed-edge join.
     full_D();
     cell_e2();
     cell_f1a();
@@ -792,7 +796,7 @@ module c58() {                          // Hex spikes, crossed-edge join.
     cell_g2();
 }
 
-module c59() {                          // Hex spikes, chunks out.
+module c59() scale(1/radius7_mm) {      // Hex spikes, chunks out.
     full_E();
     cell_f1a();
     cell_f2();
@@ -805,14 +809,14 @@ module c59() {                          // Hex spikes, chunks out.
 // the exterior `radius`, divide into practical objects, and create guiding
 // indentations for joining.
 
-module dodeca_single(raw_radius) {
+module dodeca_single() {
     if (piece == 0) {
         children();
     }
     if (piece == 1) {
         difference() {
             translate([0,0,-extra_z_remove])
-                dodeca_pointup(raw_radius) children();
+                dodeca_pointup() children();
             if (extra_z_remove > 0)
                 translate([0,0,-1.1 * radius]) cube(2.2 * radius, center=true);
         }
@@ -839,14 +843,14 @@ module dodeca_spikey(post=0.1, inset=0) {
     }
 }
 
-module icosa_top_bottom(raw_radius, post=0, inset=5) {
+module icosa_top_bottom(post=0, inset=5) {
     if (piece == 0) {
         children();
     }
     if (piece == 1) {
         difference() {
             translate([0, 0, -1e-3])
-                icosa_tb_whole(raw_radius, post, inset)
+                icosa_tb_whole(post, inset)
                 children();
             translate([0, 0, -radius * 1.1]) cube(radius * 2.2, center=true);
         }
@@ -854,17 +858,17 @@ module icosa_top_bottom(raw_radius, post=0, inset=5) {
     if (piece == 2) {
         difference() {
             translate([0, 0, -1e-3]) rotate([0,180,0])
-                icosa_tb_whole(raw_radius, post, inset)
+                icosa_tb_whole(post, inset)
                 children();
             translate([0,0, -radius * 1.1]) cube(radius * 2.2, center=true);
         }
     }
 }
 
-module icosa_tb_whole(raw_radius, post=0, inset=0) {
+module icosa_tb_whole(post=0, inset=0) {
     offset = inscribe * ico_scale;
     difference() {
-        scale(radius / raw_radius)
+        scale(radius)
             translate([0, 0, offset]) faceup() children();
         if (post != 0)
             for (i = [0:2])
@@ -895,9 +899,9 @@ module pointup() {
 
 // Position so the 6a, 6b dodecahedron is resting on the x-y plane, with an
 // icosahedral point upper most.
-module dodeca_pointup(raw_radius, post=0, inset=0) {
+module dodeca_pointup(post=0, inset=0) {
     difference() {
-        scale(radius / raw_radius)
+        scale(radius)
             translate([0, 0, radius6_mm * inscribe])
             pointup()
             children();
@@ -951,7 +955,7 @@ module three_twelfths() {
 
 // Slice off 2/12 of a dodecahedron towards a square, two faces joined by an
 // edge.
-module two_twelfths(raw_radius, big=10, small = 1, inset=7) {
+module two_twelfths(big=10, small = 1, inset=7) {
     q0 = [0, gold-1, gold];
     q1 = [1, 1, 1];
     q2 = [gold, 0, gold-1];
@@ -962,7 +966,7 @@ module two_twelfths(raw_radius, big=10, small = 1, inset=7) {
     q7 = [-1, 1, 1];
     q = [q0, q1, q2, q3, q4, q5, q6, q7];
     sq = (gold - 1) * small;
-    sc = radius / raw_radius;
+    sc = radius;
     difference() {
         scale(sc) translate([0, 0, -sq]) intersection() {
             polyhedron(
@@ -1001,7 +1005,7 @@ module two_twelfths(raw_radius, big=10, small = 1, inset=7) {
 }
 
 // Slice off 1/12 of a dodecahedron.
-module one_twelfth(raw_radius, big=1.1/inscribe,
+module one_twelfth(big=1.1/inscribe,
                    top=radius3_mm, mid=radius2_mm, small = 1/4,
                    inset=4) {
     q0 = [0, 1-gold, gold];
@@ -1022,15 +1026,15 @@ module one_twelfth(raw_radius, big=1.1/inscribe,
                         [9, 8, 7, 6, 5],
                         for (i = [0:4]) [i, (i + 4) % 5, (i + 4) % 5 + 5, i + 5]
                         ]);
-                scale(radius / raw_radius) children();
+                scale(radius) children();
             }
         }
         for (i = [0:4]) rotate(i * 72) pointup() post_set();
     }
     module post_set() {
         post_pair(radius * small + inset, 0);
-        rmid = radius * mid / raw_radius;
-        rtop = radius * top / raw_radius;
+        rmid = radius * mid;
+        rtop = radius * top;
         level = rmid * cos(18) - inset/4;
         aside = rmid * sin(18) - inset;
         post_pair(level,  aside);
@@ -1077,21 +1081,21 @@ module joiner_post(angle, position) {
 //
 // `height` is the height of the center of the object, as a ratio of `radius`.
 // 2mm is added to this.
-module stand_tripod(raw_radius, strut, strut_mm=0, thick=3, base=0,
+module stand_tripod(strut, strut_mm=0, thick=3, base=0,
                     length=1, height=1, align=[1, 0, 0], hole=0, p=10) {
     stand_generic(
-        raw_radius, 3, strut, strut_mm, thick, base, length, height, hole, p)
+        3, strut, strut_mm, thick, base, length, height, hole, p)
         align_rot(align) faceup() children();
 }
 
-module stand_pentapod(raw_radius, strut, strut_mm=0, thick=3, base=0,
+module stand_pentapod(strut, strut_mm=0, thick=3, base=0,
                       length=1, height=1, hole=0, p=10) {
     stand_generic(
-        raw_radius, 5, strut, strut_mm, thick, base, length, height, hole, p)
+        strut, strut_mm, thick, base, length, height, hole, p)
         pointup() children();
 }
 
-module stand_generic(raw_radius, num, strut, strut_mm=0, thick=3, base=0,
+module stand_generic(num, strut, strut_mm=0, thick=3, base=0,
                      length=1, height=1, hole=0, p=10) {
     if (piece == p) {
         strut_all = strut * radius + strut_mm;
@@ -1100,8 +1104,8 @@ module stand_generic(raw_radius, num, strut, strut_mm=0, thick=3, base=0,
                 rotate(i * 360 / num) translate([strut_all, 0, 0])
                     cylinder(r = thick, h=radius * length + 2);
             }
-            #translate([0, 0, radius * height + 2])
-                scale(radius / raw_radius) children();
+            # translate([0, 0, radius * height + 2])
+                scale(radius) children();
         }
         minkowski() {
             difference() {
@@ -1118,14 +1122,14 @@ module stand_generic(raw_radius, num, strut, strut_mm=0, thick=3, base=0,
     }
 }
 
-module stand_quad(raw_radius, x, y, thick=3, length=1, height=1) {
+module stand_quad(x, y, thick=3, length=1, height=1) {
     r = sqrt(x * x + y * y) * radius;
     difference() {
         for (c = [[x, y], [-x, y], [-x, -y], [x, -y]])
             translate([c.x * radius, c.y * radius, 0])
                 cylinder(r = thick, h=radius * length + 2);
         #translate([0, 0, radius * height + 2])
-        scale(radius / raw_radius) children();
+        scale(radius) children();
     }
     minkowski() {
         cylinder(r=r+thick, h = 0.1, $fn=6 * $fn);

@@ -269,10 +269,11 @@ A printable version of Crennell 45.  Crennell 45 is the fiftenth stellation and
 is hollow with pieces connected by corners, making it fairly unprintable.  Here,
 we fill in enough to make it printable.
 
-If still requires dodecahedral assembly.  Print twelve copies of the piece.
+It requires dodecahedral assembly.  Print twelve copies of the piece and follow
+the instructions above re dodecahedral assembly.
 
-Needs infill.  Slice with a raft, as the contact area to the print bed is a bit
-small.  Has a stand.
+Needs infill.  Slice with a raft or brim, as the contact area to the print bed
+is a bit small.  Has a stand.
 
 47 – Five Tetrahedra
 --------------------
