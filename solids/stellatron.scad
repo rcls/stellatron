@@ -27,7 +27,6 @@ inscribe = sqrt(1/3 + 2/15 * sqrt(5));
 coscribe = sqrt(2/3 - 2/15 * sqrt(5));
 
 main();
-//one_twelfth(radius6_mm) c46();;
 
 module main() {
     if (crennell == 1) {
@@ -130,9 +129,8 @@ module main() {
     if (crennell == 46) {
         if (piece == 0) c46();
         if (piece == 1)
-            one_twelfth() c46();;
-        if (piece == 2)
-            two_twelfths(big=radius6_mm + 1, small=radius2_mm/sqrt(3)) c46();
+            one_twelfth(cut=1/5, small=1/5, top=radius3/radius6,
+                        mid=radius2/radius6) c46();
         stand_tripod(strut=-coscribe/radius6, hole=2) c46();
     }
     if (crennell == 47) {
@@ -1005,21 +1003,40 @@ module two_twelfths(big=10, small = 1, inset=7) {
 }
 
 // Slice off 1/12 of a dodecahedron.
+//
+// Joiner posts may be put on 3 levels, in a diamond shape.
+//
+// `big` is the outer radius of the cutting segment; just needs to be big
+// enough to envelope the entire piece.
+//
+// If `cut` is non-zero, then the inner point is cut off with this midscribe
+// distance.
+//
+// `small` places the bottom joiner.
+//
+// `mid' places the middle pair of joiners, and is the radius (before inset) of
+// those.
+//
+// `top` places the top joiner, and is the radius (before inset) of that.
+//
+// `inset` is the approximate distance to bring the joiner in from the edge.
 module one_twelfth(big=1.1/inscribe,
-                   top=radius3_mm, mid=radius2_mm, small = 1/4,
-                   inset=4) {
+                   top=radius3/radius6, mid=radius2/radius6, small = 1/4,
+                   cut = 1e-6, inset=2.5, post_face=[0:4]) {
+    midscribe = sqrt(1/2 + sqrt(5)/6);
+    comidscribe = sqrt(1/2 - sqrt(5)/6);
     q0 = [0, 1-gold, gold];
     q1 = [-1, -1, 1];
     q2 = [-gold, 0, gold-1];
     q3 = [-1, 1, 1];
     q4 = [0, gold-1, gold];
     q = [q0, q1, q2, q3, q4];
-    translate([0, 0, -small * radius * inscribe]) difference() {
+    translate([0, 0, -cut * radius / midscribe * inscribe]) difference() {
         pointup() {
             intersection() {
                 scale(radius / sqrt(3)) polyhedron(
                     points=[
-                        for (v = q) small * v,
+                        for (v = q) cut / midscribe * v,
                         for (v = q) big * v],
                     faces = [
                         [0, 1, 2, 3, 4],
@@ -1029,28 +1046,21 @@ module one_twelfth(big=1.1/inscribe,
                 scale(radius) children();
             }
         }
-        for (i = [0:4]) rotate(i * 72) pointup() post_set();
+    for (i = post_face) rotate(i * 72) pointup() post_set();
     }
     module post_set() {
-        post_pair(radius * small + inset, 0);
-        rmid = radius * mid;
-        rtop = radius * top;
-        level = rmid * cos(18) - inset/4;
-        aside = rmid * sin(18) - inset;
-        post_pair(level,  aside);
-        post_pair(level, -aside);
-        translate([0, 0, rtop - inset]) rotate([0, 90, 0])
-            joiner_post(0, [0, 0, 0]);
-        translate([0, aside, radius * small + inset]) rotate([0, 90, 0])
-            joiner_post(0, [0, 0, 0]);
-        translate([0, -aside, radius * small + inset]) rotate([0, 90, 0])
-            joiner_post(0, [0, 0, 0]);
-    }
-    module post_pair(raise, aside) {
-        translate([0, 0, raise]) {
-            pointup() joiner_post(0, [0, aside, 0]);
-            rotate(180) pointup() joiner_post(0, [0, aside, 0]);
+        if (top)
+            post_at(radius * top - 1.5 * inset, 0);
+        if (small) post_at(radius * small + inset, 0);
+        if (mid) {
+            rmid = radius * mid;
+            post_at(rmid * midscribe, rmid * comidscribe - 1.5 * inset);
+            post_at(rmid * midscribe, -rmid * comidscribe + 1.5 * inset);
         }
+    }
+    module post_at(raise, aside) {
+        translate([0, 0, raise]) rotate([0, 90, 0])
+            joiner_post(0, [0, aside, 0]);
     }
 }
 
