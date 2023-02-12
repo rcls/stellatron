@@ -69,26 +69,6 @@ Millimeters to remove from the mating face of a piece.  Setting this to 1 or 2
 times the layer height (e.g., 0.2) may be useful for pieces that have bare edges
 on the printer platform (see e.g., the Great Icosahedron (c7) main piece).
 
-Joiners
--------
-
-Where an object has multiple pieces, there are guiding indentations in the
-mating surface.  These can have a smaller 'joiner' inserted as a mechanical
-guide.
-
-The joiners are a few short segments of 1.75mm filament.  Each part has 2.3mm
-diameter holes in the mating faces.  Cut a short piece of filament to insert
-into each hole. You may need to poke filament into the holes a few times to
-loosen them up.
-
-Where there are five joiner holes, you don't need to use all five.  Three
-is quite adequate, and is easier to assembly.
-
-I generally find it is easiest to place the joiner segments and glue on the
-smaller of two pieces, and then fit the larger piece on top of the smaller.
-This may sound counter-intuitive, but spreading glue on the smaller surface
-avoids getting glue onto non-mating areas.
-
 Support
 -------
 
@@ -113,6 +93,77 @@ Pieces with horizontal surfaces benefit greatly from Cura ironing.
 
 Lightning infill generally works well, with 10% to 20% infill.  Many pieces
 print fine with no infill (0%).
+
+Assembly
+========
+
+Most objects need to be printed in multiple pieces and then glued.  The cutting
+into multiple pieces has been choosen both for printability, and also to keep
+the glue lines unobtrusive.
+
+I generally find it is easiest to place the joiner segments and glue on the
+smaller of two pieces, and then fit the larger piece on top of the smaller.
+This may sound counter-intuitive, but spreading glue on the smaller surface
+avoids getting glue onto non-mating areas.
+
+Where you are glueing, always practice mating the peices without glue first, so
+that you understand how they will fit together, and two ensure that there are no
+obstructions in holes etc.
+
+If the mating surfaces were printed face down on the print bed, then they should
+already be adequately smooth.  If not, then lightly sanding the mating surfaces
+may ensure better contact.
+
+Joiners
+-------
+
+Where an object has multiple pieces, there are guide holes in the mating
+surfaces.  These can have a 'joiner' inserted as a mechanical guide.
+
+The joiners are short segments of 1.75mm filament.  Each part has 2.3mm diameter
+holes in the mating faces.  Cut a short piece of filament to insert into each
+hole. You may need to poke filament into the holes a few times to loosen them
+up.
+
+Cut the filament with side cutters.  Use the angled, not flat, blade side to
+create the end of the joiner&mdash;this leaves a slight point that makes finding
+the mating hole easier when you push the pieces together.
+
+Where there are many joiner holes, you don't need to use them all.  Fewer is
+easier to assemble.  The joiners are for alignment, not structural support.
+Three or even just two is quite adequate.  Choose the joiner holes to use so as
+to spread them out as much as possible.
+
+Where there are multiple mating surfaces at angles to each other, the edges
+provide some additional alignment.  In that case, use just two
+joiners&mdash;most likely these will be at different angles, so keep them as
+short as possible.
+
+Dodecahedral Assembly
+---------------------
+
+Not all objects can be conveniently split into printable parts by a single split
+place through the object.  A few require more complex assembly.
+
+This is accomplished by splitting into 12 dodecahedral pieces, or small clusters
+of those.  (E.g., 6 pieces each built from two adjacent dodecahedral pieces.
+The pieces are identical, so print multiple times.  Use different colours if you
+wish!
+
+The best assembly procedure is hierarchical: don't assembly by adding one piece
+at a time incrementally.  Instead, build clusters of 2 pieces, then pair those
+into 3 clusters of 4 pieces, and then glue into 8 + 4 pieces before the final
+assembly.  This procesdure avoids tolerances building up to the point where the
+last piece(s) don't fit in properly.
+
+As you assemble clusters together, the joiner segments may be at an angle to the
+direction at which the pieces fit onto each other!  If you keep the joiners
+short, and only use two spread as far as possible from each other, then this
+should not be a problem.
+
+
+The Stellations
+===============
 
 1 – Icosahedron
 ---------------------
@@ -176,14 +227,25 @@ match 23 at corresponding size.
 28 – Twelve big spikes, twenty small
 ------------------------------------
 
-This is a compound of the triambic icosahedron (the twelve big spikes) and the
-seventh stellation (the twenty small spikes).
+This is a compound of the great triambic icosahedron (the twelve big spikes) and
+the seventh stellation (the twenty small spikes).
 
 Both pieces need infill.  I printed with `radius=90` to match my Great
-Icosohedron.
+Icosahedron.
 
 Stand `piece=10` places the object on a tripod stand, while `11` exposes the
 rectangular aspect.
+
+29 - Eighth Stellation
+----------------------
+
+Twelve pentagram spikes.  Similar to the great icosahedren, I'd print the great
+not the eighth!
+
+30 - Great (or medial) Triambic
+-------------------------------
+
+Twelve sharp pentagonal spikes.  Has a stand.
 
 37 – Chiral Dodecahedral Cage
 ----------------------
@@ -207,12 +269,10 @@ A printable version of Crennell 45.  Crennell 45 is the fiftenth stellation and
 is hollow with pieces connected by corners, making it fairly unprintable.  Here,
 we fill in enough to make it printable.
 
-Print twelve copies of the piece, they then fit together in a dodecahedral
-arrangement.  The are multiple sets of joiner holes, allowing you to mate peices
-approaching each other from various directions—which is especially necessary for
-the last piece!
+If still requires dodecahedral assembly.  Print twelve copies of the piece.
 
-Needs infill.  Has a stand.
+Needs infill.  Slice with a raft, as the contact area to the print bed is a bit
+small.  Has a stand.
 
 47 – Five Tetrahedra
 --------------------

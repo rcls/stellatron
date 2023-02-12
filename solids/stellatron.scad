@@ -103,6 +103,19 @@ module main() {
         stand_tripod(radius7_mm, strut=gold-1.5, base=radius/5,
                      height=inscribe, p=11) c28();
     }
+    if (crennell == 29) c29();
+    if (crennell == 30) {
+        icosa_top_bottom(raw_radius=radius7_mm,
+                         post=-radius4/radius7, inset=5) c30();
+        stand_pentapod(radius7_mm, strut=gold * 5 / 7 - 1, base=radius/4,
+                       hole=2) c30();
+    }
+    if (crennell == 31) c31();
+    if (crennell == 32) c33();
+    if (crennell == 33) c33();
+    if (crennell == 34) c34();
+    if (crennell == 35) c35();
+    if (crennell == 36) c36();
     if (crennell == 37) {
         dodeca_single(radius6_mm) c37();
         // Default stand is low-profile.
@@ -111,6 +124,13 @@ module main() {
         stand_tripod(radius6_mm, strut=1/4, length=2/3,
                      height=inscribe * radius7 / radius6, p=11) c37();
     }
+    if (crennell == 38) c38();
+    if (crennell == 39) c39();
+    if (crennell == 40) c40();
+    if (crennell == 41) c41();
+    if (crennell == 42) c42();
+    if (crennell == 43) c43();
+    if (crennell == 44) c44();
     if (crennell == 45) c45();
     if (crennell == 46) {
         if (piece == 0) c46();
@@ -125,6 +145,18 @@ module main() {
         icosa_top_bottom(radius6_mm, post=0.5, inset=5) c47();
         stand_tripod(radius6_mm, strut=0.1, align=p6a, hole=2) c47();
     }
+    if (crennell == 48) c48();
+    if (crennell == 49) c49();
+    if (crennell == 50) c50();
+    if (crennell == 51) c51();
+    if (crennell == 52) c52();
+    if (crennell == 53) c53();
+    if (crennell == 54) c54();
+    if (crennell == 55) c55();
+    if (crennell == 56) c56();
+    if (crennell == 57) c57();
+    if (crennell == 58) c58();
+    if (crennell == 59) c59();
 }
 
 // ICOSAHEDRAL STELLATION DIAGRAM
@@ -537,7 +569,7 @@ module c20() {                    // Fifth stellation, star spikes, point joins.
     cell_g2();
 }
 
-module c21() {                          // Seventh stellation, 20 hex spikes.
+module c21() {        // Seventh stellation, great dodecaisocron, 20 hex spikes.
     full_D();
     cell_e1();
 }
@@ -969,7 +1001,9 @@ module two_twelfths(raw_radius, big=10, small = 1, inset=7) {
 }
 
 // Slice off 1/12 of a dodecahedron.
-module one_twelfth(raw_radius, big=1.1, small = 1/4, inset=4) {
+module one_twelfth(raw_radius, big=1.1/inscribe,
+                   top=radius3_mm, mid=radius2_mm, small = 1/4,
+                   inset=4) {
     q0 = [0, 1-gold, gold];
     q1 = [-1, -1, 1];
     q2 = [-gold, 0, gold-1];
@@ -995,12 +1029,13 @@ module one_twelfth(raw_radius, big=1.1, small = 1/4, inset=4) {
     }
     module post_set() {
         post_pair(radius * small + inset, 0);
-        r2 = radius * radius2_mm / raw_radius;
-        level = r2 * cos(18) - inset/4;
-        aside = r2 * sin(18) - inset;
+        rmid = radius * mid / raw_radius;
+        rtop = radius * top / raw_radius;
+        level = rmid * cos(18) - inset/4;
+        aside = rmid * sin(18) - inset;
         post_pair(level,  aside);
         post_pair(level, -aside);
-        translate([0, 0, level + aside]) rotate([0, 90, 0])
+        translate([0, 0, rtop - inset]) rotate([0, 90, 0])
             joiner_post(0, [0, 0, 0]);
         translate([0, aside, radius * small + inset]) rotate([0, 90, 0])
             joiner_post(0, [0, 0, 0]);
