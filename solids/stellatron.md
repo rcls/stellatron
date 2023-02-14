@@ -15,7 +15,8 @@ have multiple parts joined only by corners.
 **NOTE**: It is recommended **not** to scale STL files of objects printed in
 multiple pieces.  Run openscad on the .scad file instead, changing parameters to
 suit.  The reason for this is that the 'joiner' holes for aligning the pieces
-when they are glued are sized to a specific size.  See below for more details.
+when they are glued are a specific size, and should not be scaled.  See below
+for more details.
 
 **NODE**: Keep your filament dry!  Many of these pieces have layers with
 multiple spikes not connected within that layer.  This is a recipe for stringing
@@ -223,6 +224,11 @@ Prints as a single piece.  As it rests on edges, slice with a Cura raft.  I set
 
 Piece 10 is a low-profile stand, while piece 11 gives a stand which will height
 match 23 at corresponding size.
+
+27 - Twelve Pentagonal Turrets
+------------------------------
+
+Pieces 1 and 2 join together.  Alternatively, print twelve of piece three.
 
 28 – Twelve big spikes, twenty small
 ------------------------------------
