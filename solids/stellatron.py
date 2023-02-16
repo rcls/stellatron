@@ -175,10 +175,11 @@ for A in stell_points:
         if ratio <= 1:
             continue
         if A.dist(B * ratio) < 1e-3:
+            print([describe(x) for x in A], [describe(x) for x in B])
             ratios.add((ratio, canonical(A.nsq()), canonical(B.nsq())))
 print('Ratios')
-for r, i, o in ratios:
-    print(describe(r), describe(i), describe(o), math.sqrt(i/o))
+for r, o, i in ratios:
+    print(describe(r), describe(math.sqrt(i)), describe(math.sqrt(o)), math.sqrt(i/o))
 
 for c in coords:
     print(describe(c))

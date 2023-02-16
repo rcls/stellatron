@@ -1,57 +1,48 @@
 // Crennell number of the object to print.
-crennell = 46;
+crennell = 8;
 // Alternatively, you may replace `main();` below with the object you want.
 
 // 0 = raw object, 1 = main printable, 2 = extra piece, 10 = stand.
-piece = 1;
+$piece = 1;
 
 // The overall radius in mm from the center of the piece to its extremities.
-radius = 65;
+$radius = 65;
 // Many of the dimensions below are scaled by the radius.
 
 // When cutting into pieces, remove this much extra in the z direction (mm).
-extra_z_remove=0;
+$extra_z_remove=0;
 // This may be helpful where you have edges touching the base plate.
 
 // Depth in mm of the hole for post joiners.
-post_depth=5;
+$post_depth=5;
 // I use 10 for larger pieces, 5 for smaller ones where space is tight.
 
 // Diameter in mm of the holes for post joiners.
-post_diameter=2.2;
+$post_diameter=2.2;
 // This should be the diameter of your filament (or whatever you use), plus a
 // little.
 
 // For stands and joiners.  (Gets multiplied for larger radii).
 $fn=20;
 
-// Ratio of inner over outer circumscribed radii of the icosahedron.  The
-// dodecahedron has the same ratio!
-inscribe = sqrt(1/3 + 2/15 * sqrt(5));
-// Ratio of face radius to icosahedron radius.
-coscribe = sqrt(2/3 - 2/15 * sqrt(5));
-// Ratio of dodecahedral mid-edge to vertex radii
-dodeca_midscribe = sqrt(1/2 + sqrt(5)/6);
-dodeca_comidscribe = sqrt(1/2 - sqrt(5)/6);
-// Ratio of icosahedral mid-edge to vertex radii.
-icosa_midscribe = sqrt(1/2 + sqrt(5) / 10);
-icosa_comidscribe = sqrt(1/2 - sqrt(5) / 10);
+include <numbers.scad>
+use <splitting.scad>
 
 main();
 
 module main() {
     if (crennell == 1) {
-        if (piece == 0) c1();
-        if (piece == 1) icosa_tb_whole(radius1) c1();
-        if (piece == 2) two_twelfths() c1();
-        if (piece == 4)
-            translate([0, 0, radius * inscribe]) rotate([180, 0, 0])
+        if ($piece == 0) c1();
+        if ($piece == 1) icosa_tb_whole(radius1) c1();
+        if ($piece == 2) two_twelfths() c1();
+        if ($piece == 4)
+            translate([0, 0, $radius * inscribe]) rotate([180, 0, 0])
                 three_twelfths(top=icosa_midscribe, cut=1/3,
                                mid=inscribe,
                                small=dodeca_midscribe/inscribe/3,
                                midsetz=-1.5, topset=3)
                 c1();
-        if (piece == 5) one_twelfth(small=1/2,
+        if ($piece == 5) one_twelfth(small=1/2,
                                     mid=radius1_mm*inscribe,
                                     top=radius1_mm*sqrt(inscribe)) c1();
     }
@@ -61,15 +52,15 @@ module main() {
     if (crennell == 5) c5();
     if (crennell == 6) {
         icosa_top_bottom(radius7, post=-1/3) c6();
-        stand_tripod(height=inscribe, strut=-1/ico_scale/6, base=radius/5) c6();
+        stand_tripod(height=inscribe, strut=-1/ico_scale/6, base=$radius/5) c6();
     }
     if (crennell == 7) {
         dodeca_spikey(post=0.1) c7();
         stand_pentapod(strut=-0.153) c7();
     }
     if (crennell == 8) {
-        if (piece == 0) c8();
-        if (piece == 1)
+        if ($piece == 0) c8();
+        if ($piece == 1)
             two_twelfths(cut=radius6/radius8 / gold / sqrt(3),
                          top=radius6/radius8 * dodeca_midscribe,
                          topset=2.25
@@ -92,7 +83,7 @@ module main() {
     if (crennell == 22) c22();
     if (crennell == 23) {
         icosa_top_bottom(radius7, post=-1/3, inset=5) c23();
-        stand_tripod(height=inscribe,strut=-1/ico_scale/6, base=radius/5) c23();
+        stand_tripod(height=inscribe,strut=-1/ico_scale/6, base=$radius/5) c23();
     }
     if (crennell == 24) c24();
     if (crennell == 25) c25();
@@ -106,7 +97,7 @@ module main() {
     }
     if (crennell == 27) {
         icosa_top_bottom(radius5, post=2/3, inset=5, angle=30) c27();
-        if (piece == 3) {
+        if ($piece == 3) {
             one_twelfth(cut=1/2, top=radius3/radius5, topset=5,
                         mid=radius2/radius5) c27();
         }
@@ -115,15 +106,15 @@ module main() {
     }
     if (crennell == 28) {
         icosa_top_bottom(radius7, post=-1/3, inset=10) c28();
-        if (piece == 10)
+        if ($piece == 10)
             stand_quad(x=0.1, y=gold/10, height=gold/ico_scale) c28();
-        stand_tripod(strut=gold-1.5, base=radius/5, height=inscribe, p=11)
+        stand_tripod(strut=gold-1.5, base=$radius/5, height=inscribe, p=11)
             c28();
     }
     if (crennell == 29) c29();
     if (crennell == 30) {
         icosa_top_bottom(radius7, post=-radius4/radius7, inset=5) c30();
-        stand_pentapod(strut=gold * 5 / 7 - 1, base=radius/4, hole=2)
+        stand_pentapod(strut=gold * 5 / 7 - 1, base=$radius/4, hole=2)
             c30();
     }
     if (crennell == 31) c31();
@@ -149,8 +140,8 @@ module main() {
     if (crennell == 44) c44();
     if (crennell == 45) c45();
     if (crennell == 46) {
-        if (piece == 0) c46();
-        if (piece == 1)
+        if ($piece == 0) c46();
+        if ($piece == 1)
             one_twelfth(cut=1/5, small=1/5, top=radius3/radius6,
                         mid=radius2/radius6) c46();
         stand_tripod(strut=-coscribe/radius6, hole=2) c46();
@@ -190,27 +181,21 @@ module main() {
 // are both on-axis and off-axis points at the same radius; these get the same
 // numbers.
 
-gold = (1 + sqrt(5)) / 2;
-
 // Center of a face.
 p0 = [1, 1, 1] / 3;
 
 //1	0	0	6	1
 p1 = [1, 0, 0];
-radius1 = 1;
 
 //0.4+0.2ϕ	0.4+0.2ϕ	0.2-0.4ϕ	1	0.2+0.6ϕ
 p2 = [2 + gold, 2 + gold, 1 - 2 * gold] / 5;
-radius2 = 1.0661408512011674;
 
 //0.5+0.5ϕ	-0.5ϕ	0.5	3	(1+ϕ)/√2
 p3a = [1 + gold, 1, -gold] / 2;
 p3b = mirror(p3a);
-radius3 = 1.3763819204711734;
 
 //1	1	-1	1	2
 p4 = [1, 1, -1];
-radius4 = 1.451059202444919;
 
 //1ϕ	1-1ϕ	0	1	2
 p4a = [gold, 0, 1 - gold];
@@ -218,7 +203,6 @@ p4b = mirror(p4a);
 
 //0.6+0.8ϕ	0.2-0.4ϕ	0.2-0.4ϕ	1	0.4+1.2ϕ
 p5 = [3 + 4 * gold, 1 - 2 * gold, 1 - 2 * gold] / 5;
-radius5 = 1.6285570507046667;
 
 //0.8+0.4ϕ	-0.2-0.6ϕ	0.4+0.2ϕ	1	0.4+1.2ϕ
 p5a = [4 + 2 * gold, 2 + gold, -1 - 3*gold] / 5;
@@ -228,34 +212,19 @@ p5b = mirror(p5a);
 // Six planes meet.
 p6a = [1 + gold, 0, -gold];
 p6b = mirror(p6a);
-radius6 = 2.3839634168752983;
 
 // -1-2ϕ	1+1ϕ	1+1ϕ	6	2+3ϕ
 // Five planes meet.
 p7 = [1 + gold, 1 + gold, -1 - 2 * gold];
-radius7 = 1 + 2 * gold;
 
 //-2-4ϕ	2+3ϕ	1+1ϕ	1	4+6ϕ
 // Six of nine.
 p8a = [2 + 3 * gold, 1 + gold, -2 - 4 * gold];
 p8b = mirror(p8a);
-radius8 = 8.359584944780256;
 
 // 3+4ϕ	-1-2ϕ	-1-2ϕ	1	4+6ϕ
 // Three of nine.
 p8 = [3 + 4 * gold, -1 - 2 * gold, -1 - 2 * gold];
-
-// Radius to icosahedron with the vertex definitions above.
-ico_scale = sqrt(2 + gold);
-// Actual radii in openscad units.
-radius1_mm = ico_scale;
-radius2_mm = radius2 * ico_scale;
-radius3_mm = radius3 * ico_scale;
-radius4_mm = radius4 * ico_scale;
-radius5_mm = radius5 * ico_scale;
-radius6_mm = radius6 * ico_scale;
-radius7_mm = radius7 * ico_scale;
-radius8_mm = radius8 * ico_scale;
 
 // A mirror symmetry in the `x+y+z=1` plane.
 function mirror(p) = [p.x, p.z, p.y];
@@ -823,249 +792,6 @@ module c59() scale(1/radius7_mm) {      // Hex spikes, chunks out.
     cell_g2();
 }
 
-// PRINTING FORMS
-//
-// Convert the raw stellation to a printable object.  Normalise the scaling to a
-// the exterior `radius`, divide into practical objects, and create guiding
-// indentations for joining.
-
-module dodeca_single() {
-    if (piece == 0) {
-        children();
-    }
-    if (piece == 1) {
-        difference() {
-            translate([0,0,-extra_z_remove])
-                dodeca_pointup() children();
-            if (extra_z_remove > 0)
-                translate([0,0,-1.1 * radius]) cube(2.2 * radius, center=true);
-        }
-    }
-}
-
-module dodeca_spikey(post=0.1, inset=0) {
-    if (piece == 0) {
-        children();
-    }
-    if (piece == 1) {
-        difference() {
-            translate([0,0,-1e-3 - extra_z_remove])
-                dodeca_pointup(radius7_mm, post=post, inset=inset) children();
-            translate([0,0,-1.1 * radius]) cube(2.2 * radius, center=true);
-        }
-    }
-    if (piece == 2) {
-        difference() {
-            translate([0,0,-1e-3 - extra_z_remove]) rotate([0,180,0])
-                dodeca_pointup(radius7_mm, post=post, inset=inset) children();
-            translate([0,0,-1.1 * radius]) cube(2.2 * radius, center=true);
-        }
-    }
-}
-
-module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0) {
-    if (piece == 0) {
-        children();
-    }
-    if (piece == 1) {
-        difference() {
-            translate([0, 0, -1e-3])
-                icosa_tb_whole(raw_radius, post, inset, angle)
-                children();
-            translate([0, 0, -radius * 1.1]) cube(radius * 2.2, center=true);
-        }
-    }
-    if (piece == 2) {
-        difference() {
-            translate([0, 0, -1e-3]) rotate([0,180,0])
-                icosa_tb_whole(raw_radius, post, inset, angle)
-                children();
-            translate([0,0, -radius * 1.1]) cube(radius * 2.2, center=true);
-        }
-    }
-}
-
-module icosa_tb_whole(raw_radius, post=0, inset=0, angle=0) {
-    offset = inscribe * radius1 / raw_radius;
-    difference() {
-        scale(radius)
-            translate([0, 0, offset]) faceup() children();
-        if (post != 0)
-            for (i = [0:2])
-                joiner_post(120 * i + angle,
-                            [radius * post - inset * sign(post), 0, 0]);
-    }
-}
-
-// Rotate so an icoshedral face is upwards.  Rotate by half the icosahedron
-// dihedral angle.
-module faceup() {
-    // This is actually the complement angle!
-    c = sqrt(1/2 - sqrt(5) / 6);
-    s = sqrt(1/2 + sqrt(5) / 6);
-    multmatrix([[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0]]) children();
-}
-
-// Rotate so an icosahedron point is upwards.  Rotate by half the dodecahedron
-// dihedral sangle.
-module pointup() {
-    c = sqrt(1/2 + sqrt(5) / 10);
-    s = sqrt(1/2 - sqrt(5) / 10);
-    multmatrix([[c, 0, s, 0],
-                [0, 1, 0, 0],
-                [-s, 0, c, 0]])
-        children();
-}
-
-// Position so the 6a, 6b dodecahedron is resting on the x-y plane, with an
-// icosahedral point upper most.
-module dodeca_pointup(post=0, inset=0) {
-    difference() {
-        scale(radius)
-            translate([0, 0, radius6_mm * inscribe])
-            pointup()
-            children();
-        if (post != 0) {
-            for (i = [0:4]) {
-                joiner_post(72 * i + 90 * sign(post) - 90,
-                            [abs(post) * radius, 0, 0]);
-            }
-        }
-    }
-}
-
-// Given a point in a constant x+y+z plane, and a faceup object, rotate around
-// the z axis to get the image of the point at a 'y' position.
-module align_rot(point) {
-    flat = point - (point.x + point.y + point.z) / 3 * [1,1,1];
-    unit = flat / norm(flat);
-    c = unit * [2, -1, -1] / sqrt(6);
-    s = unit * [0, -1, 1] / sqrt(2);
-
-    multmatrix([[c, s, 0, 0], [-s, c, 0, 0], [0, 0, 1, 0]]) children();
-}
-
-// Three one-twelfth items placed together.  This is not printabble, except for
-// the regular icosahedron where we can flip it!
-module three_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
-                      cut=1/3, inset=2.5, topset=2.5, midsetz=2) {
-    // This leaves us with a dodecahedral point upwards.  We want an
-    // icosahedral point upwards.
-    for (i = [0, 120, -120])
-        rotate(i) multmatrix([[inscribe, 0, coscribe],
-                              [0, 1, 0],
-                              [-coscribe, 0, inscribe]]) {
-            intersection() {
-                raw_twelfth(big, top, mid, small, inset, topset, [0, 1, 4],
-                            chamfer_edge=[1, 3], midsetz=midsetz) children();
-                translate([0, 0, cut*radius])
-                    scale(big * radius) translate([-1, -1, 0]) cube([2, 2, 1]);
-            }
-        }
-}
-
-// Two one_twelfth items placed together.  Parameters are very similar to
-// one_twelfth().
-module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
-                    cut=0, inset=2.5, topset=2.5) {
-    difference() {
-        translate([0, 0, -cut * radius]) {
-            pointup() rotate(180)
-                raw_twelfth(big, top, mid, small, inset, topset, [1:4],
-                            chamfer_edge=[0, 4])
-                children();
-            rotate(180) pointup() rotate(180)
-                raw_twelfth(big, top, mid, small, inset, topset, [1:4],
-                            chamfer_edge=[0, 4])
-                children();
-        }
-        translate([0, 0, -big*radius]) cube(2*big*radius, center=true);
-    }
-}
-
-// Slice off 1/12 of a dodecahedron.
-//
-// Joiner posts may be put on 3 levels, in a diamond shape.
-//
-// `big` is the outer radius of the cutting segment; just needs to be big
-// enough to envelope the entire piece.
-//
-// If `cut` is non-zero, then the inner point is cut off with this midscribe
-// distance.
-//
-// `small` places the bottom joiner.
-//
-// `mid' places the middle pair of joiners, and is the radius (before inset) of
-// those.
-//
-// `top` places the top joiner, and is the radius (before inset) of that.
-//
-// `inset` is the approximate distance to bring the joiner in from the edge.
-module one_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
-                   cut=0, inset=2.5, topset=3.75, post_face=[0:4]) {
-    intersection() {
-        translate([0, 0, -cut * radius / dodeca_midscribe * inscribe])
-            raw_twelfth(big, top, mid, small, inset, topset, post_face)
-            children();
-        translate([0, 0, big * radius]) cube(big * radius * 2, center=true);
-    }
-}
-
-
-module raw_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
-                   inset=2.5, topset=3.75, post_face=[0:4],
-                   chamfer=0.4, chamfer_edge=[], midsetz=0) {
-    midscribe = dodeca_midscribe;
-    q0 = [0, 1-gold, gold];
-    q1 = [-1, -1, 1];
-    q2 = [-gold, 0, gold-1];
-    q3 = [-1, 1, 1];
-    q4 = [0, gold-1, gold];
-    q = [q0, q1, q2, q3, q4];
-    difference() {
-        pointup() {
-            intersection() {
-                scale(radius / sqrt(3)) polyhedron(
-                    points=[[0, 0, 0], each big * q],
-                    faces = [
-                        [5, 4, 3, 2, 1],
-                        [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5], [0, 5, 1]]);
-                scale(radius) children();
-            }
-        }
-        for (i = post_face) rotate(i * 72) pointup() post_set();
-        for (i = chamfer_edge) rotate(i * 72) pointup()
-            multmatrix([[1, 0, 0],
-                        [0, midscribe, dodeca_comidscribe],
-                        [0, -dodeca_comidscribe, midscribe]]) rotate(27) {
-                translate([-chamfer/2,-chamfer,0])
-                    cube([chamfer, 2*chamfer, big*radius]);
-            }
-    }
-    module post_set() {
-        if (top)
-            post_at(radius * top - topset, 0);
-        if (small) post_at(radius * small + inset, 0);
-        if (mid) {
-            rmid = radius * mid;
-            post_at(rmid * midscribe + midsetz,
-                    rmid * dodeca_comidscribe - 1.5 * inset);
-            post_at(rmid * midscribe + midsetz,
-                    -rmid * dodeca_comidscribe + 1.5 * inset);
-        }
-    }
-    module post_at(raise, aside) {
-        translate([0, 0, raise]) rotate([0, 90, 0])
-            joiner_post(0, [0, aside, 0]);
-    }
-}
-
-
-module joiner_post(angle, position) {
-    rotate(angle) translate(position) #cylinder(
-        r=post_diameter / 2, h=post_depth*2, center=true);
-}
-
 // STANDS
 
 // Create a tripod.  This implies that the object is face-up to get the 3-fold
@@ -1103,15 +829,15 @@ module stand_pentapod(strut, strut_mm=0, thick=3, base=0,
 
 module stand_generic(num, strut, strut_mm=0, thick=3, base=0,
                      length=1, height=1, hole=0, p=10) {
-    if (piece == p) {
-        strut_all = strut * radius + strut_mm;
+    if ($piece == p) {
+        strut_all = strut * $radius + strut_mm;
         difference() {
             for (i = [1:num]) {
                 rotate(i * 360 / num) translate([strut_all, 0, 0])
-                    cylinder(r = thick, h=radius * length + 2);
+                    cylinder(r = thick, h=$radius * length + 2);
             }
-            # translate([0, 0, radius * height + 2])
-                scale(radius) children();
+            # translate([0, 0, $radius * height + 2])
+                scale($radius) children();
         }
         minkowski() {
             difference() {
@@ -1129,13 +855,13 @@ module stand_generic(num, strut, strut_mm=0, thick=3, base=0,
 }
 
 module stand_quad(x, y, thick=3, length=1, height=1) {
-    r = sqrt(x * x + y * y) * radius;
+    r = sqrt(x * x + y * y) * $radius;
     difference() {
         for (c = [[x, y], [-x, y], [-x, -y], [x, -y]])
-            translate([c.x * radius, c.y * radius, 0])
-                cylinder(r = thick, h=radius * length + 2);
-        #translate([0, 0, radius * height + 2])
-        scale(radius) children();
+            translate([c.x * $radius, c.y * $radius, 0])
+                cylinder(r = thick, h=$radius * length + 2);
+        #translate([0, 0, $radius * height + 2])
+        scale($radius) children();
     }
     minkowski() {
         cylinder(r=r+thick, h = 0.1, $fn=6 * $fn);
