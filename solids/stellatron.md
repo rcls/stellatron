@@ -162,6 +162,16 @@ direction at which the pieces fit onto each other!  If you keep the joiners
 short, and only use two spread as far as possible from each other, then this
 should not be a problem.
 
+Printing in multiple pieces, you can print in multiple colours if wanted.  In
+that case, plan the arrangement of colours!
+
+* E.g., if you want opposing pieces to have the same colour, then the object
+  will have inversion symmetry through the center.  In that case, as you
+  assemble, create clusters in pairs that are mirror images of each other.
+
+* E.g., if you want four pieces of each of three colours, with a tetrahedral
+  arrangement, then likely you want each cluster of three to have the same
+  handedness.
 
 The Stellations
 ===============
@@ -175,9 +185,11 @@ Just a plain icosahedron.  Prints as a single piece.
 ---------------------
 
 Prints as two pieces.  Somewhat like Crennell 23, except the dodecahedron is
-reduced to a second set of (small) spikes.  I prefer Crennell 28.
+reduced to a second set of (small) spikes.  Also see Crennell 28 (which I
+prefer), which again is very similar except that the small spikes are slightly
+different.
 
-Both parts need infil.  Has a stand.
+Both parts need infill.  Has a stand.
 
 7 – Great Icosahedron
 ---------------------------
@@ -229,6 +241,9 @@ match 23 at corresponding size.
 ------------------------------
 
 Pieces 1 and 2 join together.  Alternatively, print twelve of piece three.
+
+It doesn't really need a stand, but we give you two: `piece=10` is a tripod
+stand while `piece=11` is a pentapod stand.
 
 28 – Twelve big spikes, twenty small
 ------------------------------------

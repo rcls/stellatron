@@ -17,9 +17,10 @@ extra_z_remove=0;
 post_depth=5;
 // I use 10 for larger pieces, 5 for smaller ones where space is tight.
 
-// Diameter in mm of the hole for post joiners.  This should be the diameter of
-// your filament (or whatever you use), plus a little.
+// Diameter in mm of the holes for post joiners.
 post_diameter=2.2;
+// This should be the diameter of your filament (or whatever you use), plus a
+// little.
 
 // For stands and joiners.  (Gets multiplied for larger radii).
 $fn=20;
@@ -109,6 +110,8 @@ module main() {
             one_twelfth(cut=1/2, top=radius3/radius5, topset=5,
                         mid=radius2/radius5) c27();
         }
+        stand_tripod(strut=(gold - 1)/2) c27();
+        stand_pentapod(strut=0.5 * inscribe, p=11) c27();
     }
     if (crennell == 28) {
         icosa_top_bottom(radius7, post=-1/3, inset=10) c28();
@@ -1094,7 +1097,7 @@ module stand_tripod(strut, strut_mm=0, thick=3, base=0,
 module stand_pentapod(strut, strut_mm=0, thick=3, base=0,
                       length=1, height=1, hole=0, p=10) {
     stand_generic(
-        strut, strut_mm, thick, base, length, height, hole, p)
+        5, strut, strut_mm, thick, base, length, height, hole, p)
         pointup() children();
 }
 
