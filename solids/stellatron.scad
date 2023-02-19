@@ -1,3 +1,7 @@
+
+include <numbers.scad>
+use <splitting.scad>
+
 // Crennell number of the object to print.
 crennell = 8;
 // Alternatively, you may replace `main();` below with the object you want.
@@ -24,9 +28,6 @@ $post_diameter=2.2;
 
 // For stands and joiners.  (Gets multiplied for larger radii).
 $fn=20;
-
-include <numbers.scad>
-use <splitting.scad>
 
 main();
 
@@ -65,6 +66,9 @@ module main() {
                          top=radius6/radius8 * dodeca_midscribe,
                          topset=2.25
                          ) c8();
+
+        stand_tripod(strut=-0.2, thick=5, hole=$radius/8) c8();
+        stand_pentapod(strut=0.12, thick=5, p=11) c8();
     }
 
     if (crennell == 9) c9();

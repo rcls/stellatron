@@ -70,6 +70,18 @@ Millimeters to remove from the mating face of a piece.  Setting this to 1 or 2
 times the layer height (e.g., 0.2) may be useful for pieces that have bare edges
 on the printer platform (see e.g., the Great Icosahedron (c7) main piece).
 
+Slicing
+-------
+
+Always scroll through the sliced layers sanity checking what you are about to
+print.  If you are using lightning infill, or no infill, then make sure the
+infil looks adequate.
+
+Pieces with horizontal surfaces benefit greatly from Cura ironing.
+
+Lightning infill generally works well, with 10% to 20% infill.  Many pieces
+print fine with no infill (0%).
+
 Support
 -------
 
@@ -82,18 +94,6 @@ very shallow edge angle overhang can be made between two faces with a much tamer
 overhang.
 
 Where supports are needed, it generally is just needed for edges
-
-Slicing
--------
-
-Always scroll through the sliced layers sanity checking what you are about to
-print.  If you are using lightning infill, or no infill, then make sure the
-infil looks adequate.
-
-Pieces with horizontal surfaces benefit greatly from Cura ironing.
-
-Lightning infill generally works well, with 10% to 20% infill.  Many pieces
-print fine with no infill (0%).
 
 Assembly
 ========
@@ -202,13 +202,22 @@ ring of spikes touches the raft.
 
 The overhangs look really scary but it printed fine for me with no support.
 
-I set `radius=85`.
+I set `$radius=85`.
 
 8 – The Mighty Final Stellation
 -------------------------------
 
-Two pieces.  Provision for both spike and post joiners.  Print as large as
-possible.
+Six identical pieces with ten spikes each.  I printed this large, with
+`$radius=167.75`—this matches my 85mm radius Great Icosahedron.
+
+I set `$post_depth=20`, contrary to the generic advice above to keep the joiner
+pieces as short as possible.  This keeps the joiner posts long enough to be
+flexible and well clear of gluey surfaces, so that they can be bent
+appropriately.
+
+If you are printing a smaller copy, then go back to making the joiners as short
+as possible.
+
 
 13 – Dodecahedral Cage
 ----------------------
