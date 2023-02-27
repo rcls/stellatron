@@ -75,12 +75,13 @@ Slicing
 
 Always scroll through the sliced layers sanity checking what you are about to
 print.  If you are using lightning infill, or no infill, then make sure the
-infil looks adequate.
+infill looks adequate.
 
 Pieces with horizontal surfaces benefit greatly from Cura ironing.
 
-Lightning infill generally works well, with 10% to 20% infill.  Many pieces
-print fine with no infill (0%).
+Many pieces print fine with no infill (0%).  Lightning infill generally works
+well for parts that need infill.  For more complex parts, set infill line
+multiplier to 2.
 
 Support
 -------
@@ -269,7 +270,7 @@ rectangular aspect.
 29 - Eighth Stellation
 ----------------------
 
-Twelve pentagram spikes.  Similar to the great icosahedren, I'd print the great
+Twelve pentagram spikes.  Similar to the great icosahedron, I'd print the great
 not the eighth!
 
 30 - Great (or medial) Triambic
@@ -308,5 +309,49 @@ is a bit small.  Has a stand.
 47 – Five Tetrahedra
 --------------------
 
-Prints as two pieces.  I set `radius=65`.  The main piece needs infill, the
+Prints as two pieces.  I set `$radius=65`.  The main piece needs infill, the
 second piece does not.
+
+Dodecahedral Facetions Etc.
+===========================
+
+These are dual to stellated icosahedra.  We add 100 to the Crennell number
+
+101 - Dodecahedron
+------------------
+
+`$piece=1` is the whole thing.
+
+`$piece=5` divides the dodecahedra into 12 pieces.
+
+107 - Great Stellated Dodecahedron
+----------------------------------
+
+Dual to the great icosahedron.  There are two pieces.  Has a stand.
+
+108 - Great Triangular Hexacontahedron
+--------------------------------------
+
+Dual to the Final Stellation of the Icosahedron.  Splits into a main piece
+and a bottom piece.  Alternatively can be split into dodecahedral segments.
+
+I printed mine big, `$radius=115`, after printing smaller test pieces with a
+dodecahedral split.
+
+There are many cavities that need infill underneath them during printing.  I
+suggest lightning infill, with infill line multiplier set to 2.  The larger
+piece will need a raft for build-plate adhesion.  You will probably also want to
+set `$extra_z_remove` to your layer height.
+
+There are three stands.  Peices 10 and 11 are pentagonal, with 11 slightly
+larger than 10.  `$piece=12` is a triangular stand.
+
+201 - Great Dodecahedron
+------------------------
+
+Prints in two pieces.  Has a stand.
+
+202 - Small Stellated Dodecahedron
+----------------------------------
+
+Prints in two pieces.  Has a stand.

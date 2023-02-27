@@ -21,21 +21,21 @@ module dodeca_single() {
     }
 }
 
-module dodeca_spikey(post=0.1, inset=0) {
+module dodeca_spikey(post=0.1, inset=0, raise = (2 * gold - 1) / 5) {
     if ($piece == 0) {
         children();
     }
     if ($piece == 1) {
         difference() {
-            translate([0,0,-1e-3 - $extra_z_remove])
-                dodeca_pointup(radius7_mm, post=post, inset=inset) children();
+            translate([0, 0, -$extra_z_remove])
+                dodeca_pointup(post=post, inset=inset, raise=raise) children();
             translate([0,0,-1.1 * $radius]) cube(2.2 * $radius, center=true);
         }
     }
     if ($piece == 2) {
         difference() {
-            translate([0,0,-1e-3 - $extra_z_remove]) rotate([0,180,0])
-                dodeca_pointup(radius7_mm, post=post, inset=inset) children();
+            translate([0,0, -$extra_z_remove]) rotate([0,180,0])
+                dodeca_pointup(post=post, inset=inset, raise=raise) children();
             translate([0,0,-1.1 * $radius]) cube(2.2 * $radius, center=true);
         }
     }
@@ -47,7 +47,7 @@ module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0) {
     }
     if ($piece == 1) {
         difference() {
-            translate([0, 0, -1e-3])
+            translate([0, 0, -$extra_z_remove])
                 icosa_tb_whole(raw_radius, post, inset, angle)
                 children();
             translate([0, 0, -$radius * 1.1]) cube($radius * 2.2, center=true);
@@ -55,7 +55,7 @@ module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0) {
     }
     if ($piece == 2) {
         difference() {
-            translate([0, 0, -1e-3]) rotate([0,180,0])
+            translate([0, 0, -$extra_z_remove]) rotate([0,180,0])
                 icosa_tb_whole(raw_radius, post, inset, angle)
                 children();
             translate([0,0, -$radius * 1.1]) cube($radius * 2.2, center=true);
@@ -97,16 +97,16 @@ module pointup() {
 
 // Position so the 6a, 6b dodecahedron is resting on the x-y plane, with an
 // icosahedral point upper most.
-module dodeca_pointup(post=0, inset=0) {
+module dodeca_pointup(post=0, inset=0, raise = (2 * gold - 1) / 5) {
     difference() {
         scale($radius)
-            translate([0, 0, radius6_mm * inscribe])
+            translate([0, 0, raise])
             pointup()
             children();
         if (post != 0) {
             for (i = [0:4]) {
                 joiner_post(72 * i + 90 * sign(post) - 90,
-                            [abs(post) * $radius, 0, 0]);
+                            [abs(post) * $radius - inset, 0, 0]);
             }
         }
     }
@@ -145,16 +145,16 @@ module three_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
 // Two one_twelfth items placed together.  Parameters are very similar to
 // one_twelfth().
 module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
-                    cut=0, inset=2.5, topset=2.5) {
+                    cut=0, inset=2.5, topset=2.5, midsetz=0) {
     difference() {
         translate([0, 0, -cut * $radius]) {
             pointup() rotate(180)
                 raw_twelfth(big, top, mid, small, inset, topset, [1:4],
-                            chamfer_edge=[0, 4])
+                            chamfer_edge=[0, 4], midsetz=midsetz)
                 children();
             rotate(180) pointup() rotate(180)
                 raw_twelfth(big, top, mid, small, inset, topset, [1:4],
-                            chamfer_edge=[0, 4])
+                            chamfer_edge=[0, 4], midsetz=midsetz)
                 children();
         }
         translate([0, 0, -big*$radius]) cube(2*big*$radius, center=true);
@@ -180,10 +180,11 @@ module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
 //
 // `inset` is the approximate distance to bring the joiner in from the edge.
 module one_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
-                   cut=0, inset=2.5, topset=3.75, post_face=[0:4]) {
+                   cut=0, inset=2.5, topset=3.75, post_face=[0:4], midsetz=0) {
     intersection() {
         translate([0, 0, -cut * $radius / dodeca_midscribe * inscribe])
-            raw_twelfth(big, top, mid, small, inset, topset, post_face)
+            raw_twelfth(big, top, mid, small, inset, topset, post_face,
+                        midsetz=midsetz)
             children();
         translate([0, 0, big * $radius]) cube(big * $radius * 2, center=true);
     }
@@ -241,5 +242,5 @@ module raw_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
 
 module joiner_post(angle, position) {
     rotate(angle) translate(position) #cylinder(
-        r=$post_diameter / 2, h=$post_depth*2, center=true);
+        r=$join_diameter / 2, h=$join_depth*2, center=true);
 }
