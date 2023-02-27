@@ -89,6 +89,6 @@ module describe(v) {
     pp = value_table[mm][1];
     ii = value_table[mm][2];
     recalc = pp * gold + (rv + ii);
-    echo(v, recalc, pp, rv + ii);
+    echo(v, recalc, pp, rv + ii, v - recalc);
 }
 

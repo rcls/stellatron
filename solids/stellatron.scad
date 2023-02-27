@@ -48,8 +48,8 @@ module main() {
                                midsetz=-1.5, topset=3)
                 c1();
         if ($piece == 5) one_twelfth(small=1/2,
-                                    mid=radius1_mm*inscribe,
-                                    top=radius1_mm*sqrt(inscribe)) c1();
+                                     mid=radius1*inscribe,
+                                     top=radius1*sqrt(inscribe)) c1();
         if ($piece == 6) two_twelfths() c1();
     }
     if (crennell == 2) c2();

@@ -247,93 +247,93 @@ module cell_g2() {
 //
 // We use the Crennell numbering.
 
-module c1() scale(1/radius1_mm) full_A(); // Icosahedron.
+module c1() scale(1/radius1) full_A();  // Icosahedron.
 
 module c2()                      // Small triambic / first stellation / triakis.
-    scale(1/radius2_mm) full_B();
+    scale(1/radius2) full_B();
 
-module c3() scale(1/radius3_mm) full_C(); // Compound of five octohedra
+module c3() scale(1/radius3) full_C();  // Compound of five octohedra
 
-module c4() scale(1/radius4_mm) full_D();
+module c4() scale(1/radius4) full_D();
 
-module c5() scale(1/radius6_mm) full_E();
+module c5() scale(1/radius6) full_E();
 
-module c6() scale(1/radius7_mm) full_F(); // Second stellation.
+module c6() scale(1/radius7) full_F();  // Second stellation.
 
-module c7() scale(1/radius7_mm) full_G(); // Great.
+module c7() scale(1/radius7) full_G();  // Great.
 
-module c8() scale(1/radius8_mm) full_H(); // The mighty final stellation.
+module c8() scale(1/radius8) full_H();  // The mighty final stellation.
 
-module c9() scale(1/radius6_mm) cell_e1(); // Twelfth stellation, spikes point joined.
+module c9() scale(1/radius6) cell_e1(); // Twelfth stellation, spikes point joined.
 
-module c10() scale(1/radius6_mm) {      // Hex spike cage, edge joins.
+module c10() scale(1/radius6) {         // Hex spike cage, edge joins.
     cell_f1a();
     cell_f1b();
 }
 
-module c11() scale(1/radius6_mm) cell_g1(); // Fourth stellation, point join.
+module c11() scale(1/radius6) cell_g1(); // Fourth stellation, point join.
 
-module c12() scale(1/radius6_mm) {      // Hex spike cage, edge joins.
+module c12() scale(1/radius6) {         // Hex spike cage, edge joins.
     cell_e1();
     cell_f1a();
     cell_f1b();
 }
 
-module c13() scale(1/radius6_mm) {      // Dodec cage.
+module c13() scale(1/radius6) {         // Dodec cage.
     cell_e1();
     color("orange") cell_f1a();
     color("green") cell_f1b();
     cell_g1();
 }
 
-module c14() scale(1/radius6_mm) {      // Dodec cage, edge joins.
+module c14() scale(1/radius6) {         // Dodec cage, edge joins.
     cell_f1a();
     cell_f1b();
     cell_g1();
 }
 
-module c15() scale(1/radius5_mm) cell_e2(); // Quint dimples, point join.
+module c15() scale(1/radius5) cell_e2(); // Quint dimples, point join.
 
-module c16() scale(1/radius7_mm) cell_f2(); // Pentagonal spikes, floating.
+module c16() scale(1/radius7) cell_f2(); // Pentagonal spikes, floating.
 
 module c17()                            // Hollow star spikes, joined by points.
-    scale(1/radius7_mm) cell_g2();
+    scale(1/radius7) cell_g2();
 
-module c18() scale(1/radius7_mm) {      // Star spikes joined by points.
+module c18() scale(1/radius7) {         // Star spikes joined by points.
     cell_e2();
     cell_f2();
 }
 
 module c19() {                    // Star spikes with two levels of point joins.
-    scale(1/radius7_mm) {
+    scale(1/radius7) {
         cell_e2();
         cell_f2();
         cell_g2();
     }
 }
 
-module c20() scale(1/radius7_mm)  // Fifth stellation, star spikes, point joins.
+module c20() scale(1/radius7)     // Fifth stellation, star spikes, point joins.
 {
     cell_f2();
     cell_g2();
 }
 
-module c21() scale(1/radius6_mm) {
+module c21() scale(1/radius6) {
     // Seventh stellation, great dodecaisocron, 20 hex spikes.
     full_D();
     cell_e1();
 }
 
-module c22() scale(1/radius6_mm) {      // Ten tetrahedra.
+module c22() scale(1/radius6) {         // Ten tetrahedra.
     full_E();
     cell_f1a();
     cell_f1b();
 }
 
 // Sixth stellation.  Exc. dodec with spikes. F g1
-module c23() scale(1/radius7_mm) stellate([[pls(p7), p6b, p6a]]);
+module c23() scale(1/radius7) stellate([[pls(p7), p6b, p6a]]);
 
-module c24() scale(1/radius6_mm) {
+module c24() scale(1/radius6) {
     // Ten tetra, with chucks out, edge joins but looks printable.
     full_D();
     cell_e1();
@@ -341,7 +341,7 @@ module c24() scale(1/radius6_mm) {
     cell_f1b();
 }
 
-module c25() scale(1/radius6_mm) {      // Sunken centers of exc. docec.
+module c25() scale(1/radius6) {         // Sunken centers of exc. docec.
     full_D();
     cell_e1();
     cell_f1a();
@@ -349,174 +349,174 @@ module c25() scale(1/radius6_mm) {      // Sunken centers of exc. docec.
     cell_g1();
 }
 
-module c26() scale(1/radius6_mm)        // Excavated dodec., E f1 g1.
+module c26() scale(1/radius6)           // Excavated dodec., E f1 g1.
     stellate([[p6a, p1, p6b]]);
 
-module c27() scale(1/radius5_mm) {      // Excavated turrets.
+module c27() scale(1/radius5) {         // Excavated turrets.
     full_D();
     cell_e2();
 }
 
 // Twelve big spikes, twenty small.  Compound of triambic icosahedron and
 // seventh stellation.
-module c28() scale(1/radius7_mm) {
+module c28() scale(1/radius7) {
     full_E();
     cell_f2();
 }
 
-module c29() scale(1/radius7_mm) {
+module c29() scale(1/radius7) {
     // Eighth stellation, great with mid-edge removed.
     full_F();
     cell_g2();
 }
 
 module c30()                    // Great triambic / medial triambic icosahedron.
-     scale(1/radius7_mm) stellate([[p2, p3a, p7, pls(p3b)]]); // D e2 f2.
+     scale(1/radius7) stellate([[p2, p3a, p7, pls(p3b)]]); // D e2 f2.
 
-module c31() scale(1/radius7_mm) {      // c29 but with gaps.
+module c31() scale(1/radius7) {         // c29 but with gaps.
     full_D();
     cell_e2();
     cell_f2();
     cell_g2();
 }
 
-module c32() scale(1/radius7_mm) {      // c29 but with gaps.
+module c32() scale(1/radius7) {         // c29 but with gaps.
     full_E();
     cell_f2();
     cell_g2();
 }
 
-module c33() scale(1/radius6_mm) cell_f1a(); // Tenth stellation
+module c33() scale(1/radius6) cell_f1a(); // Tenth stellation
 
-module c34() scale(1/radius6_mm) {      // Eleventh stellation, point touch.
+module c34() scale(1/radius6) {         // Eleventh stellation, point touch.
     cell_e1();
     cell_f1a();
 }
 
-module c35() scale(1/radius6_mm) {      // Quint cube with chunks removed.
+module c35() scale(1/radius6) {         // Quint cube with chunks removed.
     full_D();
     cell_e1();
     cell_f1a();
 }
 
-module c36() scale(1/radius6_mm) {      // Only points touch.
+module c36() scale(1/radius6) {         // Only points touch.
     cell_f1a();
     cell_g1();
 }
 
-module c37() scale(1/radius6_mm) {  // Fourteenth stellation, chiral dodec cage.
+module c37() scale(1/radius6) {     // Fourteenth stellation, chiral dodec cage.
     cell_e1();
     cell_f1a();
     cell_g1();
 }
 
-module c38() scale(1/radius6_mm) {      // Exc. dodec with chiral chunks out.
+module c38() scale(1/radius6) {         // Exc. dodec with chiral chunks out.
     full_D();
     cell_e1();
     cell_f1a();
     cell_g1();
 }
 
-module c39() scale(1/radius6_mm) {      // Dodec cage, point join.
+module c39() scale(1/radius6) {         // Dodec cage, point join.
     cell_f1a();
     cell_g1();
 }
 
-module c40() scale(1/radius7_mm) {      // Twelve hex spikes, hollow.
+module c40() scale(1/radius7) {         // Twelve hex spikes, hollow.
     cell_e1();
     cell_f1a();
     cell_g2();
 }
 
-module c41() scale(1/radius7_mm) {      // Twelve hex spikes, chunks out.
+module c41() scale(1/radius7) {         // Twelve hex spikes, chunks out.
     full_D();
     cell_e1();
     cell_f1a();
     cell_g2();
 }
 
-module c42() scale(1/radius7_mm) {      // Hex spikes, point join.
+module c42() scale(1/radius7) {         // Hex spikes, point join.
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c43() scale(1/radius7_mm) {      // Hex spikes, hollow.
-    cell_e1();
-    cell_f1a();
-    cell_f2();
-    cell_g2();
-}
-
-module c44() scale(1/radius7_mm) {      // Hex spikes, chunks out.
-    full_D();
+module c43() scale(1/radius7) {         // Hex spikes, hollow.
     cell_e1();
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c45() scale(1/radius6_mm) {
+module c44() scale(1/radius7) {         // Hex spikes, chunks out.
+    full_D();
+    cell_e1();
+    cell_f1a();
+    cell_f2();
+    cell_g2();
+}
+
+module c45() scale(1/radius6) {
     // Fifteenth stellation, point join at dodec spike tips.
     cell_e2();
     cell_f1a();
 }
 
-module c46() scale(1/radius6_mm) {      // Hollow hex spikes, solid support.
+module c46() scale(1/radius6) {         // Hollow hex spikes, solid support.
     full_D();
     cell_e2();
     cell_f1a();
 }
 
-module c47() scale(1/radius6_mm)               // Five tetrahedra.
+module c47() scale(1/radius6)                  // Five tetrahedra.
     stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
 
-module c48() scale(1/radius6_mm) {      // Hollowed chiral exc. dodec.
+module c48() scale(1/radius6) {         // Hollowed chiral exc. dodec.
     cell_e2();
     cell_f1a();
     cell_g1();
 }
 
-module c49() scale(1/radius6_mm) {      // Exc. dodec, hollow spikes, solid.
+module c49() scale(1/radius6) {         // Exc. dodec, hollow spikes, solid.
     full_D();
     cell_e2();
     cell_f1a();
     cell_g1();
 }
 
-module c50() scale(1/radius6_mm) {      // Exc. dodec, chiral chunks out.
+module c50() scale(1/radius6) {         // Exc. dodec, chiral chunks out.
     full_E();
     cell_f1a();
     cell_g1();
 }
 
-module c51() scale(1/radius7_mm) {      // Thirteenth stellation
+module c51() scale(1/radius7) {         // Thirteenth stellation
     cell_e2();                          // Spikes with crazy point joins.
     cell_f1a();
     cell_f2();
 }
 
-module c52() scale(1/radius7_mm) {      // 12 + 20 spikes, some hollow.
+module c52() scale(1/radius7) {         // 12 + 20 spikes, some hollow.
     full_D();
     cell_e2();
     cell_f1a();
     cell_f2();
 }
 
-module c53() scale(1/radius7_mm) {      // No retro, crazy!
+module c53() scale(1/radius7) {         // No retro, crazy!
     full_E();
     cell_f1a();
     cell_f2();
 }
 
-module c54() scale(1/radius7_mm) {      // Spikes with joiners.
+module c54() scale(1/radius7) {         // Spikes with joiners.
     cell_e2();
     cell_f1a();
     cell_f2();
     cell_g1();
 }
 
-module c55() scale(1/radius7_mm) {      // 12 + 20 spikes, some hollow.
+module c55() scale(1/radius7) {         // 12 + 20 spikes, some hollow.
     full_D();
     cell_e2();
     cell_f1a();
@@ -524,21 +524,21 @@ module c55() scale(1/radius7_mm) {      // 12 + 20 spikes, some hollow.
     cell_g1();
 }
 
-module c56() scale(1/radius7_mm) {      // Chiral exc. dodec with spikes.
+module c56() scale(1/radius7) {         // Chiral exc. dodec with spikes.
     full_E();
     cell_f1a();
     cell_f2();
     cell_g1();
 }
 
-module c57() scale(1/radius7_mm) {      // Hex spikes, point join.
+module c57() scale(1/radius7) {         // Hex spikes, point join.
     cell_e2();
     cell_f1a();
     cell_f2();
     cell_g2();
 }
 
-module c58() scale(1/radius7_mm) {      // Hex spikes, crossed-edge join.
+module c58() scale(1/radius7) {         // Hex spikes, crossed-edge join.
     full_D();
     cell_e2();
     cell_f1a();
@@ -546,7 +546,7 @@ module c58() scale(1/radius7_mm) {      // Hex spikes, crossed-edge join.
     cell_g2();
 }
 
-module c59() scale(1/radius7_mm) {      // Hex spikes, chunks out.
+module c59() scale(1/radius7) {         // Hex spikes, chunks out.
     full_E();
     cell_f1a();
     cell_f2();

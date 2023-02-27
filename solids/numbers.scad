@@ -15,23 +15,23 @@ dodeca_comidscribe = sqrt(1/2 - sqrt(5) / 6);
 icosa_midscribe = sqrt(1/2 + sqrt(5) / 10);
 icosa_comidscribe = sqrt(1/2 - sqrt(5) / 10);
 
-radius1 = 1;
-radius2 = 1.0661408512011674;
-radius3 = 1.3763819204711734;
-radius4 = 1.451059202444919;
-radius5 = 1.6285570507046667;
-radius6 = 2.3839634168752983;
-radius7 = 1 + 2 * gold;
-radius8 = 8.359584944780256;
+raw_radius1 = 1;
+raw_radius2 = (6 * gold - 3) / 5 * inscribe; // 1.0661408512011674
+raw_radius3 = gold * icosa_midscribe;        // 1.3763819204711734;
+raw_radius4 = sqrt((17 - 4 * gold) / 5);     // 1.451059202444919;
+raw_radius5 = 1.6285570507046667;
+raw_radius6 = 3 * inscribe;                 // 2.3839634168752983;
+raw_radius7 = 1 + 2 * gold;                 // 4.23607
+raw_radius8 = 8.359584944780256;
 
 // Radius of icosahedron with the vertex definitions we use.
 ico_scale = sqrt(2 + gold);
 // Actual radii in openscad units.
-radius1_mm = ico_scale;
-radius2_mm = radius2 * ico_scale;
-radius3_mm = radius3 * ico_scale;
-radius4_mm = radius4 * ico_scale;
-radius5_mm = radius5 * ico_scale;
-radius6_mm = radius6 * ico_scale;
-radius7_mm = radius7 * ico_scale;
-radius8_mm = radius8 * ico_scale;
+radius1 = ico_scale;
+radius2 = raw_radius2 * ico_scale;
+radius3 = raw_radius3 * ico_scale;
+radius4 = raw_radius4 * ico_scale;
+radius5 = raw_radius5 * ico_scale;
+radius6 = raw_radius6 * ico_scale;
+radius7 = raw_radius7 * ico_scale;
+radius8 = raw_radius8 * ico_scale;
