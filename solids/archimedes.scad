@@ -51,6 +51,7 @@ module main() {
     if (archimedes == 8) icosidodecahedron();
     if (archimedes == 9) truncated_dodecahedron();
     if (archimedes == 10) truncated_icosahedron();
+    if (archimedes == 11) rhombicosidodecahedron();
     if (archimedes == 12) truncated_icosidodecahedron();
 }
 
@@ -174,6 +175,18 @@ module icosidodecahedron()
     polygon_face_set(face_list);
 }
 
+module rhombicosidodecahedron() {
+    a = [1, 1, 2*gold + 1];
+    b = mx(rot5 * a);
+
+    face_list = [
+        [[b, mns(b), pls(b)], 20, "yellow"],
+        [[b, pls(b), a, my(rot5_4 * a)], 30, "green"],
+        [[for (r = rotate5) -r * mx(a)], 12, "magenta"]
+        ];
+
+    polygon_face_set(face_list);
+}
 
 module truncated_icosidodecahedron() {
     p0 = [gold-1, gold-1, 3 + gold];

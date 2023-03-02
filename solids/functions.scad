@@ -250,7 +250,7 @@ module pyramid_sixty(f) for (g = sixty(f)) {
 }
 
 module pyramid_coset_sixty(f) {
-    ff = coset(canonvvv(sixty(f)), tol=1e-7);
+    ff = coset(canonvvv(sixty(f)), tol=0);
     echo(len(ff));
     for (f = ff) pyramid(f);
 }
