@@ -31,26 +31,26 @@ p2 = [2 + gold, 2 + gold, 1 - 2 * gold] / 5;
 
 //0.5+0.5ϕ	-0.5ϕ	0.5	3	(1+ϕ)/√2
 p3a = [1 + gold, 1, -gold] / 2;
-p3b = mirror(p3a);
+p3b = reflect(p3a);
 
 //1	1	-1	1	2
 p4 = [1, 1, -1];
 
 //1ϕ	1-1ϕ	0	1	2
 p4a = [gold, 0, 1 - gold];
-p4b = mirror(p4a);
+p4b = reflect(p4a);
 
 //0.6+0.8ϕ	0.2-0.4ϕ	0.2-0.4ϕ	1	0.4+1.2ϕ
 p5 = [3 + 4 * gold, 1 - 2 * gold, 1 - 2 * gold] / 5;
 
 //0.8+0.4ϕ	-0.2-0.6ϕ	0.4+0.2ϕ	1	0.4+1.2ϕ
 p5a = [4 + 2 * gold, 2 + gold, -1 - 3*gold] / 5;
-p5b = mirror(p5a);
+p5b = reflect(p5a);
 
 // 1+1ϕ	-1ϕ	0	10	(1+ϕ)√2
 // Six planes meet.
 p6a = [1 + gold, 0, -gold];
-p6b = mirror(p6a);
+p6b = reflect(p6a);
 
 // -1-2ϕ	1+1ϕ	1+1ϕ	6	2+3ϕ
 // Five planes meet.
@@ -59,18 +59,14 @@ p7 = [1 + gold, 1 + gold, -1 - 2 * gold];
 //-2-4ϕ	2+3ϕ	1+1ϕ	1	4+6ϕ
 // Six of nine.
 p8a = [2 + 3 * gold, 1 + gold, -2 - 4 * gold];
-p8b = mirror(p8a);
+p8b = reflect(p8a);
 
 // 3+4ϕ	-1-2ϕ	-1-2ϕ	1	4+6ϕ
 // Three of nine.
 p8 = [3 + 4 * gold, -1 - 2 * gold, -1 - 2 * gold];
 
 // A mirror symmetry in the `x+y+z=1` plane.
-function mirror(p) = [p.x, p.z, p.y];
-// Positive rotation in the `x+y+z=1` plane.
-function pls(p) = [p.z, p.x, p.y];
-// Negative rotation in the `x+y+z=1` plane.
-function mns(p) = [p.y, p.z, p.x];
+function reflect(p) = [p.x, p.z, p.y];
 
 function u_apply(tri, p) = tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2];
 
@@ -212,7 +208,7 @@ module cell_f1a() {
     stellate1([p5b, mns(p4), p3b], weights=[1.3, 1, -1.1], normal=1.1);
 }
 
-module cell_f1b() mirror([0,0,1]) cell_f1a();
+module cell_f1b() reflect([0,0,1]) cell_f1a();
 
 module cell_g1() {
     stellate1([p6a, p5, p6b], weights=[1,4,1], normal=-0.48);

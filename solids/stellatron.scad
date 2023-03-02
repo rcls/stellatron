@@ -5,7 +5,7 @@ use <dodecatron.scad>
 use <splitting.scad>
 
 // Crennell number of the object to print.
-crennell = 8;
+crennell = 1;
 // Alternatively, you may replace `main();` below with the object you want.
 
 // 0 = raw object, 1 = main printable, 2 = extra piece, 10 = stand.
