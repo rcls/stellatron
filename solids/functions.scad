@@ -97,6 +97,11 @@ module describe(v) {
 
 function unit(v) = v / norm(v);
 
+function transpose(dx, dy, dz, p = [0,0,0]) = [
+    [dx.x, dy.x, dz.x, p.x],
+    [dx.y, dy.y, dz.y, p.y],
+    [dx.z, dy.z, dz.z, p.z]];
+
 function verticate_non_singular(v) = let (
     vn = v / norm(v),
     x = vn.x,
@@ -155,9 +160,25 @@ module pyramid(f, a=[0,0,0]) {
 
 module pyramids(ff) for (f = ff) pyramid(f);
 
-module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4)
-    pyramid(chamfer(f, inset), a);
-
+module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4) {
+    mid = sum(f) / len(f);
+    difference() {
+        pyramid(chamfer(f, inset), a);
+        for (i = [1:len(f)])
+            chamfer_box(f[i-1],f[i%len(f)]);
+    }
+    module chamfer_box(u, v) {
+        // Establish a coordinate system for the box...
+        c = (u+v)/ 2;
+        dx = unit(v - u);
+        y1 = unit(mid - c);
+        y2 = unit(a - c);
+        dy = unit(y1+y2);
+        dz = cross(dx, dy);
+        multmatrix(transpose(dx,dy,dz,c))
+            translate([0, -0.6, 0]) cube([norm(v - u)+2, 2, 2], center=true);
+    }
+}
 
 // Order 3 rotation of a vector.
 function pls(p) = [p.z, p.x, p.y];
@@ -223,11 +244,29 @@ function is_least_first(f, tol=1e-7) =
 // Three fold symmetry.
 function three(face) = [face, ppls(face), mmns(face)];
 
+// Construct a triangle.
+function triangle(v) = [v, mns(v), pls(v)];
+
+// Given a face with old rotational symmetry, double it up.
+function double(vv) = let (l = len(vv), a = ceil(l / 2), mid = sum(vv) / l)
+    [ for (i = [0:l-1]) each [vv[i], 2 * mid - vv[(i + a) % l]] ];
+
 // Generate four images, the Klein four grup.
 function four(f) = [f, rrx(f), rry(f), rrz(f)];
 
+// Square around z axis.
+function zsquare(v) = [v, rmz(v), rz(v), rpz(v)];
+
+// Octohedron around z axis, the vertex should be rotated <45° positive from
+// the x.
+function octogon(v) = [v, my(v), rmz(v), rmz(my(v)),
+                       rz(v), rz(my(v)), rpz(v), rpz(my(v))];
+
 // Give a face, generate 5 images, rotating about a dodec. face.
 function five(f) = [for (m = rotate5) [for (v = f) m * v]];
+
+// Construct a pentagon.
+function pentagon(v) = [for (m = rotate5) m * v];
 
 //function six(face) = [each three(face), for (f = three(face)) invert(f)];
 function six(face) = [each three(face), each three(rrx(face))];

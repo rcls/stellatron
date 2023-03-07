@@ -259,12 +259,15 @@ module mid_vertex_joiner_post(
     dy = unit(cross(u, v));
     dx = unit(cross(dy, dz));
 
-    multmatrix([[dz.x, dx.x, dy.x, p.x],
-                [dz.y, dx.y, dy.y, p.y],
-                [dz.z, dx.z, dy.z, p.z]]) joiner_post(0, [0, 0, 0]);
+    multmatrix(transpose(dz, dx, dy, p)) joiner_post(0, [0, 0, 0]);
 }
 
 module joiner_post(angle, position) {
-    rotate(angle) translate(position) #cylinder(
-        r=$join_diameter / 2, h=$join_depth*2, center=true);
+    r = $join_diameter / 2;
+    l = $join_depth;
+    c = 0.4;
+
+    rotate(angle) translate(position) #rotate_extrude() {
+        polygon([[0,-l], [r, -l], [r,-c], [r+c,0], [r,c], [r,l], [0, l]]);
+    }
 }
