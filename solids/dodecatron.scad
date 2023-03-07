@@ -95,7 +95,7 @@ I1 = -I0;
 module dodecahedron() scale(1/sqrt(3)) poly(twelve(A));
 
 module final_dual()
-    scale(1/sqrt(3)) pyramid_sixty([B[0], B[2], C[1]]);
+    scale(1/sqrt(3)) pyramid(canonvvv(sixty([B[0], B[2], C[1]])));
 
 // Generate the region of the final_dual() that is bounded by all the faces.
 module final_dual_peanut() {
@@ -108,10 +108,10 @@ module final_dual_peanut() {
 module broken_final_dual() poly(sixty([B[0], B[2], C[1]]));
 
 module great_stellated_dodecahedron()
-    scale(1 / sqrt(3)) pyramid_sixty([B[0], B[2], sum(B) / 5]);
+    scale(1 / sqrt(3)) pyramids(canonvvv(sixty([B[0], B[2], sum(B) / 5])));
 
 module great_dodecahedron()
     scale(1 / norm(I0)) for (f = twelve(IA)) pyramid(f);
 
 module small_stellated_dodecahedron()
-    scale(1 / norm(I0)) pyramid_sixty([IA[0], IA[2], sum(IA) / 5]);
+    scale(1 / norm(I0)) pyramid(canonvvv(sixty([IA[0], IA[2], sum(IA) / 5])));

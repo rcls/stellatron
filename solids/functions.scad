@@ -95,6 +95,8 @@ module describe(v) {
     echo(v, recalc, pp, rv + ii, v - recalc);
 }
 
+function unit(v) = v / norm(v);
+
 function verticate_non_singular(v) = let (
     vn = v / norm(v),
     x = vn.x,
@@ -133,6 +135,15 @@ module verticate(v) {
     multmatrix(verticate(v)) children();
 }
 
+// Bring mean of face to vertical and align first edge.
+module verticate_align(f) {
+    m = verticate(sum(f));
+    a = m * (f[0] + f[1]);
+    b = unit([a.x, a.y]);
+    multmatrix([[b.x, b.y, 0], [-b.y, b.x, 0], [0, 0, 1]])
+        multmatrix(m) children();
+}
+
 // A pyramid connecting a face to an point.
 module pyramid(f, a=[0,0,0]) {
     polyhedron(
@@ -141,6 +152,8 @@ module pyramid(f, a=[0,0,0]) {
                [1, len(f), 0],
                for (x = [2:len(f)]) [x, x-1, 0]]);
 }
+
+module pyramids(ff) for (f = ff) pyramid(f);
 
 module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4)
     pyramid(chamfer(f, inset), a);
@@ -231,7 +244,7 @@ function twelve(face) = [for (f = three(face)) each four(f)];
 function twenty(face) = [for (f = four(face)) each five(f)];
 
 // Close under three fold rotation and four fold rotation about each axis.
-function twentyfour(face) = [for (f = three(face)) each eight(f)];
+function twentyfour(face) = [for (f = eight(face)) each three(f)];
 
 // Given a face, generate 60 images, dodec. rotational symmetry.
 function sixty(f) = [for (ff = five(f)) each twelve(ff)];
@@ -239,23 +252,9 @@ function sixty(f) = [for (ff = five(f)) each twelve(ff)];
 // Full symmetry.
 function onetwenty(f) = [each sixty(f), each sixty(invert(f))];
 
-module pyramid_coset_onetwenty(f) {
-    ff = coset(canonvvv(onetwenty(f)), tol=0);
-    echo(len(ff));
-    for (f = ff) pyramid(f);
-}
-
-module pyramid_sixty(f) for (g = sixty(f)) {
-    pyramid(canonvv(g));
-}
-
-module pyramid_coset_sixty(f) {
-    ff = coset(canonvvv(sixty(f)), tol=0);
-    echo(len(ff));
-    for (f = ff) pyramid(f);
-}
-
 // If we've generated a set of faces, with the redundancy of each face having
 // permutations bringing each vertex to the front, then remove the redundancy.
-function coset(ff, stride = 1, tol=1e-7) = [
-    for (f = ff) if (is_least_first(f, tol)) f ];
+function coset(ff, stride = 1, tol=1e-7) = let
+    (result = [for (f = ff) if (is_least_first(f, tol)) f ])
+    echo("Coset reduction to", len(result), "from", len(ff))
+    result;

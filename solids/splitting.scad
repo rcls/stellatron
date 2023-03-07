@@ -5,6 +5,7 @@
 // the exterior `$radius`, divide into practical objects, and create guiding
 // indentations for joining.
 
+use <functions.scad>
 include <numbers.scad>
 
 module dodeca_single() {
@@ -243,18 +244,24 @@ module raw_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
 // and v have the same radius, forming an isoceles triangle.  `radius` is a
 // multiplier for the distance from the origin to the midpoint.  `radius_mm` is
 // a distance away from the origin.
-module mid_vertex_joiner_post(u, v, radius_mm=0, radius=1) {
-    p = (u + v) * radius / 2;
-    p0 = p / norm(p);
-    q = p0 * (norm(p) + radius_mm);
-    // Now form the transverse.  This gives the direction of the post.
-    c = cross(u, v);
-    // We need two normals.  One is given by q, and the other by...
-    d0 = (u - v) / norm(u - v);
-    c0 = c / norm(c);
-    multmatrix([[p0[0], d0[0], c0[0], q[0]],
-                [p0[1], d0[1], c0[1], q[1]],
-                [p0[2], d0[2], c0[2], q[2]]]) joiner_post(0, [0, 0, 0]);
+module mid_vertex_joiner_post(
+    u, v, radius_mm=0, radius=1, offset_mm=0, offset=0)
+{
+    // Adjust u and v according to the radial parameters.
+    uu = u * radius + unit(u) * radius_mm;
+    vv = v * radius + unit(v) * radius_mm;
+
+    // Position of the post.
+    p = (uu + vv) / 2 + offset * (uu - vv) + offset_mm * unit(uu - vv);
+    // Co-ordinate system for the post.  'z' is radial.  'y' is perpendicular to
+    // the face, and 'x' is orthogonal and on the face.
+    dz = unit(p);
+    dy = unit(cross(u, v));
+    dx = unit(cross(dy, dz));
+
+    multmatrix([[dz.x, dx.x, dy.x, p.x],
+                [dz.y, dx.y, dy.y, p.y],
+                [dz.z, dx.z, dy.z, p.z]]) joiner_post(0, [0, 0, 0]);
 }
 
 module joiner_post(angle, position) {

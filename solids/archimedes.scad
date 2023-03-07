@@ -3,10 +3,19 @@ use <splitting.scad>
 include <numbers.scad>
 
 // Faces are coloured as follows:
-// Cubical, multiple of 6 (but not 12) faces: Green.
-// Tetrahedral, octahedral, icosahedral: Yellow.
-// - hmmm truncated tetra has two tetrahedral symmetry faces!
-// Magenta: dodecahdral (12 faces).
+// Rhombication squares - green.
+// Icosohedral - Yellow.
+// Dodecahdral - Magenta.
+
+// Snub triangles - Gray.
+
+// Octohedral - Lets do orange.
+// Cubical - Purple.
+// Tetrahedral - Lets do red.
+// Truncated tetrahedron - red + pink?
+
+// Rhombicuboctahedron - 12 rhombications, green or magneta? 3,(3+3),3 rings not
+// 3,3,3,3 - I say green.
 
 // Index of the object to print.
 archimedes = 12;
@@ -38,6 +47,9 @@ $stand_diameter = 6;
 // For stands and joiners.  (Gets multiplied for larger radii).
 $fn=20;
 
+// Print pieces face down rather than face-up.
+$flip = false;
+
 main();
 
 module main() {
@@ -47,29 +59,45 @@ module main() {
     if (archimedes == 4) truncated_octahedron();
     if (archimedes == 5) rhombi_cuboctahedron();
     if (archimedes == 6) truncated_cuboctahedron();
-    if (archimedes == 7) snub_cube();
-    if (archimedes == 8) icosidodecahedron();
+    if (archimedes == 7) snub_cube();         // 55mm
+    if (archimedes == 8) icosidodecahedron(); // 65mm
     if (archimedes == 9) truncated_dodecahedron();
     if (archimedes == 10) truncated_icosahedron();
     if (archimedes == 11) rhombicosidodecahedron();
-    if (archimedes == 12) truncated_icosidodecahedron();
+    if (archimedes == 12) truncated_icosidodecahedron(); // 90mm
+    if (archimedes == 13) snub_dodecahedron();
 }
+
+// Joiner array description is [radius,radius_mm,offset,offset_mm].
+vertical_joiners=[
+    // radius, radius_mm
+    [1, -4, 0, 0], [0, 2.5, 0, 0] ];
+
+// Old.
+//triangle_joiners=[[1, -5, -0.5, 10],[1, -5, 0.5, -10]]; //, [0, 3, 0, 0]];
+// With bottom post.
+triangle_joiners=[[1, -5, -0.5, 10], [1, -5, 0.5, -10], [0, 2.5, 0, 0]];
+// By four.
+//triangle_joiners=[[1, -5, -0.5, 4],[1, -5, 0.5, -4],
+//                  [0,3, -0.5, 4], [0, 3, 0.5, -4]];
 
 module truncated_tetrahedron() {
     a = [3,1,1];
     b = pls(a);
     c = mns(a);
+    // Suppress coset reduction on the hexagon.  The order-6 rotation is not
+    // in the full rotational symmetry group!
     face_list = [
-        [[c, b, a], 4, "yellow", 2],
-        [-[mz(a), mz(b), mx(b), mx(c), my(c), my(a)], 4, "green", 3]];
+        [[c, b, a], 4, "green", 2],
+        [-([mz(a), mz(b), mx(b), mx(c), my(c), my(a)]), 4, "red", 3]];
     polygon_face_set(face_list);
 }
 
 module cuboctahedron() {
     //p = [1, 0, 1];
     face_list=[
-        [[[1, 0, 1], [0, -1, 1], [-1, 0, 1], [0, 1, 1]], 6, "green"],
-        [[[0, 1, 1], [1, 0, 1], [1, 1, 0]], 8, "yellow"]];
+        [[[1, 0, 1], [0, -1, 1], [-1, 0, 1], [0, 1, 1]], 6, "purple"],
+        [[[0, 1, 1], [1, 0, 1], [1, 1, 0]], 8, "orange"]];
     polygon_face_set(face_list);
 }
 
@@ -78,16 +106,16 @@ module truncated_cube() {
     b = mns(a);
     c = pls(a);
     face_list = [
-        [[a, b, c], 8, "yellow"],
-        [[a, c, rmz(a), rmz(c), rz(a), rz(c), rpz(a), rpz(c)], 6, "green", 2]];
+        [[a, b, c], 8, "orange"],
+        [[a, c, rmz(a), rmz(c), rz(a), rz(c), rpz(a), rpz(c)], 6, "purple", 2]];
     polygon_face_set(face_list);
 }
 
 module truncated_octahedron() {
     a = [0, sqrt(2), 1 + sqrt(2)];
     face_list = [
-        [[a, rmz(a), rz(a), rpz(a)], 6, "green"],
-        [[rmz(a), a, mns(rmz(a)), mns(a), pls(rmz(a)), pls(a)], 8, "yellow"]];
+        [[a, rmz(a), rz(a), rpz(a)], 6, "purple"],
+        [[rmz(a), a, mns(rmz(a)), mns(a), pls(rmz(a)), pls(a)], 8, "orange"]];
     echo(max([for (f = face_list) [len(f[0]), f[0]]]));
     polygon_face_set(face_list);
 }
@@ -96,16 +124,15 @@ module truncated_octahedron() {
 module rhombi_cuboctahedron() {
     a = [1, 1, 1 + sqrt(2)];
     face_list= [
-        [[a, mns(a), pls(a)], 8, "yellow", 2],
-        [[a, rmz(a), rz(a), rpz(a)], 6, "green", 3],
-        [[a, pls(a), my(pls(a)), my(a)], 12, "magenta", 4],
+        [[a, mns(a), pls(a)], 8, "orange", 2],
+        [[a, rmz(a), rz(a), rpz(a)], 6, "purple", 3],
+        [[a, pls(a), my(pls(a)), my(a)], 12, "green", 4],
         ];
     polygon_face_set(face_list);
 }
 
 module truncated_cuboctahedron() {
-    p0 = [1, 1 + sqrt(2), 1 + 2 * sqrt(2)];
-    p = p0 / norm(p0);
+    p = [1, 1 + sqrt(2), 1 + 2 * sqrt(2)];
     q = [p.y, p.x, p.z];
 
     f4 = [q, pls(p), my(pls(p)), rmz(p)];
@@ -113,30 +140,28 @@ module truncated_cuboctahedron() {
     f8 = [p, q, rmz(p), rmz(q), rz(p), rz(q), rpz(p), rpz(q)];
 
     face_list = [
-        [f4, 12, "magenta"],
-        [f6, 8, "yellow"],
-        [f8, 6, "green"]];
+        [f4, 12, "green"],
+        [f6, 8, "orange"],
+        [f8, 6, "purple"]];
     polygon_face_set(face_list);
 }
 
 
 module snub_cube() {
-    function tribo(n, a, b, c) = n == 0 ? c / b : tribo(n - 1, b, c, a + b + c);
-    t = tribo(20, 0, 0, 1);
-    echo(t);
+    function tribo(n, a) = n == 0 ? a : tribo(n - 1, sqrt(1/a + 1 + a));
+    t = tribo(22, 1);
     a = [1/t, 1, t];
-    translate(a) sphere(0.1);
     face_list=[
-        [[a, rmz(a), rz(a), rpz(a)], 6, "green"],
-        [[a, mns(a), pls(a)], 8, "yellow"],
+        [[a, rmz(a), rz(a), rpz(a)], 6, "purple"],
+        [[a, mns(a), pls(a)], 8, "orange"],
         [[a, pls(a), rmz(a)], 24, "grey", 4],
         ];
-    polygon_face_set(face_list);
+    polygon_face_set(face_list, joiners=triangle_joiners);
 }
 
 module truncated_dodecahedron() {
     p = [0, gold-1, gold+2];
-    q = rz(rot5_3 * p);
+    q = canonv(rz(rot5_3 * p));
 
     quint = [for (r = rotate5) r * p];
     mid_quint = sum(quint) / 5;
@@ -145,14 +170,14 @@ module truncated_dodecahedron() {
 
     face_list = [
         [[q, mns(q), pls(q)], 20, "yellow"],
-        [dec, 12, "magenta"]];
+        [canonvv(dec), 12, "magenta"]];
 
     polygon_face_set(face_list);
 }
 
 module truncated_icosahedron() {
     a = [0, 1, 3 * gold];
-    quint = [for (r = rotate5) r * rpz(a)];
+    quint = [for (r = rotate5) canonv(r * rpz(a))];
     hex = [mx(quint[2]), mx(quint[1]),
            mns(mx(quint[2])), mns(mx(quint[1])),
            pls(mx(quint[2])), pls(mx(quint[1]))];
@@ -166,13 +191,13 @@ module icosidodecahedron()
 {
     p0 = [0, 0, 1];
     p1 = [gold/2 - 1/2, 1/2, gold/2];
-    quint = [for (m = rotate5) m * p0];
+    quint = [for (m = rotate5) canonv(m * p0)];
 
     face_list = [
         [[p1, mns(p1), pls(p1)], 20, "yellow"],
         [-quint, 12, "magenta"]];
 
-    polygon_face_set(face_list);
+    polygon_face_set(face_list, cut=0.75, joiners=triangle_joiners);
 }
 
 module rhombicosidodecahedron() {
@@ -214,23 +239,56 @@ module truncated_icosidodecahedron() {
 }
 
 
-module joinable_frustum(w, cut=0.75) {
+// For this guy we give up on canonicalisation and cosets.
+module snub_dodecahedron() {
+    // ξ ≈ 0.94315125924 from wikipedia.
+    epsilon = 0.94315125924;
+    //assert(abs(epsilon * epsilon * (epsilon + 2) - gold - 1) < 1e-7);
+    p = [
+        -gold*gold*gold + gold * epsilon + 2 * gold * epsilon * epsilon,
+        (gold + 1) * (1 - epsilon),
+        epsilon
+        ];
+
+    //for (v = sixty([p])) translate(v[0]) sphere(0.05);
+
+    //color("blue") translate(p) sphere(0.06);
+
+    pentagon = [for (r = reverse(rotate5)) r * rz(p)];
+    t = [p, rot5 * rz(p), rot5 * rz(rot5 * rz(p))];
+    triangle = [for (v = t) rz(rot5 * v)];
+
+    face_list = [
+        [pentagon, -12, "magenta"],
+        [[p, rz(p), rot5 * rz(p)], -60, "grey", 2],
+        [triangle, -20, "yellow"]
+        ];
+    polygon_face_set(face_list, joiners=triangle_joiners);
+}
+
+module joinable_frustum(w, cut=0.75, joiners=vertical_joiners, colour) {
     mean = sum(w) / len(w);
     w_inscribe = norm(mean);
-    difference() {
-        translate([0, 0, -cut * w_inscribe]) verticate(sum(w)) difference() {
-            chamfer_pyramid(w);
+    flipper = $flip
+        ? [[1, 0, 0], [0, 1, 0], [0, 0, -1, w_inscribe * (1 - cut)]]
+        : [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+
+    multmatrix(flipper) difference() {
+        translate([0, 0, -cut * w_inscribe]) verticate_align(w) difference() {
+            color(colour) chamfer_pyramid(w);
             for (i = [1:len(w)]) {
-                mid_vertex_joiner_post(w[i-1], w[i%len(w)], radius_mm=-4);
-                mid_vertex_joiner_post(w[i-1], w[i%len(w)],
-                                       radius_mm=4, radius=cut);
+                for (j = joiners)
+                    mid_vertex_joiner_post(
+                        w[i-1], w[i%len(w)],
+                        radius=cut + j[0] * (1 - cut), radius_mm=j[1],
+                        offset=j[2], offset_mm=j[3]);
             }
         }
         translate([0, 0, -$radius]) cube(2*$radius, center=true);
     }
 }
 
-module polygon_face_set(faces) {
+module polygon_face_set(faces, cut=0.75, joiners=vertical_joiners) {
     big_face = max([for (f = faces) [len(f[0]), f[0]]]);
     vertical = sum(big_face[1]) / big_face[0];
     if ($piece == 0)
@@ -247,7 +305,7 @@ module polygon_face_set(faces) {
         face = f[0];
         p = len(f) <= 3 ? len(face) % 2 == 0 ? len(face) / 2 : len(face) : f[3];
         if ($piece == p) {
-            joinable_frustum($radius / norm(face[0]) * face);
+            joinable_frustum($radius / norm(face[0]) * face, cut, joiners, f[2]);
         }
     }
 }
@@ -257,27 +315,32 @@ module polygon_face_all(faces) {
 }
 
 module polygon_faces(face, copies) {
+    echo("Edge length", $radius * norm(face[1] - face[0]) / norm(face[0]));
     total = copies * len(face);
+    echo("Total", total, "from", copies, "of", len(face));
     // If it's sensible to do coset reduction, then just do it.
     if (total == 120)
-        pyramid_coset_onetwenty(face);
+        pyramids(coset(canonvvv(onetwenty(face))));
     else if (total == 60)
-        pyramid_coset_sixty(face);
-    else if (total == 24) {
-        ff = coset(twentyfour(face));
-        echo(len(ff));
-        for (f = ff) pyramid(f);
-    }
+        pyramids(coset(canonvvv(sixty(face))));
+    // The <5 is a hack, we really should be using the order of the I5
+    // stabiliser of the face rather than len(face).
+    else if (total == 24 && len(face) < 5)
+        pyramids(coset(twentyfour(face)));
     else if (copies == 24)
-        for (f = twentyfour(face)) pyramid(f);
-    else if (copies == 12)
-        for (f = twelve(face)) pyramid(f);
+        pyramids(twentyfour(face));
+    else if (abs(copies) == 60)
+        pyramids(sixty(face));
+    else if (abs(copies) == 20)
+        pyramids(twenty(face));
+    else if (abs(copies) == 12)
+        pyramids(twelve(face));
     else if (copies == 8)
-        for (f = eight(face)) pyramid(f);
+        pyramids(eight(face));
     else if (copies == 6)
-        for (f = six(face)) pyramid(f);
+        pyramids(six(face));
     else if (copies == 4)
-        for (f = four(face)) pyramid(f);
+        pyramids(four(face));
     else if (copies == 1)
         pyramid(face);
     else
