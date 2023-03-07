@@ -36,16 +36,15 @@ radius6 = raw_radius6 * ico_scale;
 radius7 = raw_radius7 * ico_scale;
 radius8 = raw_radius8 * ico_scale;
 
-// Rotation matrixes with order five.  We don't canonicalise the numeric
-// values of these - we presume that needs to be done after application anyway.
-rot5 = [[1/2, -gold/2, -1/2/gold],
-        [gold/2, 1/2/gold, 1/2],
-        [-1/2/gold, -1/2, gold/2]];
+identity = [[1,0,0],[0,1,0],[0,0,1]];
+
+// Clockwise around [1,0,gold].
+rot5 = [[1/2, gold/2, 1/2/gold],
+        [-gold/2, 1/2/gold, 1/2],
+        [1/2/gold, -1/2, gold/2]];
 
 rot5_2 = rot5 * rot5;
 rot5_3 = rot5_2 * rot5;
 rot5_4 = rot5_2 * rot5_2;
-
-identity = [[1,0,0],[0,1,0],[0,0,1]];
 
 rotate5 = [identity, rot5, rot5_2, rot5_3, rot5_4];

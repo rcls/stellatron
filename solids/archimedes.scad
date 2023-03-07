@@ -161,7 +161,7 @@ module snub_cube() {
 
 module truncated_dodecahedron() {
     p = [0, gold-1, gold+2];
-    q = canonv(rz(rot5_3 * p));
+    q = canonv(rot5 * p);
 
     quint = [for (r = rotate5) r * p];
     mid_quint = sum(quint) / 5;
@@ -176,62 +176,60 @@ module truncated_dodecahedron() {
 }
 
 module truncated_icosahedron() {
-    a = [0, 1, 3 * gold];
-    quint = [for (r = rotate5) canonv(r * rpz(a))];
-    hex = [mx(quint[2]), mx(quint[1]),
-           mns(mx(quint[2])), mns(mx(quint[1])),
-           pls(mx(quint[2])), pls(mx(quint[1]))];
+    a = [1, 0, 3 * gold];
+    quint = [for (r = rotate5) canonv(r * a)];
+    hex = [quint[2], quint[1],
+           mns(quint[2]), mns(quint[1]),
+           pls(quint[2]), pls(quint[1])];
     face_list = [
-        [-quint, 12, "magenta", 2],
+        [quint, 12, "magenta", 2],
         [hex, 20, "yellow", 3]];
     polygon_face_set(face_list);
 }
 
 module icosidodecahedron()
 {
-    p0 = [0, 0, 1];
-    p1 = [gold/2 - 1/2, 1/2, gold/2];
-    quint = [for (m = rotate5) canonv(m * p0)];
+    p = [0, 0, 1];
+    q = [gold/2 - 1/2, 1/2, gold/2];
+    quint = [for (m = rotate5) canonv(m * p)];
 
     face_list = [
-        [[p1, mns(p1), pls(p1)], 20, "yellow"],
-        [-quint, 12, "magenta"]];
+        [[q, mns(q), pls(q)], 20, "yellow"],
+        [quint, 12, "magenta"]];
 
     polygon_face_set(face_list, cut=0.75, joiners=triangle_joiners);
 }
 
 module rhombicosidodecahedron() {
     a = [1, 1, 2*gold + 1];
-    b = mx(rot5 * a);
+    b = rot5 * a;
 
     face_list = [
         [[b, mns(b), pls(b)], 20, "yellow"],
-        [[b, pls(b), a, my(rot5_4 * a)], 30, "green"],
-        [[for (r = rotate5) -r * mx(a)], 12, "magenta"]
+        [[a, rmz(a), rz(a), rpz(a)], 30, "green"],
+        [[for (r = rotate5) r * a], 12, "magenta"]
         ];
 
     polygon_face_set(face_list);
 }
 
 module truncated_icosidodecahedron() {
-    p0 = [gold-1, gold-1, 3 + gold];
-    p1 = [2*gold - 2, gold, 1 + 2 * gold];
-    p2 = [gold - 1, gold + 1, 3 * gold - 1];
-    p3 = [2 * gold - 1, 2, 2 + gold];
-    p4 = [gold, 3, 2 * gold];
+    p = [gold-1, gold-1, 3 + gold];
 
-    half_dec = [p0, p1, p3, pls(p4), pls(p2)];
-    dec = [each half_dec, for (v = reverse(half_dec)) my(v)];
+    dec = [for (r = rotate5) each [r * my(p), r * p]];
+    hex = [rot5_2 * my(p), rot5 * p,
+           mns(rot5_2 * my(p)), mns(rot5 * p),
+           pls(rot5_2 * my(p)), pls(rot5 * p)];
 
     face_list = [
-        [[p0, my(p0), rz(p0), mx(p0)], 30, "green"],
-        [[p2, p1, p0, mx(p0), mx(p1), mx(p2)], 20, "yellow"],
+        [[p, my(p), rz(p), mx(p)], 30, "green"],
+        [hex, 20, "yellow"],
         [dec, 12, "magenta"]];
     polygon_face_set(face_list);
 
     if ($piece == 4) {
         difference() {
-            scale ($radius / norm(p0)) polygon_face_all(face_list);
+            scale ($radius / norm(p)) polygon_face_all(face_list);
             translate([0, 0, -$radius]) cube(2 * $radius, center=true);
             for (i = [0:90:270]) joiner_post(i, [$radius * 0.9, 0, 0]);
         }
@@ -243,24 +241,18 @@ module truncated_icosidodecahedron() {
 module snub_dodecahedron() {
     // ξ ≈ 0.94315125924 from wikipedia.
     epsilon = 0.94315125924;
-    //assert(abs(epsilon * epsilon * (epsilon + 2) - gold - 1) < 1e-7);
     p = [
         -gold*gold*gold + gold * epsilon + 2 * gold * epsilon * epsilon,
         (gold + 1) * (1 - epsilon),
         epsilon
         ];
 
-    //for (v = sixty([p])) translate(v[0]) sphere(0.05);
-
-    //color("blue") translate(p) sphere(0.06);
-
-    pentagon = [for (r = reverse(rotate5)) r * rz(p)];
-    t = [p, rot5 * rz(p), rot5 * rz(rot5 * rz(p))];
-    triangle = [for (v = t) rz(rot5 * v)];
+    pentagon = [for (r = rotate5) r * p];
+    triangle = [rot5 * p, mns(rot5 * p), pls(rot5 * p)];
 
     face_list = [
         [pentagon, -12, "magenta"],
-        [[p, rz(p), rot5 * rz(p)], -60, "grey", 2],
+        [[p, rz(p), rz(rot5_4 * p)], -60, "grey", 2],
         [triangle, -20, "yellow"]
         ];
     polygon_face_set(face_list, joiners=triangle_joiners);

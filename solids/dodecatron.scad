@@ -56,46 +56,28 @@ module poly(faces) {
 }
 
 // Four rings of five, dodecahedral points.
-A = [
-    [0, 1-gold, -gold],
-    [1, -1, -1],
-    [gold, 0, 1-gold],
-    [1, 1, -1,],
-    [0, gold-1, -gold]
-    ];
-// Sum: [2 + ϕ, 0, -3ϕ - 1] = (2 + ϕ)[1, 0, -ϕ]
-
-B = [
-    [-1, -1, -1],
+A = [for (r = rotate5) canonv(r * [0, gold-1, gold])];
+B = [for (r = rotate5) canonv(r * [gold-1,gold,0])];
+aB = [
+    [-1, -1, 1],
     [gold-1, -gold, 0],
-    [gold, 0, gold-1],
+    [gold, 0, 1-gold],
     [gold-1, gold, 0],
-    [-1, 1, -1]
+    [-1, 1, 1]
     ];
 C = -B;
 D = -A;
 
-for (i = [0:4]) {
-    for (j = [0:4]) {
-        assert(A[(i+j)%5] == canonv(rotate5[j] * A[i]));
-        assert(B[(i+j)%5] == canonv(rotate5[j] * B[i]));
-    }
-}
-
 // Icosohedral points.
-I0 = [1, 0, -gold];
-IA = [canonv(         [-1, 0, -gold]),
-      canonv(rot5   * [-1, 0, -gold]),
-      canonv(rot5_2 * [-1, 0, -gold]),
-      canonv(rot5_3 * [-1, 0, -gold]),
-      canonv(rot5_4 * [-1, 0, -gold])];
+I0 = [1, 0, gold];
+IA = [for (r = rotate5) canonv(r * [-1, 0, gold])];
 IB = -IA;
 I1 = -I0;
 
 module dodecahedron() scale(1/sqrt(3)) poly(twelve(A));
 
 module final_dual()
-    scale(1/sqrt(3)) pyramid(canonvvv(sixty([B[0], B[2], C[1]])));
+    scale(1/sqrt(3)) pyramids(canonvvv(sixty([A[0], C[3], C[0]])));
 
 // Generate the region of the final_dual() that is bounded by all the faces.
 module final_dual_peanut() {
@@ -114,4 +96,10 @@ module great_dodecahedron()
     scale(1 / norm(I0)) for (f = twelve(IA)) pyramid(f);
 
 module small_stellated_dodecahedron()
-    scale(1 / norm(I0)) pyramid(canonvvv(sixty([IA[0], IA[2], sum(IA) / 5])));
+    scale(1 / norm(I0)) pyramids(canonvvv(sixty([IA[0], IA[2], sum(IA) / 5])));
+
+//translate(A[0]) color("blue") sphere(0.1);
+//translate(C[0]) color("orange") sphere(0.1);
+//pyramid([A[0], C[0], C[3]]);
+//final_dual();
+//small_stellated_dodecahedron();
