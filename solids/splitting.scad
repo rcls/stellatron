@@ -253,16 +253,11 @@ module mid_vertex_joiner_post(
 
     // Position of the post.
     p = (uu + vv) / 2 + offset * (uu - vv) + offset_mm * unit(uu - vv);
-    // Co-ordinate system for the post.  'z' is radial.  'y' is perpendicular to
-    // the face, and 'x' is orthogonal and on the face.
-    dz = unit(p);
-    dy = unit(cross(u, v));
-    dx = unit(cross(dy, dz));
 
-    multmatrix(transpose(dz, dx, dy, p)) joiner_post(0, [0, 0, 0]);
+    multmatrix(orthonormal(p, u - v, p=p)) joiner_post(0, [0, 0, 0]);
 }
 
-module joiner_post(angle, position) {
+module joiner_post(angle=0, position=[0,0,0]) {
     r = $join_diameter / 2;
     l = $join_depth;
     c = 0.4;

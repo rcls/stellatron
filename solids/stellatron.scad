@@ -24,7 +24,7 @@ $join_depth=5;
 // I use 10 for larger pieces, 5 for smaller ones where space is tight.
 
 // Diameter in mm of the holes for post joiners.
-$join_diameter=2.2;
+$join_diameter=2.1;
 // This should be the diameter of your filament (or whatever you use), plus a
 // little.
 

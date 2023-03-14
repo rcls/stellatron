@@ -102,6 +102,21 @@ function transpose(dx, dy, dz, p = [0,0,0]) = [
     [dx.y, dy.y, dz.y, p.y],
     [dx.z, dy.z, dz.z, p.z]];
 
+// Return an orthonormal matrix that converts from (x,y,z) to a co-ordinate
+// system based on the input vectors.  `x` transforms to the direction of `u`.
+// `y` transforms to the projection of `y` onto the plane transverse to `u`.
+// `z` is normal to both, with a sign convention to make its dot-product with
+// `w` positive, if possible.  The origin transforms to `p`.
+function orthonormal(u, v, w=[0,0,0], p=[0,0,0]) = let (
+    dx = unit(u),
+    dy = unit(v - (dx * v) * dx),
+    dz1 = cross(dx, dy),
+    dz = dz1 * w < 0 ? -dz1 : dz1)
+    assert(dx * dy < 1e-7)
+    assert(dy * dz < 1e-7)
+    assert(dz * dx < 1e-7)
+    transpose(dx, dy, dz, p);
+
 function verticate_non_singular(v) = let (
     vn = v / norm(v),
     x = vn.x,
@@ -126,19 +141,9 @@ function verticate(v) =
     : verticate_plus_z(
         [-v.x, v.y, -v.z]) * [[-1, 0, 0], [0, 1, 0], [0, 0, -1]];
 
-function chamfer(f, inset=0.4) = [
-    // Replace each vertex with two, inset slightly from the original
-    // end-points.
-    for (i = [1:len(f)]) each let(
-        s = f[i-1],
-        e = f[i % len(f)],
-        d = (e - s) * inset / norm(s - e)) [s + d, e - d]];
-
 // Rotate children to bring the vector `v` vertical.  The rotation is in the v-z
 // plane.
-module verticate(v) {
-    multmatrix(verticate(v)) children();
-}
+module verticate(v) multmatrix(verticate(v)) children();
 
 // Bring mean of face to vertical and align first edge.
 module verticate_align(f) {
@@ -163,20 +168,22 @@ module pyramids(ff) for (f = ff) pyramid(f);
 module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4) {
     mid = sum(f) / len(f);
     difference() {
-        pyramid(chamfer(f, inset), a);
+        pyramid(f, a);
         for (i = [1:len(f)])
             chamfer_box(f[i-1],f[i%len(f)]);
+        for (p = f)
+            chamfer_side(p);
     }
     module chamfer_box(u, v) {
         // Establish a coordinate system for the box...
         c = (u+v)/ 2;
-        dx = unit(v - u);
-        y1 = unit(mid - c);
-        y2 = unit(a - c);
-        dy = unit(y1+y2);
-        dz = cross(dx, dy);
-        multmatrix(transpose(dx,dy,dz,c))
-            translate([0, -0.6, 0]) cube([norm(v - u)+2, 2, 2], center=true);
+        multmatrix(orthonormal(v - u, unit(mid - c) + unit(a - c), p=c))
+            cube([norm(v - u)+2, inset*2, inset*4], center=true);
+    }
+    module chamfer_side(p) {
+        multmatrix(orthonormal(p, p - mid, p=p/2))
+            rotate([-45,0,0])
+            cube([norm(p), inset*2, inset*2], center=true);
     }
 }
 
