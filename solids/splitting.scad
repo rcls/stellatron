@@ -181,11 +181,12 @@ module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
 //
 // `inset` is the approximate distance to bring the joiner in from the edge.
 module one_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
-                   cut=0, inset=2.5, topset=3.75, post_face=[0:4], midsetz=0) {
+                   cut=0, inset=2.5, topset=3.75, post_face=[0:4], midsetz=0,
+                   chamfer_edge=[]) {
     intersection() {
         translate([0, 0, -cut * $radius / dodeca_midscribe * inscribe])
             raw_twelfth(big, top, mid, small, inset, topset, post_face,
-                        midsetz=midsetz)
+                        midsetz=midsetz, chamfer_edge=chamfer_edge)
             children();
         translate([0, 0, big * $radius]) cube(big * $radius * 2, center=true);
     }
@@ -196,20 +197,15 @@ module raw_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
                    inset=2.5, topset=3.75, post_face=[0:4],
                    chamfer=0.4, chamfer_edge=[], midsetz=0) {
     midscribe = dodeca_midscribe;
-    q0 = [0, 1-gold, gold];
-    q1 = [-1, -1, 1];
-    q2 = [-gold, 0, gold-1];
-    q3 = [-1, 1, 1];
-    q4 = [0, gold-1, gold];
-    q = [q0, q1, q2, q3, q4];
+    q = [for (r = rotate5) rz(r * [0, gold-1, gold])];
     difference() {
         pointup() {
             intersection() {
                 scale($radius / sqrt(3)) polyhedron(
                     points=[[0, 0, 0], each big * q],
                     faces = [
-                        [5, 4, 3, 2, 1],
-                        [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5], [0, 5, 1]]);
+                        [1, 2, 3, 4, 5],
+                        [0, 2, 1], [0, 3, 2], [0, 4, 3], [0, 5, 4], [0, 1, 5]]);
                 scale($radius) children();
             }
         }

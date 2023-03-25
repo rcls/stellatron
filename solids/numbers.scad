@@ -15,6 +15,7 @@ dodeca_comidscribe = sqrt(1/2 - sqrt(5) / 6);
 icosa_midscribe = sqrt(1/2 + sqrt(5) / 10);
 icosa_comidscribe = sqrt(1/2 - sqrt(5) / 10);
 
+// Relative radii of the icosohedral stellation points.
 raw_radius1 = 1;
 raw_radius2 = (6 * gold - 3) / 5 * inscribe; // 1.0661408512011674
 raw_radius3 = gold * icosa_midscribe;        // 1.3763819204711734;
@@ -26,7 +27,7 @@ raw_radius8 = 8.359584944780256;
 
 // Radius of icosahedron with the vertex definitions we use.
 ico_scale = sqrt(2 + gold);
-// Actual radii in openscad units.
+// Actual radii in openscad units of the icosahedral stellation points.
 radius1 = ico_scale;
 radius2 = raw_radius2 * ico_scale;
 radius3 = raw_radius3 * ico_scale;

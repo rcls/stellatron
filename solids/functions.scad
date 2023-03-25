@@ -165,7 +165,7 @@ module pyramid(f, a=[0,0,0]) {
 
 module pyramids(ff) for (f = ff) pyramid(f);
 
-module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4) {
+module chamfer_pyramid(f, a=[0, 0, 0], chamfer=0.4, inset=0.3) {
     mid = sum(f) / len(f);
     difference() {
         pyramid(f, a);
@@ -178,7 +178,7 @@ module chamfer_pyramid(f, a=[0, 0, 0], inset=0.4) {
         // Establish a coordinate system for the box...
         c = (u+v)/ 2;
         multmatrix(orthonormal(v - u, unit(mid - c) + unit(a - c), p=c))
-            cube([norm(v - u)+2, inset*2, inset*4], center=true);
+            cube([norm(v - u)+2, chamfer*2, chamfer*4], center=true);
     }
     module chamfer_side(p) {
         multmatrix(orthonormal(p, p - mid, p=p/2))

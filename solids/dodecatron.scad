@@ -58,13 +58,6 @@ module poly(faces) {
 // Four rings of five, dodecahedral points.
 A = [for (r = rotate5) canonv(r * [0, gold-1, gold])];
 B = [for (r = rotate5) canonv(r * [gold-1,gold,0])];
-aB = [
-    [-1, -1, 1],
-    [gold-1, -gold, 0],
-    [gold, 0, 1-gold],
-    [gold-1, gold, 0],
-    [-1, 1, 1]
-    ];
 C = -B;
 D = -A;
 

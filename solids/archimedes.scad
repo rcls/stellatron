@@ -45,7 +45,8 @@ $flip = true;
 main();
 
 module main() {
-    if (archimedes == 1) truncated_tetrahedron();
+    // 46.9041 gives an edge length of 40.
+    if (archimedes == 1) truncated_tetrahedron(); // 50mm
     // Cuboctahedron has inscribe distance of /sqrt(2) for the squares
     // and /sqrt(3/2) for the trianges.  At 50mm, that gives square inscribe
     // radius of 35.3553mm and triangle inscribe 40.8248mm.
@@ -54,34 +55,45 @@ module main() {
     if (archimedes == 3) truncated_cube();
     // 52.7045 gives a triangle inscribe of 40.8247
     if (archimedes == 4) truncated_octahedron();
-    if (archimedes == 5) rhombi_cuboctahedron(); // 60mm ?
+    if (archimedes == 5) rhombi_cuboctahedron(); // 60mm
     // Inscribes: 53.6863 (cube), 58.638 (octohedron), 61.9008 (rhombis)
     if (archimedes == 6) truncated_cuboctahedron(); // 65mm
     if (archimedes == 7) snub_cube();         // 55mm
+    // Inscribe 60.7212 for the triangles and 55.2923 for the pentagons.
     if (archimedes == 8) icosidodecahedron(); // 65mm
+    // 75mm gives an edge length of 25.2572.
+    // 65.9415 gives an decagon inscribe of 55.2923 and edge length 22.2066.
     if (archimedes == 9) truncated_dodecahedron();
+    // 66.3659 gives hexagons matching the inscribe of the icosidodecahedron
+    // and an edge length of 26.7815.
     if (archimedes == 10) truncated_icosahedron();
     if (archimedes == 11) rhombicosidodecahedron();      // 65mm
     if (archimedes == 12) truncated_icosidodecahedron(); // 90mm
     if (archimedes == 13) snub_dodecahedron();           // 65mm
+
+    // Platonic solids.
+    if (archimedes == 21) tetrahedron();
+    if (archimedes == 22) plato_cube();
+    if (archimedes == 23) octohedron();
+    if (archimedes == 24) dodecahedron();
+    if (archimedes == 25) icosahedron();
 }
 
-// Joiner array description is [radius,radius_mm,offset,offset_mm].
-vertical_joiners=[
-    // radius, radius_mm
-    [1, -4, 0, 0], [0, 2.5, 0, 0] ];
-
-// With bottom post.
-triangle_joiners=[[1, -5, -0.5, 10], [1, -5, 0.5, -10], [0, 2.5, 0, 0]];
+// Joiner array item description is [radius,radius_mm,offset,offset_mm] or just
+// [radius_mm,offset_mm] with the origin inferred from the signs.
+vertical_joiners=[[1, -4, 0, 0], [0, 2.5, 0, 0]];
 
 module truncated_tetrahedron() {
+    $join_depth=4;
     a = [3,1,1];
     // Suppress coset reduction on the hexagon.  The order-6 rotation is not
     // in the full rotational symmetry group!
+    joiners=[[2.5,4],[-9,-4]];
     face_list = [
-        [triangle(a), 4, "black", 2],
-        [invert(double(triangle(mz(a)))), -4, "red", 3]];
-    polygon_face_set(face_list);
+        [triangle(a), 4, "grey", 2, [[[2.5,4],[-9,-4]]] ],
+        [invert(double(triangle(mz(a)))), -4, "red", 3,
+         [[[2.5,-4],[-9,4]], [[-9,4], [-9, -4]]] ]];
+    polygon_face_set(face_list, cut = 1 - 14.5 / $radius);
 }
 
 module cuboctahedron() {
@@ -96,9 +108,9 @@ module cuboctahedron() {
 
 module truncated_cube() {
     a = [1 + sqrt(2), 1, 1 + sqrt(2)];
-    t_joins=[[1, -7 , 0.5, -4.7], [0, 2.5, -0.5, 4.7]];
-    s_joint=[[0, 2.5, 0.5, -4.7], [1,  -7, -0.5, 4.7]];
-    s_joins=[[1, -7, 0.5, -3], [1, -7, -0.5, 3]];
+    t_joins=[[2.5,  4.7], [-7, -4.7]];
+    s_joint=[[2.5, -4.7], [-7,  4.7]];
+    s_joins=[[-7, -3], [-7, 3]];
     face_list = [
         [triangle(a), 8, "orange", 3, [t_joins]],
         [octogon(a), 6, "purple", 2, [s_joint, s_joins]]];
@@ -150,7 +162,8 @@ module snub_cube() {
         [triangle(a), 8, "orange"],
         [[a, pls(a), rmz(a)], 24, "pink", 4],
         ];
-    polygon_face_set(face_list, joiners=triangle_joiners);
+    joiners=[[-5, 10], [-5, -10], [2.5, 0]];
+    polygon_face_set(face_list, joiners=joiners);
 }
 
 module icosidodecahedron()
@@ -161,7 +174,8 @@ module icosidodecahedron()
         [triangle(q), 20, "yellow"],
         [canonvv(pentagon(q)), 12, "magenta"]];
 
-    polygon_face_set(face_list, cut=0.75, joiners=triangle_joiners);
+    joiners=[[-5, 10], [-5, -10], [2.5, 0]];
+    polygon_face_set(face_list, cut=0.75, joiners=joiners);
 }
 
 module truncated_dodecahedron() {
@@ -171,15 +185,17 @@ module truncated_dodecahedron() {
         [triangle(q), 20, "yellow"],
         [canonvv(double(pentagon(q))), 12, "magenta"]];
 
-    polygon_face_set(face_list);
+    joiners=[[-5.2, 0], [2.5, 0]];
+    polygon_face_set(face_list, joiners=joiners);
 }
 
 module truncated_icosahedron() {
     b = [2, gold, 2 * gold + 1];
+    joiners=[[-4, -4.8], [-4, 4.8]];
     face_list = [
         [canonvv(pentagon(b)), 12, "magenta", 2],
         [double(triangle(b)), 20, "yellow", 3]];
-    polygon_face_set(face_list);
+    polygon_face_set(face_list, cut=0.85, joiners=joiners);
 }
 
 module rhombicosidodecahedron() {
@@ -191,7 +207,6 @@ module rhombicosidodecahedron() {
         [pentagon(a), 12, "magenta"]
         ];
 
-    joiners=[[1, -3.2, -0.5, 10], [1, -3.2, 0.5, -10]];
     polygon_face_set(face_list, joiners=vertical_joiners);
 }
 
@@ -226,6 +241,42 @@ module snub_dodecahedron() {
     polygon_face_set(face_list, joiners=joiners);
 }
 
+module tetrahedron() {
+    $join_depth = 4;
+    p = [1,1,-1];
+    face_list = [[triangle(p), 4, "red", 2]];
+    joiners=[[-13, 6], [-13, -6]];
+    polygon_face_set(face_list, joiners=joiners);
+}
+
+module plato_cube() {
+    p = [1,1,1];
+    face_list = [[zsquare(p), 6, "green", 2]];
+    joiners=[[-9, 6], [-9, -6]];
+    polygon_face_set(face_list, joiners=joiners);
+}
+
+module octohedron() {
+    p = [0,0,1];
+    face_list = [[triangle(p), 8, "orange", 2]];
+    joiners = [[-7.5, 9], [-7.5, -9]];
+    polygon_face_set(face_list, joiners=joiners);
+}
+
+module dodecahedron() {
+    p = [0,gold-1,gold];
+    face_list = [[pentagon(p), 12, "magenta", 2]];
+    joiners = [[-5, 5], [-5, -5]];
+    polygon_face_set(face_list, joiners=joiners);
+}
+
+module icosahedron() {
+    p = [1,0,gold];
+    face_list = [[triangle(p), 20, "yellow", 2]];
+    joiners = [[-4.5, 10], [-4.5, -10]];
+    polygon_face_set(face_list, joiners=joiners);
+}
+
 module joinable_frustum(w, cut=0.75, joiners, colour) {
     mean = sum(w) / len(w);
     w_inscribe = norm(mean);
@@ -237,11 +288,16 @@ module joinable_frustum(w, cut=0.75, joiners, colour) {
         translate([0, 0, -cut * w_inscribe]) verticate_align(w) difference() {
             color(colour) chamfer_pyramid(w);
             for (i = [1:len(w)]) {
-                for (j = joiners[i % len(joiners)])
+                for (j = joiners[i % len(joiners)]) {
+                    v   = len(j) == 4 ? j[0] : 0.5 - 0.5 * sign(j[0]);
+                    vmm = len(j) == 4 ? j[1] : j[0];
+                    h   = len(j) == 4 ? j[2] : -0.5 * sign(j[1]);
+                    hmm = len(j) == 4 ? j[3] : j[1];
                     mid_vertex_joiner_post(
                         w[i-1], w[i%len(w)],
-                        radius=cut + j[0] * (1 - cut), radius_mm=j[1],
-                        offset=j[2], offset_mm=j[3]);
+                        radius=cut + v * (1 - cut), radius_mm=vmm,
+                        offset=h, offset_mm=hmm);
+                }
             }
         }
         translate([0, 0, -$radius]) cube(2*$radius, center=true);

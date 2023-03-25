@@ -151,12 +151,17 @@ module main() {
     if (crennell == 46) {
         if ($piece == 0) c46();
         if ($piece == 1)
+            //one_twelfth(cut=1/3, small=1/3, top=radius3/radius6) c46();
+            one_twelfth(cut=1/3, mid=radius2/radius6, inset=3.5,
+                        chamfer_edge=[0:4]) c46();
+        if ($piece == 2)
             one_twelfth(cut=1/5, small=1/5, top=radius3/radius6,
                         mid=radius2/radius6) c46();
-        stand_tripod(strut=-coscribe/radius6, hole=2) c46();
+        stand_tripod(strut=-coscribe / raw_radius6, hole=2) c46();
     }
     if (crennell == 47) {
         icosa_top_bottom(radius6, post=0.5, inset=5) c47();
+        p6a = [1 + gold, 0, -gold];
         stand_tripod(strut=0.1, align=p6a, hole=2) c47();
     }
     if (crennell == 48) c48();

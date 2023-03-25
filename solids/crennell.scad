@@ -262,7 +262,7 @@ module c8() scale(1/radius8) full_H();  // The mighty final stellation.
 
 module c9() scale(1/radius6) cell_e1(); // Twelfth stellation, spikes point joined.
 
-module c10() scale(1/radius6) {         // Hex spike cage, edge joins.
+module c10() scale(1/radius6) {         // Hex hollow spike cage, edge joins.
     cell_f1a();
     cell_f1b();
 }
