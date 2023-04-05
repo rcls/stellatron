@@ -184,6 +184,20 @@ module main() {
         icosa_top_bottom(radius6, post=0.5, inset=5) c47();
         p6a = [1 + gold, 0, -gold];
         stand_tripod(strut=-radius1/radius6*coscribe, hole=2) c47();
+        if ($piece == 3)
+            five_tetrahedron_twentieth();
+        if ($piece == 11) {
+            stand_tripod(strut=-radius1/radius6*coscribe, hole=2, p=11) c47();
+            for (i = [0:4]) {
+                translate($radius * [cos(i * 60), sin(i * 60), 0]) {
+                    cylinder(h=$radius/4, r=$stand_diameter);
+                    translate([0, 0, $radius/2]) faceup()
+                        scale($radius/3/sqrt(3))
+                        multmatrix(rotate5[(i + 3) * 2 % 5])
+                        pyramids(four(invert(triangle([-1,1,1]))));
+                }
+            }
+        }
     }
     if (crennell == 48) c48();
     if (crennell == 49) c49();
