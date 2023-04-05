@@ -1,7 +1,8 @@
 // ICOSAHEDRAL STELLATIONS.
 
-include <numbers.scad>
 use <functions.scad>
+use <splitting.scad>
+include <numbers.scad>
 
 // ICOSAHEDRAL STELLATION DIAGRAM
 
@@ -31,26 +32,26 @@ p2 = [2 + gold, 2 + gold, 1 - 2 * gold] / 5;
 
 //0.5+0.5ϕ	-0.5ϕ	0.5	3	(1+ϕ)/√2
 p3a = [1 + gold, 1, -gold] / 2;
-p3b = reflect(p3a);
+p3b = [p3a.x, p3a.z, p3a.y];
 
 //1	1	-1	1	2
 p4 = [1, 1, -1];
 
 //1ϕ	1-1ϕ	0	1	2
 p4a = [gold, 0, 1 - gold];
-p4b = reflect(p4a);
+p4b = [p4a.x, p4a.z, p4a.y];
 
 //0.6+0.8ϕ	0.2-0.4ϕ	0.2-0.4ϕ	1	0.4+1.2ϕ
 p5 = [3 + 4 * gold, 1 - 2 * gold, 1 - 2 * gold] / 5;
 
 //0.8+0.4ϕ	-0.2-0.6ϕ	0.4+0.2ϕ	1	0.4+1.2ϕ
 p5a = [4 + 2 * gold, 2 + gold, -1 - 3*gold] / 5;
-p5b = reflect(p5a);
+p5b = [p5a.x, p5a.z, p5a.y];
 
 // 1+1ϕ	-1ϕ	0	10	(1+ϕ)√2
 // Six planes meet.
 p6a = [1 + gold, 0, -gold];
-p6b = reflect(p6a);
+p6b = [p6a.x, p6a.z, p6a.y];
 
 // -1-2ϕ	1+1ϕ	1+1ϕ	6	2+3ϕ
 // Five planes meet.
@@ -59,75 +60,71 @@ p7 = [1 + gold, 1 + gold, -1 - 2 * gold];
 //-2-4ϕ	2+3ϕ	1+1ϕ	1	4+6ϕ
 // Six of nine.
 p8a = [2 + 3 * gold, 1 + gold, -2 - 4 * gold];
-p8b = reflect(p8a);
+p8b = [p8a.x, p8a.z, p8a.y];
 
 // 3+4ϕ	-1-2ϕ	-1-2ϕ	1	4+6ϕ
 // Three of nine.
 p8 = [3 + 4 * gold, -1 - 2 * gold, -1 - 2 * gold];
 
-// A mirror symmetry in the `x+y+z=1` plane.
-function reflect(p) = [p.x, p.z, p.y];
-
-function u_apply(tri, p) = tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2];
-
-function apply(tri, p) = canonv(u_apply(tri, p));
-
 // PLAIN ICOSAHEDRON
 
 // The co-ordinates of each vertex is an even permutation of [0, ±1, ±ϕ].  The
 // edges have length 2.
+ico_faces = canonvvv(twenty(triangle([0, gold, 1])));
 
-ico_faces_edged1 = [
-     [[-1, 0, gold], [ 1, 0, gold], [0, -gold, 1]],
-     [[ 1, 0, gold], [-1, 0, gold], [0,  gold, 1]]];
-ico_faces_edged = [ for (f = ico_faces_edged1)
-        each [f, [for (v = f) pls(v)], [for (v = f) mns(v)]]];
-ico_faces_oct = [
-    for (sx = [-1, 1]) for (sy = [-1, 1]) [
-        [sx, 0, sx * sy * gold], [0, sy * gold, sx * sy], [sx * gold, sy , 0]]];
-ico_faces_half = [ each ico_faces_edged, each ico_faces_oct ];
-ico_faces = [
-    each ico_faces_half,
-    for (f = ico_faces_half) [-f[2], -f[1], -f[0]] ];
-assert(len(ico_faces) == 20);
+$ico_color = [["green", for (i=[1:12]) undef, "green", for (i=[14:19]) undef]];
+five_colors = ["lightgreen", "orange", "#8cf", "yellow", "red"];
 
+five_octa_color = [
+    [
+        "red", "green", "yellow", "blue", "orange",
+        "red", "green", "yellow", "blue", "orange",
+        "red", "green", "yellow", "blue", "orange",
+        "red", "green", "yellow", "blue", "orange"],
+    [
+        "blue", "orange", "red", "green", "yellow",
+        "green", "yellow", "blue", "orange", "red",
+        "yellow", "blue", "orange", "red", "green",
+        "orange", "red", "green", "yellow", "blue"],
+    ];
 // STELLATION LIBRARY
 
-module wedge(tri, stellation, anchor=[0, 0, 0]) {
-    d = stellation[1] - stellation[0];
-    e = stellation[2] - stellation[1];
-    cross_sum = d.y * e.z - d.z * e.y
-        +       d.z * e.x - d.x * e.z
-        +       d.x * e.y - d.y * e.x;
+module wedge(tri, stellation, anchor=[0, 0, 0], c=undef) {
+    cross_sum = cross(stellation[1] - stellation[0],
+                      stellation[2] - stellation[1]) * [1,1,1];
 
-    points = [
-        u_apply(tri, anchor),
-        for (p = stellation) apply(tri, p),
-        ];
-    faces = [
-        [each [1:len(stellation)]],
-        [1, len(stellation), 0],
-        for (i = [2:len(stellation)]) [i, i-1, 0],
-        ];
-    if (cross_sum >= 0)
-        polyhedron(points = points, faces = faces, convexity=10);
+    if (c)
+        color(c) poly();
+    else if (cross_sum >= 0)
+        poly();
     else
-        color("red") polyhedron(points = points, faces = faces, convexity=2);
+        color("red") poly();
     // # for (p = stellation) translate(apply(tri, p)) sphere(0.1);
     //% translate(anchor) sphere(0.1);
-}
-
-module wedges(tri, stellations) {
-    for (s = stellations) wedge(tri, s);
+    function apply(tri, p) = tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2];
+    module poly()
+        polyhedron(
+            points=[
+                apply(tri, anchor), for (p = stellation) canonv(apply(tri, p))],
+            faces=[
+                [each [1:len(stellation)]],
+                [1, len(stellation), 0],
+                for (i = [2:len(stellation)]) [i, i-1, 0],
+                ],
+            convexity=10);
 }
 
 module stellate_sym(stellations) {
-    for (f = ico_faces)
-        wedges(f, stellations);
+    cl = len($ico_color);
+    for (i = [0:len(stellations) - 1])
+        for (j = [0:19])
+            wedge(ico_faces[j], stellations[i], c = $ico_color[i%cl][j]);
 }
 
 module stellate(stellations) {
-    stellate_sym([ for (s = stellations) each triple(s) ]);
+    stellate_sym(stellations);
+    stellate_sym([for (s = stellations) mmns(s)]);
+    stellate_sym([for (s = stellations) ppls(s)]);
 }
 
 module stellate1(stellation, weights=[], normal=0) {
@@ -136,10 +133,11 @@ module stellate1(stellation, weights=[], normal=0) {
         / sum(weights);
     anchorn = normal * p0;
     anchor = anchorw + anchorn;
-    for (f = ico_faces) {
-        wedge(f, stellation, anchor);
-        wedge(pls(f), stellation, anchor);
-        wedge(mns(f), stellation, anchor);
+    for (i = [0:19]) {
+        f = ico_faces[i];
+        wedge(f, stellation, anchor, c=$ico_color[0][i]);
+        wedge([f.y, f.z, f.x], stellation, anchor, c=$ico_color[0][i]);
+        wedge([f.z, f.x, f.y], stellation, anchor, c=$ico_color[0][i]);
     }
 }
 
@@ -171,8 +169,10 @@ module full_C() stellate_sym(
     [[p3a, pls(p3a), mns(p3a)],
      [p3b, pls(p3b), mns(p3b)]]);
 
-// TODO - split this up.
-module full_D() stellate([[mns(p1), p4a, p4, pls(p4b)]]);
+module full_D() stellate(
+    // Splitting the kite allows the use of 2 colours, e.g., c21.
+    [[mns(p1), p4a, p4],
+     [mns(p1), p4, pls(p4b)]]);
 
 module full_E() stellate(
     [[p3a, p4a, p6a],
@@ -200,6 +200,7 @@ module cell_e1() {
     stellate1([p6b, p4b, p3b], weights=[0, 1, 1], normal=-0.7);
     stellate1([p4, p3a, p2, pls(p3b)], weights=[1], normal=1);
 }
+module full_e1() stellate([[p3a, p4a, p6a], [p6b, p4b, p3b]]);
 
 module cell_f1a() {
     stellate1([p6a, p5a, p3a], weights=[1, 4, 4], normal=-0.4);
@@ -208,7 +209,12 @@ module cell_f1a() {
     stellate1([p5b, mns(p4), p3b], weights=[1.3, 1, -1.1], normal=1.1);
 }
 
-module cell_f1b() reflect([0,0,1]) cell_f1a();
+module cell_f1b() {
+    stellate1([p3b, p5b, p6b], weights=[4, 4, 1], normal=-0.4);
+    stellate1([p6b, p5, p4b], weights=[0, 2, 1], normal=-0.3);
+    stellate1([p6a, p4a, p3a], weights=[1, 3, 7], normal=0.3);
+    stellate1([p3a, p4, p5a], weights=[-1.1, 1, 1.3], normal=1.1);
+}
 
 module cell_g1() {
     stellate1([p6a, p5, p6b], weights=[1,4,1], normal=-0.48);
@@ -248,7 +254,10 @@ module c1() scale(1/radius1) full_A();  // Icosahedron.
 module c2()                      // Small triambic / first stellation / triakis.
     scale(1/radius2) full_B();
 
-module c3() scale(1/radius3) full_C();  // Compound of five octohedra
+module c3() {                           // Compound of five octohedra
+    $ico_color = cycles(five_colors, [[0, 0, 0, 0], [3, 1, 2, 4]]);
+    scale(1/radius3) full_C();
+}
 
 module c4() scale(1/radius4) full_D();
 
@@ -260,7 +269,7 @@ module c7() scale(1/radius7) full_G();  // Great.
 
 module c8() scale(1/radius8) full_H();  // The mighty final stellation.
 
-module c9() scale(1/radius6) cell_e1(); // Twelfth stellation, spikes point joined.
+module c9() scale(1/radius6) cell_e1(); // Twelfth stellation, hex spikes point joined.
 
 module c10() scale(1/radius6) {         // Hex hollow spike cage, edge joins.
     cell_f1a();
@@ -316,14 +325,22 @@ module c20() scale(1/radius7)     // Fifth stellation, star spikes, point joins.
 
 module c21() scale(1/radius6) {
     // Seventh stellation, great dodecaisocron, 20 hex spikes.
+    $ico_color = cycles(five_colors, [[3, 1, 2, 4], [0, 0, 0, 0]]);
     full_D();
-    cell_e1();
+    full_e1();
 }
 
 module c22() scale(1/radius6) {         // Ten tetrahedra.
-    full_E();
-    cell_f1a();
-    cell_f1b();
+    // We split the kite in two, and color, so it's easiest to skip the cell
+    // definitions (E f1).
+    $ico_color = cycles(five_colors, [[3, 1, 2, 4], [0, 0, 0, 0]]);
+    stellate([
+                 [p1, p5, p6a],
+                 [p6b, p5, p1],
+                 [p6a, p5a, p3a],
+                 [p3b, p5b, p6b]
+                 ]);
+    color("grey") full_e1();
 }
 
 // Sixth stellation.  Exc. dodec with spikes. F g1
@@ -354,7 +371,7 @@ module c27() scale(1/radius5) {         // Excavated turrets.
 }
 
 // Twelve big spikes, twenty small.  Compound of triambic icosahedron and
-// seventh stellation.
+// seventh stellation.  Small enneagrammic icosohedron.
 module c28() scale(1/radius7) {
     full_E();
     cell_f2();
@@ -376,7 +393,7 @@ module c31() scale(1/radius7) {         // c29 but with gaps.
     cell_g2();
 }
 
-module c32() scale(1/radius7) {         // c29 but with gaps.
+module c32() scale(1/radius7) {         // c29 but with small gaps.
     full_E();
     cell_f2();
     cell_g2();
@@ -464,8 +481,11 @@ module c46() scale(1/radius6) {         // Hollow hex spikes, solid support.
     cell_f1a();
 }
 
-module c47() scale(1/radius6)                  // Five tetrahedra.
-    stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
+module c47() {                          // Five tetrahedra.
+    $ico_color = [cycles(["yellow", "pink", "red", "green", "purple"],
+                         [3, 1, 2, 4])];
+    scale(1/radius6) stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
+}
 
 module c48() scale(1/radius6) {         // Hollowed chiral exc. dodec.
     cell_e2();
@@ -499,7 +519,8 @@ module c52() scale(1/radius7) {         // 12 + 20 spikes, some hollow.
     cell_f2();
 }
 
-module c53() scale(1/radius7) {         // No retro, crazy!
+module c53() scale(1/radius7) {         // No hollows, crazy!
+    $ico_color = [cycles(five_colors, [3, 1, 2, 4])];
     full_E();
     cell_f1a();
     cell_f2();
@@ -547,4 +568,33 @@ module c59() scale(1/radius7) {         // Hex spikes, chunks out.
     cell_f1a();
     cell_f2();
     cell_g2();
+}
+
+module five_tetrahedron_twentieth() {
+    tri = [[1, 0, gold], [gold, -1, 0], [0, -gold, 1]];
+    function apply(p) = $radius / radius6 * canonv(tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2]);
+    q4  = apply(p4);
+    q4a = apply(p4a);
+    q1  = apply(p1);
+    q6a = apply(p6a);
+
+    joiners=[[[-3, 0], [3, 0]], [], []];
+
+    trapezohedron(
+        [q4, q4a, q1, mns(q4), mns(q4a), mns(q1), pls(q4), pls(q4a), pls(q1)],
+        q6a, 0.32 * $radius, joiners);
+}
+
+module five_octahedron_twentieth() {
+    function apply(p) = $radius / radius3 * canonv(tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2]);
+    tri = [[1, 0, gold], [gold, -1, 0], [0, -gold, 1]];
+    q1 = apply(p1);
+    q2 = apply(p2);
+    q3a = apply(p3a);
+
+    //color("red") indicate(rot5 * apply(p3b));
+    trapezohedron(
+        [q2, q1, rot5_4 * q2, pls(q1)],
+        q3a, 0.5 * $radius,
+        [[[-1.5, -5], [-3.5, 9.5]], [[-1.5, 5], [-3.5, -9.5]]]);
 }

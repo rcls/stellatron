@@ -1,6 +1,7 @@
 
 include <numbers.scad>
 use <crennell.scad>
+use <functions.scad>
 use <dodecatron.scad>
 use <splitting.scad>
 
@@ -53,7 +54,12 @@ module main() {
         if ($piece == 6) two_twelfths() c1();
     }
     if (crennell == 2) c2();
-    if (crennell == 3) c3();
+    if (crennell == 3) {
+        icosa_top_bottom(radius3, post=1/2) c3();
+        if ($piece == 3) five_octahedron_twentieth();
+        if ($piece == 10)
+            stand_rhombus(x=2-gold, y=(3 - gold)/5) c3();
+    }
     if (crennell == 4) c4();
     if (crennell == 5) c5();
     if (crennell == 6) {
@@ -119,7 +125,26 @@ module main() {
             stand_quad(x=0.1, y=gold/10, height=gold/ico_scale) c28();
         stand_tripod(strut=gold-1.5, base=$radius/5, height=inscribe, p=11)
             c28();
+        if ($piece == 12) {
+            difference() {
+                union() {
+                    minkowski() {
+                        cylinder(r1=3, r2=2.5, h=1, $fn=5);
+                        intersection() {
+                            sphere(1);
+                            translate([-2,-2,0]) cube(4);
+                        }
+                    }
+                    for (a = [-36,36,144,-144])
+                        rotate(a) rotate([0,60,0]) translate([0,0,2])
+                            rounded_ring(0, 0, height=3, r=1);
+                            // dome() cylinder(r=0.5, h=2);
+                }
+                translate([0,0,10-$radius]) scale($radius) pointup() c16();
+            }
+        }
     }
+
     if (crennell == 29) c29();
     if (crennell == 30) {
         icosa_top_bottom(radius7, post=-radius4/radius7, inset=5) c30();
@@ -151,18 +176,14 @@ module main() {
     if (crennell == 46) {
         if ($piece == 0) c46();
         if ($piece == 1)
-            //one_twelfth(cut=1/3, small=1/3, top=radius3/radius6) c46();
             one_twelfth(cut=1/3, mid=radius2/radius6, inset=3.5,
                         chamfer_edge=[0:4]) c46();
-        if ($piece == 2)
-            one_twelfth(cut=1/5, small=1/5, top=radius3/radius6,
-                        mid=radius2/radius6) c46();
         stand_tripod(strut=-coscribe / raw_radius6, hole=2) c46();
     }
     if (crennell == 47) {
         icosa_top_bottom(radius6, post=0.5, inset=5) c47();
         p6a = [1 + gold, 0, -gold];
-        stand_tripod(strut=0.1, align=p6a, hole=2) c47();
+        stand_tripod(strut=-radius1/radius6*coscribe, hole=2) c47();
     }
     if (crennell == 48) c48();
     if (crennell == 49) c49();
@@ -194,15 +215,26 @@ module main() {
                 dodecahedron();
         stand_tripod(strut=-1/3, hole=$radius) dodecahedron();
     }
+    if (crennell == 102) {
+        if ($piece == 0) small_ditrigonal_icosidodecahedron();
+        if ($piece == 1)
+            scale($radius) translate([0,0,inscribe]) pointup()
+                small_ditrigonal_icosidodecahedron();
+        small_ditrigonal_icosidodecahedron_piece();
+        if ($piece == 10)
+            stand_quad(x=0.3047, y=0.3047, hole=1)
+                small_ditrigonal_icosidodecahedron();
+    }
+    if (crennell == 103) {
+        five_cubes();
+    }
     if (crennell == 107) {
-        if ($piece == 0) great_stellated_dodecahedron();
         dodeca_spikey(post=0.3, inset=3, raise=(2 * gold - 3)*inscribe)
             great_stellated_dodecahedron();
         stand_tripod(strut=(0.6 - 0.2 * gold) * inscribe / sqrt(3), hole=2)
             great_stellated_dodecahedron();
     }
     if (crennell == 108) {
-        if ($piece == 0) final_dual();
         icosa_top_bottom(radius6, post=0.4, inset=0*5) final_dual();
         if ($piece == 5)
             one_twelfth(cut=0.3, top=0.4, topset=0,
@@ -224,6 +256,34 @@ module main() {
         stand_tripod(strut=0.23, strut_mm=$stand_diameter/2,
                      length=2/3, hole=$radius/5, p=12) final_dual();
     }
+    if (crennell == 128) {
+        // Project [gold,1-gold,0] onto [1,1,1].
+        p = [gold, 1-gold, 0];
+        q = [1, 1, 1];
+        icosa_top_bottom(norm(p)*norm(q),
+                         post=0.767,//0.93,
+                         inset=5, angle=30,
+                         ref_radius=p * q) dual_c28();
+        r1 = (2 - gold) * coscribe * $radius + $stand_diameter / 2 / cos(36);
+        r2 = (1 - 2 * gold) / 5 * coscribe * $radius;
+        stand_pentapod(strut=0, strut_mm=-max(r1, r2), hole=0) dual_c28();
+    }
+    // The 30th stellation can be taken to be either the medial- or the great-
+    // triambic icosahedron, the duals of which are visibly different.  We
+    // number the two as 130 and 230.
+    if (crennell == 130) {
+        ditrigonal_dodecadodecahedron();
+    }
+    if (crennell == 230) {
+        great_ditrigonal_icosidodecahedron();
+    }
+    if (crennell == 200) {              // Out of place!
+        if ($piece == 0) stella_octangular();
+        if ($piece == 1) scale($radius) translate([0, 0, 1/sqrt(3)])
+                             stella_octangular();
+        if ($piece == 2) stella_octangular_eighth();
+        if ($piece == 3) mirror([1, 0, 0]) stella_octangular_eighth();
+    }
     if (crennell == 201) {
         dodeca_spikey(post=-2/sqrt(5), inset=15) great_dodecahedron();
         stand_pentapod(strut=(6 * gold - 8) / 5) great_dodecahedron();
@@ -231,6 +291,13 @@ module main() {
     if (crennell == 202) {
         dodeca_spikey(post=(gold-3)/5, inset=5) small_stellated_dodecahedron();
         stand_pentapod(strut=(gold-3)/5) small_stellated_dodecahedron();
+    }
+    if (crennell == 203) {
+        if ($piece == 0)
+            dodecadodecahedron();
+        dodecadodecahedron_pieces();
+        stand_tripod(strut=(gold - 2) * dodeca_midscribe, hole=1)
+            dodecadodecahedron();
     }
 }
 
@@ -281,27 +348,11 @@ module stand_generic(num, strut, strut_mm=0, base=0,
             # translate([0, 0, $radius * height + 2])
                 scale($radius) children();
         }
-        minkowski() {
-            difference() {
-                cylinder(r=max(base, abs(strut_all) + $stand_diameter / 2),
-                         h = 0.1, $fn=6 * $fn);
-                if (hole > 0) {
-                    holey = min(hole + 1.9,
-                                abs(strut_all) - $stand_diameter / 2);
-                    cylinder(r=holey, h=1, center=true,
-                             $fn = holey > 4 ? $fn * 6 : $fn);
-                }
-            }
-            intersection() {
-                sphere(r=1.9);
-                translate([-3, -3, 0]) cube(6);
-            }
-        }
+        stand_ring(base, hole, strut_all);
     }
 }
 
-module stand_quad(x, y, length=1, height=1) {
-    r = sqrt(x * x + y * y) * $radius;
+module stand_quad(x, y, length=1, height=1, hole=0) {
     difference() {
         for (c = [[x, y], [-x, y], [-x, -y], [x, -y]])
             translate([c.x * $radius, c.y * $radius, 0])
@@ -309,11 +360,40 @@ module stand_quad(x, y, length=1, height=1) {
         #translate([0, 0, $radius * height + 2])
         scale($radius) children();
     }
-    minkowski() {
-        cylinder(r = r + $stand_diameter / 2, h = 0.1, $fn=6 * $fn);
-        intersection() {
-            sphere(r=1.9);
-            translate([-3, -3, 0]) cube(6);
+    stand_ring(0, 1, norm([x, y]) * $radius);
+}
+
+module stand_rhombus(x, y, length=1, height=1) {
+    difference() {
+        for (c = [[x, 0], [-x, 0], [0, -y], [0, y]])
+            translate([c.x * $radius, c.y * $radius, 0])
+                cylinder(r = $stand_diameter / 2, h=$radius * length + 2);
+        #translate([0, 0, $radius * height + 2])
+        scale($radius) children();
+    }
+    stand_ring(max(x, y), min(x, y), x * $radius);
+}
+
+module stand_ring(base, hole, strut_mm) {
+    outer = max(base * $radius, abs(strut_mm) + $stand_diameter / 2);
+    inner = min(hole * $radius, abs(strut_mm) - $stand_diameter / 2);
+    rounded_ring(outer, inner, n = $fn * 6);
+}
+
+module rounded_ring(outer, inner, height=0, r=2, n=0) {
+    rotate_extrude($fn = n ? n : $fn) {
+        translate([outer, height]) intersection() {
+            circle(r);
+            square(r);
         }
+        if (inner >= r) translate([inner, height]) intersection() {
+                circle(r);
+                translate([-r, 0]) square(r);
+            }
+        if (outer > inner)
+            translate([inner, 0]) square([outer - inner, height + r]);
+        iinner = inner >= r ? inner - r : inner;
+        if (height > 0)
+            translate([inner, 0]) square([outer + r - iinner, height]);
     }
 }

@@ -4,26 +4,36 @@ import math
 import numpy.linalg
 from vector import Vector
 
-numpy.linalg.solve
-
 '''Convert a number to our canonical golden ratio form'''
-def rational(x):
-    x10 = x * 10
-    rx10 = round(x10)
-    fx10 = x10 - rx10
-    for n in list(range(-200, 210, 10)) \
-        + list(range(-15, 16, 10)) \
-        + list(range(-20, 21)):
+def rationali(x):
+    ix = round(x)
+    fx = x - ix
+    for n in range(200):
         ng = n * gold
-        rng = round(ng)
-        fng = ng - rng
-        if abs(fx10 - fng) < 1e-6:
-            # x10 = n * gold - rng + rx10
-            return n / 10, (rx10 - rng) / 10
-    return 0, x
+        ing = round(ng)
+        fng = ng - ing
+        if abs(fx - fng) < 1e-6:
+            return n, ix - ing
+        if abs(fx + fng) < 1e-6:
+            return -n, ix + ing
+    return 0, float(x)
+
+def rational(x):
+    if abs(2 * x - round(2 * x)) < 1e-6:
+        return 0, round(2 * x) / 2
+    p, i = rationali(x)
+    if p != 0:
+        return p, i
+    p, i = rationali(5 * x)
+    if p != 0:
+        return p / 5, i / 5
+    p, i = rationali(25 * x)
+    if p != 0:
+        return p / 25, i / 25
+    return 0, float(x)
 
 def describe(x):
-    #print(rational(x))
+    #print(x, rational(x))
     cp, ci = rational(x)
     if cp == int(cp):
         cp = int(cp)
@@ -43,6 +53,7 @@ def describe(x):
 
 def canonical(x):
     cp, ci = rational(x)
+    #print(x, cp, ci)
     return cp * gold + ci
 
 def canonv(v):
@@ -115,6 +126,7 @@ def near(l, x):
     assert False, x
 
 def p_norm(s):
+    #print("P norm", s, ico_faces[0], applys(s, ico_faces[0]))
     return applys(s, ico_faces[0]).norm()
 
 def is_canon(s):
@@ -144,9 +156,9 @@ def calc_raw_stell_points():
 raw_stell_points = calc_raw_stell_points()
 
 for s, n in raw_stell_points:
+    r = p_norm(s) / ico_faces[0][0].norm();
     print(describe(s[0]), describe(s[1]), describe(s[2]),
-          n,
-          p_norm(s) / ico_faces[0][0].norm(),
+          n, 'r=', describe(r), 'r²=', describe(r * r),
           sep='\t')
 
 stell_points = set()

@@ -42,14 +42,14 @@ module dodeca_spikey(post=0.1, inset=0, raise = (2 * gold - 1) / 5) {
     }
 }
 
-module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0) {
+module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0, ref_radius=undef) {
     if ($piece == 0) {
         children();
     }
     if ($piece == 1) {
         difference() {
             translate([0, 0, -$extra_z_remove])
-                icosa_tb_whole(raw_radius, post, inset, angle)
+                icosa_tb_whole(raw_radius, post, inset, angle, ref_radius)
                 children();
             translate([0, 0, -$radius * 1.1]) cube($radius * 2.2, center=true);
         }
@@ -57,15 +57,16 @@ module icosa_top_bottom(raw_radius, post=0, inset=5, angle=0) {
     if ($piece == 2) {
         difference() {
             translate([0, 0, -$extra_z_remove]) rotate([0,180,0])
-                icosa_tb_whole(raw_radius, post, inset, angle)
+                icosa_tb_whole(raw_radius, post, inset, angle, ref_radius)
                 children();
             translate([0,0, -$radius * 1.1]) cube($radius * 2.2, center=true);
         }
     }
 }
 
-module icosa_tb_whole(raw_radius, post=0, inset=0, angle=0) {
-    offset = inscribe * radius1 / raw_radius;
+module icosa_tb_whole(raw_radius, post=0, inset=0, angle=0, ref_radius=undef) {
+    offset = ref_radius ? ref_radius / raw_radius
+        : inscribe * radius1 / raw_radius;
     difference() {
         scale($radius)
             translate([0, 0, offset]) faceup() children();
@@ -192,7 +193,6 @@ module one_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
     }
 }
 
-
 module raw_twelfth(big=1.1/inscribe, top=0, mid=0, small=0,
                    inset=2.5, topset=3.75, post_face=[0:4],
                    chamfer=0.4, chamfer_edge=[], midsetz=0) {
@@ -257,8 +257,93 @@ module joiner_post(angle=0, position=[0,0,0]) {
     r = $join_diameter / 2;
     l = $join_depth;
     c = 0.4;
+    eps = 1e-3;
 
-    rotate(angle) translate(position) #rotate_extrude() {
-        polygon([[0,-l], [r, -l], [r,-c], [r+c,0], [r,c], [r,l], [0, l]]);
+    rotate(angle) translate(position) rotate_extrude() {
+        polygon([[0,-l], [r, -l], [r,-c-eps],
+                 [r+c,-eps], [r+c, eps],
+                 [r,c+eps], [r,l], [0, l]]);
+    }
+}
+
+module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1) {
+    l = len(points);
+    v = l;
+    a = l + 1;
+    cutoff(cut_radius) verticate(vertex, align=points[0]) difference() {
+        polyhedron(
+            [each points, vertex, [0, 0, 0]],
+            [for (i = [1:l]) each [[a, i % l, i - 1], [v, i - 1, i % l]]],
+            convexity=l);
+        for (i = [1:l]) {
+            chamfer(points[i%l], points[i-1], points[(i+1)%l]);
+            // chamferh(points[i%l], points[i-1], vertex, [0,0,0]);
+        }
+
+        for (i = [0:l-1]) {
+            for (j = joiners[i % len(joiners)]) {
+                a = points[i];
+                b = points[(i + 1) % l];
+                v_inset = j[0];
+                h_inset = j[1];
+
+                s = i - (i % span);
+                e = s + span;
+                s1 = round((s + e - 0.5) / 2);
+                e1 = round((s + e + 0.5) / 2);
+                vertical = points[e1 % l] + points[s1 % l];
+                horizontal = points[e % l] - points[s];
+
+                #jpost(a, b, v_inset, h_inset, vertical, horizontal);
+            }
+        }
+    }
+
+    module cutoff(cut_radius) {
+        intersection() {
+            translate([0, 0, -cut_radius]) children();
+            translate([0,0,$radius]) cube(2 * $radius, center=true);
+        }
+    }
+
+    module jpost(a, b, jv_mm, jh_mm, vertical, horizontal) {
+        // Ignore cut_radius for this calculation....
+        jv = (1 - sign(jv_mm)) / 2 + jv_mm / $radius;
+        jh = -sign(jh_mm) + jh_mm / norm(a - b);
+        // Location of post before mm offset.
+        p = (a + b)/2 * jv + jh * (a - b)/2;
+        depth = unit(cross(vertical, horizontal));
+        trans1 = unit(cross(depth, vertical));
+        trans2 = unit(cross(depth, trans1));
+        // Normal to the face.
+        normal = cross(a, b);
+        // Now work out the in-face vectors that differ from trans1 and trans2
+        // by a multiple of depth.
+        skew1 = trans1 - (trans1*normal)/(depth*normal) * depth;
+        skew2 = trans2 - (trans2*normal)/(depth*normal) * depth;
+
+        intersection() {
+            multmatrix(transpose(trans1, trans2, depth, p=p))
+                cube($join_depth * 2, center=true);
+            let ($join_depth = $join_depth + 2)
+                multmatrix(transpose(skew1, skew2, depth, p=p))
+                joiner_post();
+        }
+    }
+
+    module chamfer(p, r, s, inset=0.2) {
+        multmatrix(orthonormal(p, unit(cross(r, p)) + unit(cross(s, p))))
+            rotate([45, 0, 0])
+            translate([0, -inset, -inset])
+            cube([norm(p) + 1, 2 * inset, 2 * inset]);
+    }
+
+    module chamferh(r, s, a, b) {
+        mid = (r + s) / 2;
+        along = unit(r - s);
+        trans = unit(unit(cross(along, mid - a)) + unit(cross(along, mid - b)));
+        multmatrix(orthonormal(along, trans, p=mid)) {
+            cube([norm(r - s), 0.4, 0.4], center=true);
+        };
     }
 }

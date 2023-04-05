@@ -100,11 +100,12 @@ function unit(v) = v / norm(v);
 function transpose(dx, dy, dz, p = [0,0,0]) = [
     [dx.x, dy.x, dz.x, p.x],
     [dx.y, dy.y, dz.y, p.y],
-    [dx.z, dy.z, dz.z, p.z]];
+    [dx.z, dy.z, dz.z, p.z],
+    [0, 0, 0, 1]];
 
 // Return an orthonormal matrix that converts from (x,y,z) to a co-ordinate
 // system based on the input vectors.  `x` transforms to the direction of `u`.
-// `y` transforms to the projection of `y` onto the plane transverse to `u`.
+// `y` transforms to the projection of `v` onto the plane transverse to `u`.
 // `z` is normal to both, with a sign convention to make its dot-product with
 // `w` positive, if possible.  The origin transforms to `p`.
 function orthonormal(u, v, w=[0,0,0], p=[0,0,0]) = let (
@@ -136,14 +137,25 @@ function verticate_plus_z(v) = let (
     d = x * x + y * y)
     (d > 1e-20 ? verticate_non_singular(v) : [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
 
-function verticate(v) =
-    v.z >= 0 ? verticate_plus_z(v)
+function verticate(v, align=undef) = let(
+    vrot = v.z >= 0 ? verticate_plus_z(v)
     : verticate_plus_z(
-        [-v.x, v.y, -v.z]) * [[-1, 0, 0], [0, 1, 0], [0, 0, -1]];
+        [-v.x, v.y, -v.z]) * [[-1, 0, 0], [0, 1, 0], [0, 0, -1]],
+    valign = align ? vrot * align : [1, 0, 0],
+    vnorm = norm([valign.x, valign.y]),
+    c = valign.x / vnorm,
+    s = valign.y / vnorm)
+    [[c, s, 0], [-s, c, 0], [0, 0, 1]] * vrot;
+
+function inverticate(v) =
+    v.z >= 0 ? verticate_plus_z([-v.x, -v.y, v.z])
+    : [[-1, 0, 0], [0, 1, 0], [0, 0, -1]] * verticate_plus_z(
+        [v.x, -v.y, -v.z]);
 
 // Rotate children to bring the vector `v` vertical.  The rotation is in the v-z
 // plane.
-module verticate(v) multmatrix(verticate(v)) children();
+module verticate(v, align=undef) multmatrix(verticate(v, align)) children();
+module inverticate(v) multmatrix(inverticate(v)) children();
 
 // Bring mean of face to vertical and align first edge.
 module verticate_align(f) {
@@ -154,16 +166,36 @@ module verticate_align(f) {
         multmatrix(m) children();
 }
 
-// A pyramid connecting a face to an point.
-module pyramid(f, a=[0,0,0]) {
-    polyhedron(
+// A pyramid connecting a face to an point.  When not rendering, do the
+// triangles to the apex in red.
+module pyramid(f, a=[0,0,0], topcolor="gold", undercolor="red") {
+    if ($preview) {
+        mid = (a + sum(f) / len(f)) * 0.5;
+        color(topcolor) basic(f, mid);
+        color(undercolor) for (i = [1:len(f)])
+            basic([f[i-1], f[i%len(f)], mid], a);
+    }
+    else {
+        basic(f, a);
+    }
+    module basic(f, a) polyhedron(
         points=[a, each f],
         faces=[[each [1:len(f)]],
                [1, len(f), 0],
                for (x = [2:len(f)]) [x, x-1, 0]]);
 }
 
-module pyramids(ff) for (f = ff) pyramid(f);
+module star_pyramid(f, stride=2, a=[0,0,0],
+                    topcolor="gold", undercolor="red") {
+    n = len(f);
+    c = sum(f) / n;
+    for (i = [0 : n - 1])
+        pyramid([f[i], f[(i+stride) % n], c], a, topcolor, undercolor);
+}
+
+module pyramids(ff, topcolor="gold") for (f = ff) pyramid(f, topcolor=topcolor);
+
+module star_pyramids(ff, stride = 2) for (f = ff) star_pyramid(f, stride);
 
 module chamfer_pyramid(f, a=[0, 0, 0], chamfer=0.4, inset=0.3) {
     mid = sum(f) / len(f);
@@ -239,6 +271,11 @@ function reorient(v) = [for (i = [len(v) : -1 : 1]) v[i % len(v)]];
 // Inversion symmetry.
 function invert(f) = -reorient(f);
 
+function cycle(v, from=1) = let (l = len(v))
+    [for (i = [from + l : from + 2 * l - 1]) v[i % l]];
+function cycles(v, froms) =
+    [for (f = froms) each is_list(f) ? [cycles(v, f)] : cycle(v, f)];
+
 // Lexicographical order for vectors, accomodating rounding errors.
 function vless(u, v, tol=1e-7) =
     abs(u.x - v.x) <= tol ? abs(u.y - v.y) <= tol ?
@@ -250,6 +287,21 @@ function is_least_first(f, tol=1e-7) =
 
 // Three fold symmetry.
 function three(face) = [face, ppls(face), mmns(face)];
+
+module three() {
+    children();
+    multmatrix([[0,1,0], [0,0,1], [1,0,0]]) children();
+    multmatrix([[0,0,1], [1,0,0], [0,1,0]]) children();
+}
+
+module four() {
+    children();
+    multmatrix([[-1,0,0], [0,-1,0], [0,0,1]]) children();
+    multmatrix([[-1,0,0], [0,1,0], [0,0,-1]]) children();
+    multmatrix([[1,0,0], [0,-1,0], [0,0,-1]]) children();
+}
+
+module twelve() three() four() children();
 
 // Construct a triangle.
 function triangle(v) = [v, mns(v), pls(v)];
@@ -300,7 +352,13 @@ function onetwenty(f) = [each sixty(f), each sixty(invert(f))];
 
 // If we've generated a set of faces, with the redundancy of each face having
 // permutations bringing each vertex to the front, then remove the redundancy.
-function coset(ff, stride = 1, tol=1e-7) = let
-    (result = [for (f = ff) if (is_least_first(f, tol)) f ])
+function coset(ff, tol=1e-7) = let (
+    result = [for (f = ff) if (is_least_first(f, tol)) f ])
     echo("Coset reduction to", len(result), "from", len(ff))
     result;
+
+function coset60(ff, tol=1e-7) = let (
+    matrixes = [
+        for (m = sixty([0,0,1],[0,1,0],[1,0,0])) transpose(m.x, m.y, m.z)],
+    all60 = sixty(ff))
+    [for (i = [0:59]) if (is_least_first(all60[i], tol)) matrixes[i]];

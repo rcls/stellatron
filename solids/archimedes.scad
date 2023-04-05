@@ -323,9 +323,8 @@ module polygon_face_set(faces, cut=0.75,
         face = f[0];
         p = len(f) <= 3 ? len(face) % 2 == 0 ? len(face) / 2 : len(face) : f[3];
         j = len(f) <= 4 ? [joiners] : f[4];
-        if ($piece == p) {
+        if ($piece == p)
             joinable_frustum($radius / norm(face[0]) * face, cut, j, f[2]);
-        }
     }
 }
 
@@ -364,7 +363,3 @@ module polygon_faces(face, copies) {
     else
         assert(false);
 }
-
-//$piece = 1;
-//$radius = 50;
-//truncated_icosidodecahedron(false);

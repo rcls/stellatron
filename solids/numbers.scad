@@ -18,12 +18,14 @@ icosa_comidscribe = sqrt(1/2 - sqrt(5) / 10);
 // Relative radii of the icosohedral stellation points.
 raw_radius1 = 1;
 raw_radius2 = (6 * gold - 3) / 5 * inscribe; // 1.0661408512011674
-raw_radius3 = gold * icosa_midscribe;        // 1.3763819204711734;
-raw_radius4 = sqrt((17 - 4 * gold) / 5);     // 1.451059202444919;
-raw_radius5 = 1.6285570507046667;
-raw_radius6 = 3 * inscribe;                 // 2.3839634168752983;
-raw_radius7 = 1 + 2 * gold;                 // 4.23607
-raw_radius8 = 8.359584944780256;
+raw_radius3 = gold * icosa_midscribe;        // 1.3763819204711734
+raw_radius4 = sqrt((17 - 4 * gold) / 5);     // 1.451059202444919
+raw_radius5 = sqrt(21 + 28 * gold) / 5;      // 1.6285570507046667
+raw_radius6 = 3 * inscribe;                  // 2.3839634168752983
+raw_radius7 = 1 + 2 * gold;                  // 4.23607
+raw_radius8 = sqrt(97 / 5 + 156 / 5 * gold); // 8.359584944780256
+assert(abs(raw_radius5 - 1.6285570507046667) < 1e-7);
+assert(abs(raw_radius8 - 8.359584944780256) < 1e-7);
 
 // Radius of icosahedron with the vertex definitions we use.
 ico_scale = sqrt(2 + gold);
