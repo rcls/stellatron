@@ -97,18 +97,21 @@ module describe(v) {
 
 function unit(v) = v / norm(v);
 
-function transpose(dx, dy, dz, p = [0,0,0]) = [
-    [dx.x, dy.x, dz.x, p.x],
-    [dx.y, dy.y, dz.y, p.y],
-    [dx.z, dy.z, dz.z, p.z],
-    [0, 0, 0, 1]];
+function transpose(dx, dy, dz, p = undef) = p
+    ? [[dx.x, dy.x, dz.x, p.x],
+       [dx.y, dy.y, dz.y, p.y],
+       [dx.z, dy.z, dz.z, p.z],
+       [0, 0, 0, 1]]
+    : [[dx.x, dy.x, dz.x],
+       [dx.y, dy.y, dz.y],
+       [dx.z, dy.z, dz.z]];
 
 // Return an orthonormal matrix that converts from (x,y,z) to a co-ordinate
 // system based on the input vectors.  `x` transforms to the direction of `u`.
 // `y` transforms to the projection of `v` onto the plane transverse to `u`.
 // `z` is normal to both, with a sign convention to make its dot-product with
 // `w` positive, if possible.  The origin transforms to `p`.
-function orthonormal(u, v, w=[0,0,0], p=[0,0,0]) = let (
+function orthonormal(u, v, w=[0,0,0], p=undef) = let (
     dx = unit(u),
     dy = unit(v - (dx * v) * dx),
     dz1 = cross(dx, dy),
@@ -118,39 +121,29 @@ function orthonormal(u, v, w=[0,0,0], p=[0,0,0]) = let (
     assert(dz * dx < 1e-7)
     transpose(dx, dy, dz, p);
 
-function verticate_non_singular(v) = let (
+function verticate_na(v) = let (
     vn = v / norm(v),
     x = vn.x,
     y = vn.y,
     z = vn.z,
     d = x * x + y * y,
-    c = x * y * (z - 1) / d,
-    a = 1 + (z - 1) * x * x / d,
-    b = 1 + (z - 1) * y * y / d)
-    [[a, c, -x], [c, b, -y], [x, y, z]];
-
-function verticate_plus_z(v) = let (
-    vn = v / norm(v),
-    x = vn.x,
-    y = vn.y,
-    z = vn.z,
-    d = x * x + y * y)
-    (d > 1e-20 ? verticate_non_singular(v) : [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+    factor = d > 1e-6 ? (abs(z) - 1) / d : -0.5 - 0.125 * d,
+    a = factor * x * x + 1,
+    b = factor * y * y + 1,
+    c = factor * x * y)
+    z >= 0
+    ? [[ a,  c, -x], [c, b, -y], [x, y, z]]
+    : [[-a, -c, -x], [c, b, -y], [x, y, z]];
 
 function verticate(v, align=undef) = let(
-    vrot = v.z >= 0 ? verticate_plus_z(v)
-    : verticate_plus_z(
-        [-v.x, v.y, -v.z]) * [[-1, 0, 0], [0, 1, 0], [0, 0, -1]],
+    vrot = verticate_na(v),
     valign = align ? vrot * align : [1, 0, 0],
     vnorm = norm([valign.x, valign.y]),
     c = valign.x / vnorm,
     s = valign.y / vnorm)
     [[c, s, 0], [-s, c, 0], [0, 0, 1]] * vrot;
 
-function inverticate(v) =
-    v.z >= 0 ? verticate_plus_z([-v.x, -v.y, v.z])
-    : [[-1, 0, 0], [0, 1, 0], [0, 0, -1]] * verticate_plus_z(
-        [v.x, -v.y, -v.z]);
+function inverticate(v) = transpose(verticate(v));
 
 // Rotate children to bring the vector `v` vertical.  The rotation is in the v-z
 // plane.
@@ -305,6 +298,7 @@ module twelve() three() four() children();
 
 // Construct a triangle.
 function triangle(v) = [v, mns(v), pls(v)];
+function hexagon(u, v) = [u, v, mns(u), mns(v), pls(u), pls(v)];
 
 // Given a face with old rotational symmetry, double it up.
 function double(vv) = let (l = len(vv), a = ceil(l / 2), mid = sum(vv) / l)

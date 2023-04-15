@@ -42,8 +42,7 @@ module five_cubes() {
 
 module dual_c28() scale(1 / sqrt(3)) {
     // Great isogonal icosidodecahedron.
-    hex = [A[3], A[4], mns(A[3]), mns(A[4]), pls(A[3]), pls(A[4])];
-    pyramids(canonvvv(twenty(hex)));
+    pyramids(canonvvv(twenty(hexagon(A[3], A[4]))));
     color("lightgreen") pyramids(twelve(B));
 }
 
@@ -86,7 +85,7 @@ module dodecadodecahedron_pieces() {
                       joiners=joiners, span=2);
 
     if ($piece == 3)
-        trapezohedron([P[0], mns(Q[0]), mns(P[0]), pls(Q[0]), pls(P[0]), Q[0]],
+        trapezohedron(hexagon(P[0], mns(Q[0])),
                       $radius * (2 - gold) * [1,1,1],
                       $radius * (2 - gold) * sqrt(3) - 1,
                       joiners=joiners, span=2);
@@ -122,7 +121,7 @@ module small_ditrigonal_icosidodecahedron_piece() {
 module ditrigonal_dodecadodecahedron() scale(1 / sqrt(3)) {
     // Dual to the Medial triambic icosahedron.  As this is a
     // dodecadodecahedron, lets use a different second color!
-    twelve() star_pyramid(A, a=sum(A) / 10, topcolor=color12,
+    twelve() star_pyramid(A, a=sum(A)/5 * (7 - 4 * gold), topcolor=color12,
                           undercolor=color12b);
     twelve() star_pyramid(B, topcolor=color12b);
 }
@@ -141,6 +140,5 @@ module ditrigonal_dodecadodecahedron() scale(1 / sqrt(3)) {
 
 module flushtruncated_great_icosahedron() scale(1 / sqrt(3)) {
     twelve() star_pyramid(A);
-    hex = [A[3], A[4], mns(A[3]), mns(A[4]), pls(A[3]), pls(A[4])];
-    color("lightgreen") pyramids(twenty(hex));
+    color("lightgreen") pyramids(twenty(hexagon(A[3], A[4])));
 }

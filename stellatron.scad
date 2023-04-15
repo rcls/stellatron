@@ -94,7 +94,23 @@ module main() {
     if (crennell == 18) c18();
     if (crennell == 19) c19();
     if (crennell == 20) c20();
-    if (crennell == 21) c21();
+    if (crennell == 21) {
+        if ($piece == 0)
+            c21();
+        if ($piece == 1) {
+            difference() {
+                intersection() {
+                    scale($radius) c21();
+                    scale($radius*1.1) translate([-1, -1, 0]) cube([2, 2, 1]);
+                }
+                r = $radius / sqrt(3) - 11;
+                joiner_post(position=r*[1/gold,gold,0]);
+                joiner_post(position=r*[-1/gold,gold,0]);
+                joiner_post(position=r*[1/gold,-gold,0]);
+                joiner_post(position=r*[-1/gold,-gold,0]);
+            }
+        }
+    }
     if (crennell == 22) c22();
     if (crennell == 23) {
         icosa_top_bottom(radius7, post=-1/3, inset=5) c23();
@@ -238,6 +254,9 @@ module main() {
         if ($piece == 10)
             stand_quad(x=0.3047, y=0.3047, hole=1)
                 small_ditrigonal_icosidodecahedron();
+        if ($piece == 11)
+            stand_tripod(strut=0.2845, hole=1, p=11)
+                small_ditrigonal_icosidodecahedron();
     }
     if (crennell == 103) {
         five_cubes();
@@ -312,8 +331,11 @@ module main() {
         dodecadodecahedron_pieces();
         stand_tripod(strut=(gold - 2) * dodeca_midscribe, hole=1)
             dodecadodecahedron();
+        stand_pentapod(strut=0.2, strut_mm = $stand_diameter/4, hole=1, p=11)
+            dodecadodecahedron();
     }
 }
+
 
 // STANDS
 

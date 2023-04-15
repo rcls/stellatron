@@ -4,6 +4,8 @@ import math
 import numpy.linalg
 from vector import Vector
 
+gold = (1 + math.sqrt(5)) / 2
+
 '''Convert a number to our canonical golden ratio form'''
 def rationali(x):
     ix = round(x)
@@ -72,8 +74,6 @@ def tri_intersect(a, b, c):
          [0, 0, 0, b[0].z, b[1].z, b[2].z, -c[0].z, -c[1].z, -c[2].z],
          ],
         [1, 1, 1, 0, 0, 0, 0, 0, 0])
-
-gold = (1 + math.sqrt(5)) / 2
 
 def applys(stell, face):
     sa, sb, sc = stell
