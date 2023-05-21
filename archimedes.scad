@@ -18,7 +18,7 @@ include <numbers.scad>
 archimedes = 12;
 // Alternatively, you may replace `main();` below with the object you want.
 
-// 0 = raw object, 1 = main printable, 2 = extra piece, 10 = stand.
+// 0 = raw object, 1, 2... = main printables, 10 = stand.
 $piece = 1;
 
 // The overall radius in mm from the center of the piece to its extremities.
@@ -77,6 +77,10 @@ module main() {
     if (archimedes == 23) octohedron();
     if (archimedes == 24) dodecahedron();
     if (archimedes == 25) icosahedron();
+
+    // 101 - 175 for the Skilling numbering of the uniform compounds.
+    // 201 - 275 for their duals.
+    if (archimedes == 246) two_dodecahedra();
 }
 
 // Joiner array item description is [radius,radius_mm,offset,offset_mm] or just
@@ -210,7 +214,7 @@ module rhombicosidodecahedron() {
     polygon_face_set(face_list, joiners=vertical_joiners);
 }
 
-module truncated_icosidodecahedron() {
+module truncated_icosidodecahedron() {  // Aka great rhombicosidodecahedron.
     p = [gold-1, gold-1, 3 + gold];
 
     face_list = [
@@ -275,6 +279,40 @@ module icosahedron() {
     face_list = [[triangle(p), 20, "yellow", 2]];
     joiners = [[-4.5, 10], [-4.5, -10]];
     polygon_face_set(face_list, joiners=joiners);
+}
+
+module two_dodecahedra() {
+    A = [for (r = rotate5) canonv(r * [0, gold-1, gold])];
+    factor = $radius / sqrt(3);
+    if ($piece == 1) {
+        scale(1 / sqrt(3)) twelve() pyramid(A);
+        color("red") rotate(90) scale(1 / sqrt(3)) twelve() pyramid(A);
+        scale(1/sqrt(3)) {
+            color("black") translate([1,-1,1]) sphere(0.1);
+            color("black") translate([1,1,1]) sphere(0.1);
+            color("black") translate([0,0,gold]) sphere(0.1);
+            color("blue") translate([gold-1,0,gold]) sphere(0.1);
+        }
+    }
+    if ($piece == 2) {
+        p = factor * [0,0,gold];
+        q1 = factor * [1,1,1];
+        q2 = factor * [1, -1, 1];
+        apex = factor * [gold - 1, 0, gold];
+        intersection() {
+            translate([2 - $radius * 0.65, 0, 0])
+                verticate(cross(q2, q1))
+                trapezohedron_uncut([p, q1, q2], apex,
+                                    // cut_radius = $radius * 0.68 - 2,
+                                    joiners=[
+                                        [[-3, 16], [-3, -16]],
+                                        [[-5.5, 19], [-5.5, -19]],
+                                        [[-3, 16], [-3, -16]],
+                                        ]
+                    );
+            translate([$radius, 0, 0]) cube(2 * $radius, center=true);
+        }
+    }
 }
 
 module joinable_frustum(w, cut=0.75, joiners, colour) {
