@@ -126,6 +126,33 @@ module ditrigonal_dodecadodecahedron() scale(1 / sqrt(3)) {
     twelve() star_pyramid(B, topcolor=color12b);
 }
 
+module dodeca_tri_split() {
+    // This ain't gonna work for the ditrigonal_dodecadodecahedron.
+    h = $radius * (gold - 1) / 2 * coscribe;
+    hm = h - $extra_z_remove;
+    hp = h + $extra_z_remove;
+    if ($piece == 0)
+        children();
+    if ($piece == 1) {
+        translate([0, 0, hm]) intersection() {
+            with_joiners() children();
+            cube([$radius * 3, $radius * 3, 2 * hm],
+                 center=true);
+        }
+    }
+    if ($piece == 2) {
+        intersection() {
+            translate([0, 0, -hp]) with_joiners() children();
+            translate(-$radius * [1.5, 1.5, 0])
+                cube([$radius * 3, $radius * 3, $radius]);
+        }
+    }
+
+    module with_joiners() {
+        scale($radius) pointup() children();
+    }
+}
+
 //stella_octangular_eighth();
 //five_cubes();
 //dodecadodecahedron();
@@ -142,3 +169,26 @@ module flushtruncated_great_icosahedron() scale(1 / sqrt(3)) {
     twelve() star_pyramid(A);
     color("lightgreen") pyramids(twenty(hexagon(A[3], A[4])));
 }
+
+module two_icosahedra() {
+    module eight() {
+        for (x = [-1, 1]) for (y = [-1, 1]) for (z = [-1, 1])
+            multmatrix([[x, 0, 0], [0, y, 0], [0, 0, z]]) children();
+    }
+    p1 = (gold - 1) * I0 + (2 - gold) * IA[1];
+    p2 = (2 + gold) / 5 * I0 + (3 - gold) / 5 * IA[2];
+    p3 = (2 + gold) / 5 * I0 + (3 - gold) / 5 * IA[3];
+    p4 = (gold - 1) * I0 + (2 - gold) * IA[4];
+    p5 = (I0 + IA[0]) / 2;
+    module pent() {
+        p = [p1, p2, p3, p4, p5];
+        for (i = [1:5]) pyramid([I0, p[i-1], p[i%5]]);
+    }
+    color("yellow") twelve() pent();
+    color("lightblue") rotate(90) twelve() pent();
+    eight() color("lightgreen") pyramid(hexagon(p2, p1));
+}
+
+//two_icosahedra();
+// two_dodecahedra();
+
