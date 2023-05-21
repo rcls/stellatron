@@ -18,6 +18,12 @@ class Vector(VectorBase):
     def __rmul__(self, u):
         return Vector(u * self.x, u * self.y, u * self.z)
 
+    def __matmul__(self, u):
+        return self.dot(u)
+
+    def __str__(self):
+        return f'[{self.x}, {self.y}, {self.z}]'
+
     def dot(self, u):
         return self.x * u.x + self.y * u.y + self.z * u.z
 
@@ -32,7 +38,7 @@ class Vector(VectorBase):
     def norm(self):
         return sqrt(self.nsq())
 
-    def setnorm(self, n):
+    def withnorm(self, n):
         return n / self.norm() * self
 
     def dist(self, u):

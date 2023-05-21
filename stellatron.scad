@@ -95,9 +95,9 @@ module main() {
     if (crennell == 19) c19();
     if (crennell == 20) c20();
     if (crennell == 21) {
-        if ($piece == 0)
-            c21();
-        if ($piece == 1) {
+        icosa_top_bottom(radius6, post=0.5, inset=5) c21();
+        stand_tripod(strut=-coscribe*radius1/radius6, hole=2) c21();
+        if ($piece == 9) {
             difference() {
                 intersection() {
                     scale($radius) c21();
@@ -164,7 +164,8 @@ module main() {
     if (crennell == 29) c29();
     if (crennell == 30) {
         icosa_top_bottom(radius7, post=-radius4/radius7, inset=5) c30();
-        stand_pentapod(strut=gold * 5 / 7 - 1, base=$radius/4, hole=2)
+        stand_tripod(height=inscribe,strut=1/6, base=1/4, hole=1) c30();
+        stand_pentapod(strut=gold * 5 / 7 - 1, base=1/4, hole=2, p=9)
             c30();
     }
     if (crennell == 31) c31();
@@ -305,7 +306,7 @@ module main() {
     // triambic icosahedron, the duals of which are visibly different.  We
     // number the two as 130 and 230.
     if (crennell == 130) {
-        ditrigonal_dodecadodecahedron();
+        dodeca_tri_split() ditrigonal_dodecadodecahedron();
     }
     if (crennell == 230) {
         great_ditrigonal_icosidodecahedron();

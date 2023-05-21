@@ -146,7 +146,7 @@ function verticate(v, align=undef) = let(
     s = valign.y / vnorm)
     [[c, s, 0], [-s, c, 0], [0, 0, 1]] * vrot;
 
-function inverticate(v) = transpose(verticate(v));
+function inverticate(v) = let (v = verticate(v)) transpose(v.x, v.y, v.z);
 
 // Rotate children to bring the vector `v` vertical.  The rotation is in the v-z
 // plane.

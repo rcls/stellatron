@@ -72,7 +72,7 @@ module icosa_tb_whole(raw_radius, post=0, inset=0, angle=0, ref_radius=undef) {
             translate([0, 0, offset]) faceup() children();
         if (post != 0)
             for (i = [0:2])
-                joiner_post(120 * i + angle,
+                #joiner_post(120 * i + angle,
                             [$radius * post - inset * sign(post), 0, 0]);
     }
 }
@@ -148,7 +148,7 @@ module three_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
 // one_twelfth().
 module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
                     cut=0, inset=2.5, topset=2.5, midsetz=0) {
-    difference() {
+    intersection() {
         translate([0, 0, -cut * $radius]) {
             pointup() rotate(180)
                 raw_twelfth(big, top, mid, small, inset, topset, [1:4],
@@ -159,7 +159,9 @@ module two_twelfths(big=1.1/inscribe, top=0, mid=0, small=0,
                             chamfer_edge=[0, 4], midsetz=midsetz)
                 children();
         }
-        translate([0, 0, -big*$radius]) cube(2*big*$radius, center=true);
+        translate([0, 0, big*$radius/2])
+            cube([2*big*$radius, 2*big*$radius, big*$radius], center=true);
+        //translate([0, 0, -big*$radius]) cube(2*big*$radius, center=true);
     }
 }
 
@@ -270,7 +272,24 @@ module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1) {
     l = len(points);
     v = l;
     a = l + 1;
-    cutoff(cut_radius) verticate(vertex, align=points[0]) difference() {
+    translate([0, 0, -cut_radius]) verticate(vertex, align=points[0])
+        cutoff(cut_radius)
+        trapezohedron_uncut(points, vertex, joiners, span);
+
+    module cutoff(cut_radius) {
+        intersection() {
+            children();
+            inverticate(vertex) translate([0,0,$radius + cut_radius])
+                cube(2 * $radius, center=true);
+        }
+    }
+}
+
+module trapezohedron_uncut(points, vertex, joiners=[[]], span=1) {
+    l = len(points);
+    v = l;
+    a = l + 1;
+    difference() {
         polyhedron(
             [each points, vertex, [0, 0, 0]],
             [for (i = [1:l]) each [[a, i % l, i - 1], [v, i - 1, i % l]]],
@@ -281,9 +300,10 @@ module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1) {
         }
 
         for (i = [0:l-1]) {
+            a = points[i];
+            b = points[(i + 1) % l];
+            echo("Edge", norm(a-b));
             for (j = joiners[i % len(joiners)]) {
-                a = points[i];
-                b = points[(i + 1) % l];
                 v_inset = j[0];
                 h_inset = j[1];
 
@@ -296,13 +316,6 @@ module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1) {
 
                 #jpost(a, b, v_inset, h_inset, vertical, horizontal);
             }
-        }
-    }
-
-    module cutoff(cut_radius) {
-        intersection() {
-            translate([0, 0, -cut_radius]) children();
-            translate([0,0,$radius]) cube(2 * $radius, center=true);
         }
     }
 
