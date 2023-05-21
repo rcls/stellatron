@@ -121,6 +121,9 @@ function orthonormal(u, v, w=[0,0,0], p=undef) = let (
     assert(dz * dx < 1e-7)
     transpose(dx, dy, dz, p);
 
+module orthonormal(u, v, w=[0,0,0], p=undef)
+    multmatrix(orthonormal(u, v, w, p)) children();
+
 function verticate_na(v) = let (
     vn = v / norm(v),
     x = vn.x,
@@ -133,7 +136,7 @@ function verticate_na(v) = let (
     c = factor * x * y)
     z >= 0
     ? [[ a,  c, -x], [c, b, -y], [x, y, z]]
-    : [[-a, -c, -x], [c, b, -y], [x, y, z]];
+    : [[-a, -c, -x], [c, b, y], [x, y, z]];
 
 function verticate(v, align=undef) = let(
     vrot = verticate_na(v),
