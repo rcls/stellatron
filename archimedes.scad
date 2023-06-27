@@ -1,5 +1,6 @@
 use <functions.scad>
 use <splitting.scad>
+use <stand.scad>
 include <numbers.scad>
 
 // Faces are coloured as follows:
@@ -77,6 +78,9 @@ module main() {
     if (archimedes == 23) octohedron();
     if (archimedes == 24) dodecahedron();
     if (archimedes == 25) icosahedron();
+
+    // 50... for duals.
+    if (archimedes == 62) disdyakis_triacontahedron(); // 90mm
 
     // 101 - 175 for the Skilling numbering of the uniform compounds.
     // 201 - 275 for their duals.
@@ -249,8 +253,66 @@ module tetrahedron() {
     $join_depth = 4;
     p = [1,1,-1];
     face_list = [[triangle(p), 4, "red", 2]];
-    joiners=[[-13, 6], [-13, -6]];
-    polygon_face_set(face_list, joiners=joiners);
+    joiners=[[-13.25, 6.5], [-13.25, -6.5]];
+    polygon_face_set(face_list, cut=0.7, joiners=joiners);
+
+    if ($piece == 10) {                 // Stand.
+        stand_diameter = 10;
+        echo($radius * sqrt(8/3));
+        target = $radius * sqrt(2)/3 + 0.2;
+        sr = stand_diameter / 2;
+        arc_radius = target * 2 - sr;
+        difference() {
+            for (a = [-90, -210, 30]) rotate(a) {
+                    rotate([0,90,0]) translate([-arc_radius, -arc_radius-sr, 0])
+                        rotate_extrude(angle=150, $fn=$fn * 10)
+                        translate([arc_radius, 0])
+                        circle(stand_diameter / 2);
+                    translate([0, target - arc_radius - sr,
+                               sqrt(3) * target + arc_radius])
+                        sphere(stand_diameter, $fn=$fn * 5);
+                    translate([0, -arc_radius-sr, 0]) sphere(sr, $fn=$fn*2);
+                }
+            translate([0, 0, sqrt(3) * target + arc_radius]) {
+                linear_extrude(10) circle($radius * sqrt(8) / 3, $fn = 3);
+            }
+            translate([0,0,-sr])
+                cube([5 * target, 5 * target, stand_diameter], center=true);
+        }
+        rounded_ring(outer=arc_radius+sr, inner=arc_radius-sr, n=$fn*5);
+    }
+    if ($piece == 11) {
+        stand_diameter = 8;
+        gap = 0.4;
+        target = $radius * sqrt(2)/3 + 0.2 - gap;
+        angle = 75;
+        difference() {
+            for (a = [60, 180, -60])
+                rotate(a) bent_dumbell(target, stand_diameter, angle, gap);
+            translate([0,0,-stand_diameter])
+                cube([3 * target, 3 * target, 2 *stand_diameter], center=true);
+            translate([0,0, bd_height(target, stand_diameter, angle, gap)])
+                linear_extrude(stand_diameter)
+                circle($radius * sqrt(8) / 3, $fn = 3);
+        }
+    }
+    module bent_dumbell(target, stand_diameter, angle, gap) {
+        c = cos(angle);
+        s = sin(angle);
+        sr = stand_diameter / 2;
+        outer_radius = target / (1 - c);
+        mid_radius = outer_radius - sr;
+        translate([outer_radius + gap, 0, outer_radius * s])
+        rotate([90,0,0]) rotate(180-angle) {
+            rotate_extrude(angle=angle*2, $fn=$fn*10)
+                translate([mid_radius, 0]) circle(sr);
+            translate([outer_radius, 0, 0]) sphere(stand_diameter, $fn=$fn*5);
+            rotate(angle*2)
+                translate([outer_radius, 0, 0]) sphere(stand_diameter, $fn=$fn*5);
+        }
+    }
+    function bd_height(target, stand_diameter, angle, gap) =
+        2 * sin(angle) * target / (1 - cos(angle));
 }
 
 module plato_cube() {
@@ -279,6 +341,26 @@ module icosahedron() {
     face_list = [[triangle(p), 20, "yellow", 2]];
     joiners = [[-4.5, 10], [-4.5, -10]];
     polygon_face_set(face_list, joiners=joiners);
+}
+
+module disdyakis_triacontahedron() {
+    p = [0, 0, 1];
+    q = [1, 0, gold] / norm([1, gold]);
+    r = [0, gold-1, gold] / norm([gold-1, gold]);
+    c = [gold-1, gold-1, gold+3] / norm([gold-1, gold-1, gold+3]);;
+    if ($piece == 11) {
+        for (v = sixty([p])) translate(v[0]) color("lightgreen") sphere(0.025);
+        for (v = twelve([q])) translate(v[0]) color("magenta") sphere(0.025);
+        for (v = twenty([r])) translate(v[0]) color("yellow") sphere(0.025);
+        for (v = onetwenty([c])) translate(v[0]) color("black") sphere(0.025);
+        color("#ffffee", 0.75) sphere(0.9, $fn=100);
+        translate(p) color("lightgreen") sphere(0.05);
+        translate(q) color("magenta") sphere(0.05);
+        translate(r) color("yellow") sphere(0.05);
+    }
+    face_list = [[[r, q, p], 60, "white", 2],
+                 [[p, q, my(r)], 60, "black", 3]];
+    polygon_face_set(face_list);
 }
 
 module two_dodecahedra() {

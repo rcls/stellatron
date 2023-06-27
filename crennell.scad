@@ -585,7 +585,7 @@ module five_tetrahedron_twentieth() {
         q6a, 0.32 * $radius, joiners);
 }
 
-module five_octahedron_twentieth() {
+module five_octahedron_thirtieth() {
     function apply(p) = $radius / radius3 * canonv(tri[0] * p[0] + tri[1] * p[1] + tri[2] * p[2]);
     tri = [[1, 0, gold], [gold, -1, 0], [0, -gold, 1]];
     q1 = apply(p1);
@@ -595,6 +595,7 @@ module five_octahedron_twentieth() {
     //color("red") indicate(rot5 * apply(p3b));
     trapezohedron(
         [q2, q1, rot5_4 * q2, pls(q1)],
-        q3a, 0.5 * $radius,
-        [[[-1.5, -5], [-3.5, 9.5]], [[-1.5, 5], [-3.5, -9.5]]]);
+        q3a, $radius / gold - 3,
+        [[[-3, -11], [-3, 19]],
+         [[-3, 11], [-3, -19]]]);
 }

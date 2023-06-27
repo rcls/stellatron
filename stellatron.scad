@@ -4,6 +4,7 @@ use <crennell.scad>
 use <functions.scad>
 use <dodecatron.scad>
 use <splitting.scad>
+use <stand.scad>
 
 // Crennell number of the object to print.
 crennell = 1;
@@ -56,7 +57,7 @@ module main() {
     if (crennell == 2) c2();
     if (crennell == 3) {
         icosa_top_bottom(radius3, post=1/2) c3();
-        if ($piece == 3) five_octahedron_twentieth();
+        if ($piece == 3) five_octahedron_thirtieth();
         if ($piece == 10)
             stand_rhombus(x=2-gold, y=(3 - gold)/5) c3();
     }
@@ -184,7 +185,9 @@ module main() {
     }
     if (crennell == 38) c38();
     if (crennell == 39) c39();
-    if (crennell == 40) c40();
+    if (crennell == 40) {
+        dodeca_spikey() c40();
+    }
     if (crennell == 41) c41();
     if (crennell == 42) c42();
     if (crennell == 43) c43();
@@ -335,102 +338,6 @@ module main() {
         stand_pentapod(strut=0.2, strut_mm = $stand_diameter/4, hole=1, p=11)
             dodecadodecahedron();
     }
-}
-
-
-// STANDS
-
-// Create a tripod.  This implies that the object is face-up to get the 3-fold
-// symmetry about the z-axis.
-//
-// `strut` is the distance from the z-axis to the support struts, as a fraction
-// of radius.  `strut_mm` is the same in mm.  If both are non-zero then they
-// are added together.
-//
-// `length` is the length of the strut, as fraction of radius.  Note that as
-// the object is raised 2mm, we also increase the length by 2mm.
-//
-// `thick` is the radius of the struts.
-//
-// `base` is the base radius, if larger than the computed one.
-//
-// `hole` if non-zero is the radius of a circle to remove from the center of the
-// base.
-//
-// `height` is the height of the center of the object, as a ratio of `radius`.
-// 2mm is added to this.
-module stand_tripod(strut, strut_mm=0, base=0,
-                    length=1, height=1, align=[1, 0, 0], hole=0, p=10) {
-    stand_generic(
-        3, strut, strut_mm, base, length, height, hole, p)
-        align_rot(align) faceup() children();
-}
-
-module stand_pentapod(strut, strut_mm=0, base=0,
-                      length=1, height=1, hole=0, p=10) {
-    stand_generic(
-        5, strut, strut_mm, base, length, height, hole, p)
-        pointup() children();
-}
-
-module stand_generic(num, strut, strut_mm=0, base=0,
-                     length=1, height=1, hole=0, p=10) {
-    if ($piece == p) {
-        strut_all = strut * $radius + strut_mm;
-        difference() {
-            for (i = [1:num]) {
-                rotate(i * 360 / num) translate([strut_all, 0, 0])
-                    cylinder(r = $stand_diameter / 2, h=$radius * length + 2);
-            }
-            # translate([0, 0, $radius * height + 2])
-                scale($radius) children();
-        }
-        stand_ring(base, hole, strut_all);
-    }
-}
-
-module stand_quad(x, y, length=1, height=1, hole=0) {
-    difference() {
-        for (c = [[x, y], [-x, y], [-x, -y], [x, -y]])
-            translate([c.x * $radius, c.y * $radius, 0])
-                cylinder(r = $stand_diameter / 2, h=$radius * length + 2);
-        #translate([0, 0, $radius * height + 2])
-        scale($radius) children();
-    }
-    stand_ring(0, 1, norm([x, y]) * $radius);
-}
-
-module stand_rhombus(x, y, length=1, height=1) {
-    difference() {
-        for (c = [[x, 0], [-x, 0], [0, -y], [0, y]])
-            translate([c.x * $radius, c.y * $radius, 0])
-                cylinder(r = $stand_diameter / 2, h=$radius * length + 2);
-        #translate([0, 0, $radius * height + 2])
-        scale($radius) children();
-    }
-    stand_ring(max(x, y), min(x, y), x * $radius);
-}
-
-module stand_ring(base, hole, strut_mm) {
-    outer = max(base * $radius, abs(strut_mm) + $stand_diameter / 2);
-    inner = min(hole * $radius, abs(strut_mm) - $stand_diameter / 2);
-    rounded_ring(outer, inner, n = $fn * 6);
-}
-
-module rounded_ring(outer, inner, height=0, r=2, n=0) {
-    rotate_extrude($fn = n ? n : $fn) {
-        translate([outer, height]) intersection() {
-            circle(r);
-            square(r);
-        }
-        if (inner >= r) translate([inner, height]) intersection() {
-                circle(r);
-                translate([-r, 0]) square(r);
-            }
-        if (outer > inner)
-            translate([inner, 0]) square([outer - inner, height + r]);
-        iinner = inner >= r ? inner - r : inner;
-        if (height > 0)
-            translate([inner, 0]) square([outer + r - iinner, height]);
-    }
+    if (crennell == 204)
+        great_icosidodecahedron();
 }

@@ -2,6 +2,14 @@
 include <numbers.scad>
 use <functions.scad>
 use <splitting.scad>
+use <stand.scad>
+
+$fn = 20;
+$join_diameter = 2.1;
+$join_depth = 5;
+$radius = 65;
+$stand_diameter = 8;
+$piece = 10;
 
 // Four rings of five, dodecahedral points.
 A = [for (r = rotate5) canonv(r * [0, gold-1, gold])];
@@ -14,6 +22,8 @@ I0 = [1, 0, gold];
 IA = [for (r = rotate5) canonv(r * [-1, 0, gold])];
 IB = -IA;
 I1 = -I0;
+
+$decorate = $preview;
 
 module dodecahedron() scale(1 / sqrt(3)) twelve() pyramid(A);
 
@@ -153,18 +163,6 @@ module dodeca_tri_split() {
     }
 }
 
-//stella_octangular_eighth();
-//five_cubes();
-//dodecadodecahedron();
-//small_ditrigonal_icosidodecahedron();
-//ditrigonal_dodecadodecahedron();
-//great_ditrigonal_icosidodecahedron();
-//flushtruncated_great_icosahedron();
-//dual_c28();
-
-//function one(x) = [x];
-//pyramids(sixty([A[0], A[2], D[1]]));
-
 module flushtruncated_great_icosahedron() scale(1 / sqrt(3)) {
     twelve() star_pyramid(A);
     color("lightgreen") pyramids(twenty(hexagon(A[3], A[4])));
@@ -189,6 +187,185 @@ module two_icosahedra() {
     eight() color("lightgreen") pyramid(hexagon(p2, p1));
 }
 
-//two_icosahedra();
-// two_dodecahedra();
+module great_icosidodecahedron() {
+    if ($piece == 0)
+        gid_main();
+    if ($piece == 1)
+        scale($radius) gid_main();
+    if ($piece == 2)
+        gid_cp();
+    if ($piece == 3)
+        gid_3p();
+    if ($piece == 5)
+        gid_5t();
+    if ($piece == 10)
+        gid_stand();
 
+    module gid_main() {
+        p1 = [0, 0, 1];
+        q = rot5 * p1;
+        p2 = [q.y, q.z, -q.x];
+        p3 = [q.y, -q.z, -q.x];
+        for (f = coset(sixty([p1, p2, p3]))) pyramid(f, topcolor="violet");
+        for (f = twelve(pentagon(rz(q)))) star_pyramid(f, topcolor="gold");
+        if (true) {
+            mark(p1, r=0.02, c="black");
+            mark(rot5 * p1, r=0.02, c="green");
+            mark(mz(rot5 * p1), r=0.02, c="green");
+            mark(rot5_2 * p1, r=0.02, c="blue");
+            mark(rx(rot5_2 * p1), r=0.02, c="blue");
+            mark(mns(rot5 * p1), r=0.02, c="red");
+            mark(rot3(p1), c="black", r=0.02);
+            mark(rot3(rot3(p1)), c="black", r=0.02);
+            mark([gold-1,0,2-gold], r=0.02, c="yellow");
+            mark([2-gold,0,2-gold], r=0.02, c="orange");
+            mark([3*gold-4,1/gold,1]/2, r=0.02, c="purple");
+            mark(sum([for (r = rotate5) r * mns(rot5 * p1)]) / 5, c="black", r=0.02);
+        }
+        function rot3(v) = rot5 * mns(rot5_4 * v);
+    }
+
+    module gid_5t() {
+        p = [0,0,$radius];
+        q = mns(rot5 * p);
+        center = sum([for (r = rotate5) r * q]) / 5;
+        echo(norm(p - rot5 * p));
+        difference() {
+            intersection() {
+                verticate(center) translate(-center) {
+                    mark(center, r=0.02, c="black");
+                    difference() {
+                        for (f = five([p, rot3(p), rot3(rot3(p))]))
+                            pyramid(f);
+
+                        for (f = five([p, rot3(p), rot3(rot3(p))])) {
+                            #edge_joiner_post(f[0], f[2], 21, -9.5);
+                            #edge_joiner_post(f[0], f[1], 24, -9.5);
+                        }
+                    }
+                }
+                translate([0,0, $radius]) cube(2 * $radius, center=true);
+            }
+            for (a = [0:72:288]) {
+                $join_depth=2.5;
+                #rotate(a) translate([-$radius*0.1-5.5,0,0]) joiner_post();
+            }
+        }
+        function rot3(v) = rot5 * mns(rot5_4 * v);
+    }
+
+    module gid_3p() {
+        p = [0,0,$radius];
+        q = rot5 * p;
+        r = mz(q);
+        s = rx(rot5_2 * p);
+        echo(norm(q - mns(q)));
+        base = [q, mns(q), pls(q)] / gold;
+        center = sum([q, mns(q), pls(q)]) / 3 / gold;
+        intersection() {
+            verticate(center, align=q) translate(-center) three() {
+                difference() {
+                    pyramid([q,r,s]);
+                    #edge_joiner_post(q, r, 21, -9.5);
+                    #edge_joiner_post(q, s, 24, -9.5);
+                }
+            }
+            translate([0,0,$radius/2]) cube($radius, center=true);
+        }
+    }
+
+    module gid_cp() {
+        difference() {
+            cylinder(r=($radius/10 + 5) * 2/gold, h=1, $fn=5);
+            for (a = [0:72:288])
+                #rotate(a) translate([-$radius*0.1-5.5,0,0]) joiner_post();
+                }
+    }
+
+    module gid_stand() {
+        //stand_rhombus(0.38, 2*gold-3)
+        stand_rhombus(2 - gold, 2*gold - 3)
+        //stand_rhombus(1 - gold/2, 2*gold - 3)
+            gid_main();
+    }
+}
+
+//great_icosidodecahedron();
+//great_id_5t();
+//great_id_3p();
+//great_id_cp();
+//great_id_stand();
+//half_id_tri_facet(0);
+//half_id_tri_facet(1, [1,0,gold], $radius-20, [18:72:360]);
+//if (false)
+difference() {
+    half_id_tri_facet(2, [1,0,gold], $radius-28, [18:72:360]);
+    r = 0.4 * $radius;
+    h1 = 0.302 * $radius - 1;
+    h2 = 0.598 * $radius - 1;
+    rotate_extrude($fn = 100) {
+        polygon(
+            [[r, -0.01], [r, h1], [0, h2], [0, -0.01]],
+            [[0, 1, 2, 3]]);
+    }
+}
+//icosidodecahedron_triangle_facetation(2);
+
+module icosidodecahedron_triangle_facetation(n) {
+    $fn = $fn ? $fn : 20;
+    p1 = [1, 0, 0];
+    p2 = [0, 1, 0];
+    // mx(pls) works.
+    // rz(mns) works.
+    p3a = my((rot5 * [0, 0, 1])); // Outer
+    p3b = mx(pls(rot5 * [0, 0, 1]));     // Mid
+    p3c = rz(mns(rot5 * [0, 0, 1]));     // Inner
+    // lots of the others work with a equatorial dodecagon.
+    p3 = n == 0 ? p3a : n == 1 ? p3b : p3c;
+    echo(p3.z);
+    mark(p1, "red");
+    mark(p2, "blue");
+    mark(p3, "black");
+    for (v = sixty([p1]))
+        mark(v[0], "orange", 0.02);
+
+    faces = onetwenty([p3, p2, p1]);
+    rod_pyramid(faces[0], topcolor="lightgreen");
+    for (i = [1:119])
+        rod_pyramid(faces[i]);
+}
+
+module half_id_tri_facet(n=0, normal=[0,0,1],
+                         offset = $radius-9, angles=[0:90:270]) {
+    $decorate = false;
+    difference() {
+        scale($radius) intersection() {
+            verticate(normal) icosidodecahedron_triangle_facetation(n);
+            translate([0,0,1]) cube(2, center=true);
+        }
+        #for (i = angles)
+            rotate(i) translate([offset, 0, 0]) joiner_post();
+    }
+}
+
+module mark(v, c="gold", r=0.05) {
+    if ($decorate)
+        color(c) translate(v) sphere(r);
+}
+
+module rod_pyramid(f, topcolor="gold") {
+    pyramid(f, topcolor=topcolor);
+    for (i = [1:len(f)]) {
+        u = f[i % len(f)];
+        v = f[i - 1];
+        n = norm(u-v);
+        c = n < 1.2 ? "blue" : n < 1.5 ? "green" : "red";
+        if ($decorate && vless(u, v))
+            rod(u, v);
+    }
+}
+
+module rod(u, v, c="green", r=0.005) {
+    color(c) translate(u) inverticate(v-u)
+        cylinder(r=r, h=norm(v-u));
+}

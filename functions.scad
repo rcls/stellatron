@@ -354,8 +354,11 @@ function coset(ff, tol=1e-7) = let (
     echo("Coset reduction to", len(result), "from", len(ff))
     result;
 
-function coset60(ff, tol=1e-7) = let (
-    matrixes = [
-        for (m = sixty([0,0,1],[0,1,0],[1,0,0])) transpose(m.x, m.y, m.z)],
-    all60 = sixty(ff))
-    [for (i = [0:59]) if (is_least_first(all60[i], tol)) matrixes[i]];
+module diffunion(uns) {
+    difference() {
+        union() {
+            children([0 : uns - 1]);
+        }
+        children([uns : $children-1]);
+    }
+}

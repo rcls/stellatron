@@ -255,6 +255,16 @@ module mid_vertex_joiner_post(
     multmatrix(orthonormal(p, u - v, p=p)) joiner_post(0, [0, 0, 0]);
 }
 
+// Sigh.  Why didn't I just do this for all the others...
+module edge_joiner_post(u, v, hoffset_mm, voffset_mm) {
+    // The coordinate system has x along u-v and y transverse in the
+    // plane through the origin.
+    orthonormal(v - u, u, p=(u+v)/2) {
+        dx = hoffset_mm - sign(hoffset_mm) * norm(v - u) / 2;
+        translate([dx, voffset_mm, 0]) joiner_post();
+    }
+}
+
 module joiner_post(angle=0, position=[0,0,0]) {
     r = $join_diameter / 2;
     l = $join_depth;
