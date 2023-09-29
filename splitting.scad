@@ -15,7 +15,7 @@ module dodeca_single() {
     if ($piece == 1) {
         difference() {
             translate([0,0,-$extra_z_remove])
-                dodeca_pointup() children();
+                dodeca_pointup(raise=inscribe) children();
             if ($extra_z_remove > 0)
                 translate([0,0,-1.1 * $radius]) cube(2.2 * $radius, center=true);
         }
@@ -75,6 +75,24 @@ module icosa_tb_whole(raw_radius, post=0, inset=0, angle=0, ref_radius=undef) {
                 #joiner_post(120 * i + angle,
                             [$radius * post - inset * sign(post), 0, 0]);
     }
+}
+
+module plane_split(normal, align=undef, p_main=1, p_part=2) {
+    flip = $piece == p_main ? [-1, 1, -1] : [1, 1, 1];
+    if ($piece == p_main || $piece == p_part) {
+        intersection() {
+            scale(flip) raise(-norm(normal) - $extra_z_remove)
+                verticate(normal, align) children();
+
+            raise($radius) cube(2 * $radius, center=true);
+        }
+    }
+}
+
+module triangle_split(a, b, c, align=undef, p_main=1, p_part=2) {
+    direction = unit(cross(b - a, c - a));
+    normal = (a * direction) * direction;
+    plane_split(normal, align, p_main, p_part) children();
 }
 
 // Rotate so an icoshedral face is upwards.  Rotate by half the icosahedron
@@ -278,24 +296,69 @@ module joiner_post(angle=0, position=[0,0,0]) {
     }
 }
 
-module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1) {
-    l = len(points);
-    v = l;
-    a = l + 1;
-    translate([0, 0, -cut_radius]) verticate(vertex, align=points[0])
-        cutoff(cut_radius)
-        trapezohedron_uncut(points, vertex, joiners, span);
+// p is point of post.  face is normal to the face containing p.  direction
+// is direction of post.
+module skew_joiner_post(p, face, direction) {
+    udirection = unit(direction);
+    ortho1 = unit(cross(udirection, p));
+    ortho2 = unit(cross(udirection, ortho1));
+    translate(p)
+        multmatrix(transpose(ortho1, ortho2, udirection))
+        joiner_post_unchamfer();
+    // Now project ortho1 & 2 parallel to direction to lie in the face,
+    // i.e., we want
+    // (ortho1 + x*direction) . face = 0.
+    x1 = (ortho1 * face) / (udirection * face);
+    skew1 = ortho1 - x1 * udirection;
+    x2 = (ortho2 * face) / (udirection * face);
+    skew2 = ortho2 - x2 * udirection;
+    translate(p)
+        multmatrix(transpose(skew1, skew2, udirection))
+        joiner_post_chamfer();
+}
 
-    module cutoff(cut_radius) {
+module joiner_post_unchamfer() {
+    r = $join_diameter / 2;
+    l = $join_depth;
+    rotate_extrude() polygon([[0,-l], [r, -l], [r,l], [0, l]]);
+}
+
+module joiner_post_chamfer() {
+    r = $join_diameter / 2;
+    l = $join_depth;
+    c = 0.4;
+    eps = 1e-3;
+    rotate_extrude()
+        polygon([[0,-c-r-eps], [r+c,-eps], [r+c, eps], [0,c+r+eps]]);
+}
+
+module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1,
+                     chamfer=[]) {
+    trapezohedron_verticate(points, vertex, cut_radius)
+        trapezohedron_uncut(points, vertex, joiners, span, chamfer);
+}
+
+module trapezohedron_verticate(points, vertex, cut_radius) {
+    if ($flip) {
         intersection() {
-            children();
-            inverticate(vertex) translate([0,0,$radius + cut_radius])
+            verticate(-vertex, align=points[0])
+                translate(-vertex) children();
+            translate([0,0, norm(vertex) - cut_radius - $radius])
+                cube(2 * $radius, center=true);
+        }
+    }
+    else {
+        intersection() {
+            translate([0, 0, -cut_radius]) verticate(vertex, align=points[0])
+                children();
+            translate([0,0,$radius])
                 cube(2 * $radius, center=true);
         }
     }
 }
 
-module trapezohedron_uncut(points, vertex, joiners=[[]], span=1) {
+module trapezohedron_uncut(points, vertex, joiners=[[]], span=1,
+                           chamfer=[]) {
     l = len(points);
     v = l;
     a = l + 1;
@@ -304,9 +367,9 @@ module trapezohedron_uncut(points, vertex, joiners=[[]], span=1) {
             [each points, vertex, [0, 0, 0]],
             [for (i = [1:l]) each [[a, i % l, i - 1], [v, i - 1, i % l]]],
             convexity=l);
-        for (i = [1:l]) {
-            chamfer(points[i%l], points[i-1], points[(i+1)%l]);
-            // chamferh(points[i%l], points[i-1], vertex, [0,0,0]);
+        for (i = chamfer) {
+            chamfer(points[i%l], points[(i+l-1)%l], points[(i+1)%l]);
+            // chamferh(points[i%l], points[(i+l-1)%l], vertex, [0,0,0]);
         }
 
         for (i = [0:l-1]) {
