@@ -27,6 +27,8 @@ $decorate = $preview;
 
 module dodecahedron() scale(1 / sqrt(3)) twelve() pyramid(A);
 
+function final_dual_triangle() = [A[0], C[4], C[1]] / sqrt(3);
+
 module final_dual()
     scale(1/sqrt(3)) pyramids(canonvvv(sixty([A[0], C[4], C[1]])));
 
@@ -70,6 +72,23 @@ module stella_octangular_eighth() {
                   joiners=joiners);
 }
 
+module tetrahemihexahedron() {
+    face = [[0,0,1],[0,1,0],[1,0,0]];
+    if ($piece == 0)
+        four() pyramid(face);
+    if ($piece == 1)
+        scale($radius) four() pyramid(face);
+    if ($piece == 2) {
+        raise($radius/sqrt(3)) verticate(-[1,1,1]) difference() {
+            scale($radius) pyramid(face);
+            three() rotate([-45,0,0]) {
+                translate([$radius*3/4,0,0]) joiner_post_unchamfer();
+                translate([$radius/4,0,0]) joiner_post_unchamfer();
+            }
+        }
+    }
+}
+
 color20 = "#5cf";                        // Light blue.
 color12 = "gold";
 color12b = "lightgreen";
@@ -92,7 +111,7 @@ module dodecadodecahedron_pieces() {
 
     if ($piece == 2)
         trapezohedron(star, sum(P) / 5, $radius * 0.71,
-                      joiners=joiners, span=2);
+                      joiners=joiners, span=2, chamfer=[1:2:10]);
 
     if ($piece == 3)
         trapezohedron(hexagon(P[0], mns(Q[0])),
@@ -122,10 +141,16 @@ module small_ditrigonal_icosidodecahedron_piece() {
     joiner = [[[-5.3,0]]];
     if ($piece == 2)
         trapezohedron(star, sum(star)/len(star),
-                      $radius * inscribe - 7, joiners=joiner, span=2);
+                      $radius * inscribe - 7, joiners=joiner, span=2,
+                      chamfer=[1:2:10]);
 
     else if ($piece == 3)
         trapezohedron(wedge, wedge_c, $radius * 0.75, joiners=joiner, span=2);
+}
+
+module great_ditrigonal_icosidodecahedron() {
+    pyramids(canonvvv(twenty([A[2], A[0], B[1]])), topcolor=color20);
+    pyramids(coset(canonvvv(sixty(B))), topcolor=color12);
 }
 
 module ditrigonal_dodecadodecahedron() scale(1 / sqrt(3)) {
@@ -290,6 +315,180 @@ module great_icosidodecahedron() {
     }
 }
 
+module small_stellated_truncated_dodecahedron() {
+    p = [1, 1, 2 * gold + 1];           // Vertex.  2φ+1 = φ(φ+1) = φ³.
+    mult = $piece == 0 ? 1 : $radius / norm(p);
+    deca = canonvv(decagon(rz(p), rot5_3 * pls(p)));
+    penta = canonvv(pentagon(rz(mns(p))));
+    normal = canonv(sum(deca)/10);      // Point on center of decagram.
+    assert(normal == [gold, 0, gold + 1], str(normal));
+
+    // Apex of crown slopes.
+    pit = [2 - gold, 0, gold - 1];
+    assert(canonv(rot5 * pit) == pit);
+
+    crux = [2 - gold, 0, 3 * gold - 1];//[3 - gold, gold, 2 * gold];   // Dip in the crown edge.
+    echo(rot5_4 * crux);
+    if ($piece <= 1) {
+        scale(mult) {
+            color("lightgreen") star_pyramids(twelve(deca), 3);
+            color("gold") pyramids(twelve(penta));
+            mark(normal, r=0.1, c="black");
+            mark(p, c="red");
+            mark(p + 0.309017 * (pit - p), c="red", r=0.0001);
+            mark(crux, r=0.1, c="blue");
+            mark(pit, c="purple");
+        }
+    }
+    if ($piece == 5) {
+        un = unit(normal);
+        difference() {
+            scale(mult) verticate(normal) translate(-normal) polyhedron(
+                points = [each decagon(crux, p),
+                          each decagon(crux - crux * un * un, p - p * un * un),
+                          pit],
+                faces = [
+                    for (i = [1:2:9]) [(i + 9) % 10, i, (i + 1) % 10, 20],
+                    for (i = [0:9]) [(i + 1) % 10, i, i + 10, (i + 1) % 10 + 10],
+                    [ for (i = [0:9]) 19-i ],
+                    ],
+                convexity=5);
+            raise(-$radius / 2) cube($radius, center=true);
+        }
+    }
+}
+
+module great_stellated_truncated_dodecahedron() {
+    // This is a facetation of a rhombicosidodecahedron, it works with any
+    // (non)uniform variant of that.  But in general that will give non-regular
+    // decagram faces.  The one we want has a regular decagram.
+    alpha = [2 * gold - 1, 3 - gold, 2 * gold + 4];
+    beta = [0, 7 - 4 * gold, 1 + 3 * gold];
+    gamma = [5 * gold - 5, 0, 5];
+
+    valley = [0, 0, 5];
+    pit = (3 * gold - 2) * [1,1,1];
+
+    mult = $piece == 0 ? 1 : $radius / norm(alpha);
+
+    if ($piece == 0) {
+        // Valley piece.
+        mark(beta, "blue", 0.2);
+        mark(alpha, "green", 0.2);
+        mark(gamma, "orange", 0.15);
+        mark(rot5_4 * alpha, "green", 0.15);
+        mark(rz(beta), "blue", 0.15);
+        mark(rz(alpha), "green", 0.15);
+        mark(rz(gamma), "orange", 0.15);
+        mark(rz(rot5_4 * alpha), "green", 0.15);
+        mark(valley, "black", 0.15);
+
+        // Triangle piece.
+        mark(rot5 * alpha, "green", 0.2);
+        mark(rot5 * beta, "blue", 0.15);
+        mark(mns(rot5 * alpha), "green", 0.15);
+        mark(pit, "black", 0.15);
+    }
+    if ($piece == 3) {
+        points = mult * hexagon(rot5 * alpha, rot5 * beta);
+        trapezohedron_verticate(points, mult * pit, $radius * 0.734808 - 10) {
+            difference() {
+                trapezohedron_uncut(points, mult * pit);
+                skew_join2(points[0], points[2], points[1]);
+                skew_join2(points[2], points[4], points[3]);
+                skew_join2(points[4], points[0], points[5]);
+            }
+        }
+    }
+    if ($piece == 4) {
+        half = mult * [beta, alpha, gamma, rot5_4 * alpha];
+        points = [each half, each rrz(half)];
+        easy_join = [[], [[-17,26], [-18,-12]], [[-18,12], [-17,-26]], []];
+        trapezohedron_verticate(points, mult * valley, $radius * 0.649457 - 5)
+            difference() {
+            trapezohedron_uncut(points, mult * valley, joiners = easy_join);
+            skew_join2(points[1], points[7], points[0]);
+            skew_join2(points[5], points[3], points[4]);
+        }
+    }
+
+    if ($piece == 0 || $piece == 1) {
+        deca = canonvv(decagon(mns(alpha), rot5_4 * rx(pls(alpha))));
+        tri = canonvv(triangle(rot5_3 * rz(alpha)));
+        scale(mult) {
+            color("crimson") star_pyramids(twelve(deca), 3);
+            color("gold") pyramids(twenty(tri));
+        }
+    }
+    // echo(norm(deca[1] - deca[0]) / norm(deca[2] - deca[1]) - 1);
+    module skew_join2(u, v, w) {
+        rad = norm((u + w) / 2) - 17;
+        p = rad * unit((u + w) / 2);
+        q = rad * unit((v + w) / 2);
+        skew_joiner_post(p, cross(u, w), cross(p, q));
+        skew_joiner_post(q, cross(v, w), cross(p, q));
+    }
+}
+
+module truncated_great_icosahedron() {
+    p0 = [2 - gold, 1, 2 * gold];
+    mult = $piece == 0 ? 1 : $radius / norm(p0);
+    p = mult * p0;
+    pit = mult * [3 - 6 / sqrt(5), 0, 6/5 + 3/5 * gold];
+    crux = mult * [1,0,3 * gold - 2];
+    crss = mult * rot5_4 * [3, 3, 3] / gold;
+    if ($piece == 0) {
+        //q = rot5_2 * rx(mns(p));
+        //r = rot5_2 * p;
+        //s = rot5_4 * rx(mns(p));
+        // q-p, p-r, r-s should be equal, p,q,r,s should be coplanar.
+        //echo(norm(q - p) / norm(p - r) - 1);
+        //echo(unit(q - p) * cross(unit(r - p), unit(s - p)));
+        //mark(q, r=0.1);
+        mark(p, r=0.1, "black");
+        mark(crss, r=0.1, c="green");
+        mark(crux, r=0.1, c="blue");
+        //mark(rz(p), r=0.1, c="black");
+        //mark(rot5_4 * mns(p), r=0.1, c="black");
+        mark(pit, r=0.1, c="red");
+    }
+    if ($piece == 0 || $piece == 1) {
+        color("yellow") star_pyramids(twelve(pentagon(p)));
+        color("pink") pyramids(twenty(hexagon(rz(p), rot5_4 * mns(p))));
+    }
+    if ($piece == 2) {
+        joiners = [[[-14,0],[-24,0]],[],[],[[-14,-0],[-24,0]],[]];
+        trapezohedron_verticate([[1,0,1]], [0,0,$radius],
+                                $radius * 0.63686 - 3) diffunion(2) {
+            trapezohedron_uncut([crss, p, crux, my(p), my(crss)], pit,
+                                joiners=joiners);
+            trapezohedron_uncut(rrz([crss, p, crux, my(p), my(crss)]), rz(pit),
+                                joiners=joiners);
+            cube(1);
+            skew_join2(p, my(p), crux);
+            skew_join2(mx(p), rz(p), rz(crux));
+        }
+    }
+    if ($piece == 5) {
+        q = (gold - 1) * p + (2 - gold) * rot5_2 * p;
+        star = decagon(p, q);
+        //trapezohedron();
+        center = sum(star) / len(star);
+        trapezohedron_verticate(star, center, $radius * 0.855 - 14) difference() {
+            trapezohedron_uncut(star, center);
+            for (r = rotate5)
+                #skew_join2(r * p, r * rot5 * p, r * q);
+        }
+    }
+    module skew_join2(u, v, w) {
+        rad = norm((u + w) / 2) - 14;
+        p = rad * unit((u + w) / 2);
+        q = rad * unit((v + w) / 2);
+        skew_joiner_post(p, cross(u, w), cross(p, q));
+        skew_joiner_post(q, cross(v, w), cross(p, q));
+    }
+}
+
 //great_icosidodecahedron();
 //great_id_5t();
 //great_id_3p();
@@ -297,7 +496,7 @@ module great_icosidodecahedron() {
 //great_id_stand();
 //half_id_tri_facet(0);
 //half_id_tri_facet(1, [1,0,gold], $radius-20, [18:72:360]);
-//if (false)
+if (false)
 difference() {
     half_id_tri_facet(2, [1,0,gold], $radius-28, [18:72:360]);
     r = 0.4 * $radius;
@@ -309,7 +508,6 @@ difference() {
             [[0, 1, 2, 3]]);
     }
 }
-//icosidodecahedron_triangle_facetation(2);
 
 module icosidodecahedron_triangle_facetation(n) {
     $fn = $fn ? $fn : 20;
