@@ -80,7 +80,10 @@ module main() {
     if (archimedes == 25) icosahedron();
 
     // 50... for duals.
-    if (archimedes == 62) disdyakis_triacontahedron(); // 90mm
+    if (archimedes == 52) rhombic_dodecahedron();
+    if (archimedes == 56) disdyakis_dodecahedron();
+    if (archimedes == 58) rhombic_triacontahedron();
+    if (archimedes == 62) disdyakis_triacontahedron();
 
     // 101 - 175 for the Skilling numbering of the uniform compounds.
     // 201 - 275 for their duals.
@@ -162,8 +165,11 @@ module truncated_cuboctahedron() {
 
 
 module snub_cube() {
-    function tribo(n, a) = n == 0 ? a : tribo(n - 1, sqrt(1/a + 1 + a));
-    t = tribo(22, 1);
+    function tribonacci(a = 2, n=7) = n <= 0 ? a : let (
+        delta = (a*a*a - a*a - a - 1) / (3*a*a - 2*a - 1),
+        b = a - delta)
+        echo(b, delta) tribonacci(b, n - 1);
+    t = tribonacci();
     a = [1/t, 1, t];
     face_list=[
         [zsquare(a), 6, "purple"],
@@ -340,14 +346,106 @@ module icosahedron() {
     p = [1,0,gold];
     face_list = [[triangle(p), 20, "yellow", 2]];
     joiners = [[-4.5, 10], [-4.5, -10]];
-    polygon_face_set(face_list, joiners=joiners);
+    polygon_face_set(face_list, joiners=joiners, cut=0.9);
+}
+
+module rhombic_dodecahedron() {
+    p1 = [0, 0, 1];
+    p2 = [1, 0, 0];
+    q1 = [0.5, 0.5, 0.5];
+    q2 = [0.5, -0.5, 0.5];
+    face = [p1, q1, p2, q2];
+    mult = $piece < 1 ? 1 / norm(q1) : $radius / norm(q1);
+    echo("Edge", mult * norm(p1 - q1));
+    if ($piece <= 1)
+        for (f = twelve(face))
+            pyramid(mult * f);
+    if ($piece == 2)
+        joinable_frustum(mult * face, 0.85,
+                         [[[-6,-9],[-6,9]]]);
+}
+
+module disdyakis_dodecahedron() {
+    p = [0, 0, 1];
+    q = unit([1, 1, 1]);
+    r = unit([0, 1, 1]);
+    c = unit([1, 1 + sqrt(2), 1 + 2 * sqrt(2)]);
+    if ($piece == 11) {
+        for (v = fortyeight([c])) translate(v[0]) color("black") sphere(0.025);
+        color("#ffffee", 0.75) sphere(0.9, $fn=100);
+        for (v = six([p])) translate(v[0]) color("lightgreen") sphere(0.025);
+        for (v = eight([q])) translate(v[0]) color("magenta") sphere(0.025);
+        for (v = twelve([r])) translate(v[0]) color("yellow") sphere(0.025);
+        translate(p) color("lightgreen") sphere(0.05);
+        translate(q) color("magenta") sphere(0.05);
+        translate(r) color("yellow") sphere(0.05);
+    }
+    echo("Lengths", $radius * [norm(p - q), norm(q - r), norm(r - p)]);
+    face_list = [[[r, q, p], 24, "white", 2],
+                 [[p, q, rmz(r)], 24, "black", 3]];
+    polygon_face_set(face_list);
+    if ($piece == 4) {
+        rot = [[0, 0, sqrt(2)], [1, 1, 0], [-1, 1, 0], ] / sqrt(2);
+        //rot = [[0, 0, sqrt(2)], [-1, 1, 0], [1, 1, 0]] / sqrt(2);
+        //rot = 1;
+        // Expand a bit, and orient on a convenient plane.
+        pp = $radius * 1.128092 * rot * p;
+        qq = $radius * 1.128092 * rot * q;
+        rr = $radius * 1.128092 * rot * r;
+        // Inner points for the cutting.
+        ip = ($radius - 5) * unit(pp);
+        iq = ($radius - 5) * unit(qq);
+        ir = ($radius - 5) * unit(rr);
+        // Normal to the cut triangle.
+        n = unit(cross(iq - ip, ir - ip));
+        cut_distance = ip * n;
+        // Cut normal projected to x-y plane.
+        medial = unit([n.x, n.y, 0]);
+        echo(norm(pp), norm(qq), norm(rr));
+        translate([-cut_distance, 0, 0]) intersection() {
+            multmatrix([[medial.x, medial.y, 0],
+                        [-medial.y, medial.x, 0],
+                        [0, 0, 1]]) difference() {
+                polyhedron(
+                    points = [[0,0,0], pp, qq, rr],
+                    faces = [[0, 1, 2], [0, 2, 3], [0, 3, 1], [3, 2, 1]]);
+                mid_vertex_joiner_post(pp, qq, -10, 1, +8, -0.5);
+                mid_vertex_joiner_post(pp, qq, -10, 1, -8,  0.5);
+
+                mid_vertex_joiner_post(rr, qq, -9.5, 1, +5, -0.5);
+                #mid_vertex_joiner_post(rr, qq, -9.5, 1, -5.25,  0.5);
+
+                #mid_vertex_joiner_post(pp, rr, -9, 1, +7.25, -0.5);
+                mid_vertex_joiner_post(pp, rr, -8, 1, -8, +0.5);
+                inverticate(n) raise(cut_distance - $radius / 2)
+                    cube($radius, center=true);
+            }
+            sphere($radius, $fn=$fn*20);
+        }
+    }
+}
+
+module rhombic_triacontahedron() {
+    p = [gold, 0, gold + 1];
+    q = [0, 1, gold + 1];
+    face = [q, p, rz(q), rz(p)];
+    mult = $piece < 1 ? 1 / norm(p) : $radius / norm(p);
+    echo("Edge", mult * sqrt(2 + gold));
+    if ($piece <= 1)
+        for (f = canonvvv(sixty(face)))
+            if (f[1] < f[3])
+                pyramid(mult * f);
+    if ($piece == 2) {
+        joinable_frustum(mult * face, 0.9,
+                         [[[-3.5,-9],[-3.5,9]]]);
+    }
 }
 
 module disdyakis_triacontahedron() {
     p = [0, 0, 1];
-    q = [1, 0, gold] / norm([1, gold]);
-    r = [0, gold-1, gold] / norm([gold-1, gold]);
-    c = [gold-1, gold-1, gold+3] / norm([gold-1, gold-1, gold+3]);;
+    q = unit([1, 0, gold]);
+    r = unit([0, gold-1, gold]);
+    c = unit([gold-1, gold-1, gold+3]);
     if ($piece == 11) {
         for (v = sixty([p])) translate(v[0]) color("lightgreen") sphere(0.025);
         for (v = twelve([q])) translate(v[0]) color("magenta") sphere(0.025);
@@ -358,9 +456,40 @@ module disdyakis_triacontahedron() {
         translate(q) color("magenta") sphere(0.05);
         translate(r) color("yellow") sphere(0.05);
     }
+    echo("Lengths", $radius * [norm(p - q), norm(q - r), norm(r - p)]);
     face_list = [[[r, q, p], 60, "white", 2],
                  [[p, q, my(r)], 60, "black", 3]];
     polygon_face_set(face_list);
+    if ($piece == 4) {
+        pp = pls($radius * 1.05581 * rot5_2 * p);
+        qq = pls($radius * 1.05581 * rot5_2 * q);
+        rr = pls($radius * 1.05581 * rot5_2 * r);
+        n = unit(cross(qq - pp, rr - pp));
+        radial = (pp * n) * n;
+        echo(norm(radial));
+        medial = unit([n.x, n.y, 0]);
+        echo(norm(pp), norm(qq), norm(rr));
+        translate([12 - $radius, 0, 0]) rotate(-50.4) difference() {
+            intersection() {
+                polyhedron(
+                    points = [[0,0,0], pp, qq, rr],
+                    faces = [[0, 1, 2], [0, 2, 3], [0, 3, 1], [3, 2, 1]]);
+                multmatrix([[medial.x, -medial.y, 0],
+                            [medial.y, medial.x, 0],
+                            [0, 0, 1]])
+                    translate([$radius - 12, -$radius/2, 0]) cube($radius);
+                sphere($radius, $fn=$fn*20);
+            }
+            mid_vertex_joiner_post(pp, qq, -6, 1, +10, -0.5);
+            mid_vertex_joiner_post(pp, qq, -8.5, 1, -5,  0.5);
+
+            mid_vertex_joiner_post(rr, qq, -8, 1, +10, -0.5);
+            #mid_vertex_joiner_post(rr, qq, -8.2, 1, -5.5,  0.5);
+
+            #mid_vertex_joiner_post(pp, rr, -6.4, 1, +5, -0.5);
+            mid_vertex_joiner_post(pp, rr, -6.5, 1, -5, +0.5);
+        }
+    }
 }
 
 module two_dodecahedra() {
@@ -406,7 +535,7 @@ module joinable_frustum(w, cut=0.75, joiners, colour) {
 
     multmatrix(flipper) difference() {
         translate([0, 0, -cut * w_inscribe]) verticate_align(w) difference() {
-            color(colour) chamfer_pyramid(w);
+            color(colour) pyramid(w); // chamfer_pyramid(w);
             for (i = [1:len(w)]) {
                 for (j = joiners[i % len(joiners)]) {
                     v   = len(j) == 4 ? j[0] : 0.5 - 0.5 * sign(j[0]);
