@@ -1,5 +1,6 @@
 
 // STANDS
+use <splitting.scad>;
 
 // Create a tripod.  This implies that the object is face-up to get the 3-fold
 // symmetry about the z-axis.
@@ -23,19 +24,19 @@
 module stand_tripod(strut, strut_mm=0, base=0,
                     length=1, height=1, align=[1, 0, 0], hole=0, p=10) {
     stand_generic(
-        3, strut, strut_mm, base, length, height, hole, p)
+        3, strut, strut_mm, base, length, height, hole, p=p)
         align_rot(align) faceup() children();
 }
 
 module stand_pentapod(strut, strut_mm=0, base=0,
-                      length=1, height=1, hole=0, p=10) {
+                      length=1, height=1, hole=0, mink=0, p=10) {
     stand_generic(
-        5, strut, strut_mm, base, length, height, hole, p)
+        5, strut, strut_mm, base, length, height, hole, mink, p=p)
         pointup() children();
 }
 
 module stand_generic(num, strut, strut_mm=0, base=0,
-                     length=1, height=1, hole=0, p=10) {
+                     length=1, height=1, hole=0, mink=0, p=10) {
     if ($piece == p) {
         strut_all = strut * $radius + strut_mm;
         difference() {
@@ -43,8 +44,13 @@ module stand_generic(num, strut, strut_mm=0, base=0,
                 rotate(i * 360 / num) translate([strut_all, 0, 0])
                     cylinder(r = $stand_diameter / 2, h=$radius * length + 2);
             }
-            # translate([0, 0, $radius * height + 2])
-                scale($radius) children();
+            minkowski() {
+                translate([0, 0, $radius * height + 2])
+                    scale($radius) children();
+                if (mink != 0)
+                    translate([0, 0, mink/2 * $radius])
+                        cube([0.02, 0.02, mink * $radius], center=true);
+            }
         }
         stand_ring(base, hole, strut_all);
     }
