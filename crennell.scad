@@ -578,7 +578,7 @@ module five_tetrahedron_twentieth() {
     q1  = apply(p1);
     q6a = apply(p6a);
 
-    joiners=[[[-3, 0], [3, 0]], [], []];
+    joiners=[[[-4, 0], [-29, 0]], [], []];
 
     trapezohedron(
         [q4, q4a, q1, mns(q4), mns(q4a), mns(q1), pls(q4), pls(q4a), pls(q1)],
