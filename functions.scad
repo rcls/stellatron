@@ -19,45 +19,60 @@ function sum(v, n=0) = n + 1 < len(v) ? v[n] + sum(v, n + 1) : v[n];
 // decomposition in Q(ϕ).
 value_table = [
     [0.0 * gold - 0.5, 0.0, -0.5],  // -0.5
+    [-4.0 * gold + 6.0, -4.0, 6.0], // -0.4721359549995796
     [-0.4 * gold + 0.2, -0.4, 0.2], // -0.44721359549995804
     [1.0 * gold + -2.0, 1.0, -2.0], // -0.3819660112501051
+    // [0.25 * gold + -0.75, 0.25, -0.75], // 0.3454915028125263
     [-1.2 * gold + 1.6, -1.2, 1.6], // -0.3416407864998736
     [-7.0 * gold + 11.0, -7.0, 11.0], // -0.3262379212492643
     [-0.5 * gold + 0.5, -0.5, 0.5], // -0.30901699437494745
     [6.0 * gold + -10.0, 6.0, -10.0], // -0.2917960675006306
+    // [0.75 * gold + -1.5, 0.75, -1.5], // -0.2864745084375788
     [0.2 * gold + -0.6, 0.2, -0.6], // -0.27639320225002095
+    // [0.0 * gold + -0.25, 0.0, -0.25], // -0.25
     [-2.0 * gold + 3.0, -2.0, 3.0], // -0.2360679774997898
     [0.5 * gold + -1.0, 0.5, -1.0], // -0.19098300562505255
     [-0.6 * gold + 0.8, -0.6, 0.8], // -0.1708203932499368
+    // [-0.25 * gold + 0.25, -0.25, 0.25], // -0.15450849718747373
     [3.0 * gold + -5.0, 3.0, -5.0], // -0.1458980337503153
     [-1.0 * gold + 1.5, -1.0, 1.5], // -0.1180339887498949
     [0.8 * gold + -1.4, 0.8, -1.4], // -0.10557280900008381
+    // [0.25 * gold + -0.5, 0.25, -0.5], // -0.09549150281252627
     [-5.0 * gold + 8.0, -5.0, 8.0], // -0.09016994374947451
     [-1.4 * gold + 2.2, -1.4, 2.2], // -0.06524758424985233
+    // [0.75 * gold + -1.25, 0.75, -1.25], // -0.03647450843757882
     [-0.0 * gold + -0.0, -0.0, -0.0], // 0.0
+    // [-0.75 * gold + 1.25, -0.75, 1.25], // 0.03647450843757882
     [1.4 * gold + -2.2, 1.4, -2.2], // 0.06524758424985233
     [5.0 * gold + -8.0, 5.0, -8.0], // 0.09016994374947451
+    // [-0.25 * gold + 0.5, -0.25, 0.5], // 0.09549150281252627
     [-0.8 * gold + 1.4, -0.8, 1.4], // 0.10557280900008381
     [1.0 * gold + -1.5, 1.0, -1.5], // 0.1180339887498949
     [-3.0 * gold + 5.0, -3.0, 5.0], // 0.1458980337503153
+    // [0.25 * gold + -0.25, 0.25, -0.25], // 0.15450849718747373
     [0.6 * gold + -0.8, 0.6, -0.8], // 0.1708203932499368
     [-0.5 * gold + 1.0, -0.5, 1.0], // 0.19098300562505255
     [2.0 * gold + -3.0, 2.0, -3.0], // 0.2360679774997898
+    // [0.0 * gold + 0.25, 0.0, 0.25], // 0.25
     [-0.2 * gold + 0.6, -0.2, 0.6], // 0.27639320225002095
+    // [-0.75 * gold + 1.5, -0.75, 1.5], // 0.2864745084375788
     [-6.0 * gold + 10.0, -6.0, 10.0], // 0.2917960675006306
     [0.5 * gold + -0.5, 0.5, -0.5], // 0.30901699437494745
     [7.0 * gold + -11.0, 7.0, -11.0], // 0.3262379212492643
     [1.2 * gold + -1.6, 1.2, -1.6], // 0.3416407864998736
+    // [-0.25 * gold + 0.75, -0.25, 0.75], // 0.3454915028125263
     [-1.0 * gold + 2.0, -1.0, 2.0], // 0.3819660112501051
     [0.4 * gold + -0.2, 0.4, -0.2], // 0.44721359549995804
+    [4.0 * gold + -6.0, 4.0, -6.0], // 0.4721359549995796
     [0.0 * gold + 0.5, 0.0, 0.5],  // 0.5
     ];
 
-for (i = [1 : len(value_table) - 1])
-    assert(value_table[i-1][0] < value_table[i][0]);
-
 for (v = value_table)
     assert(abs(v[0] - gold * v[1] - v[2]) < 1e-7);
+
+for (i = [1 : len(value_table) - 1])
+    assert(value_table[i-1][0] < value_table[i][0],
+           str(value_table[i-1], " ", value_table[i]));
 
 // Binary search helper on the `value_table`.
 function canon_find(v, m, p) =
@@ -76,7 +91,8 @@ function canon(v) =
          pp = value_table[mm][1],
          ii = value_table[mm][2],
          recalc = pp * gold + (rv + ii))
-    assert(abs(recalc - v) < 1e-7)
+    //echo(v, recalc)
+    assert(abs(recalc - v) < 1e-7, str("Canon fail", v, ",", recalc))
     recalc;
 
 function canonv(v) = [for (x = v) canon(x)];
@@ -125,7 +141,7 @@ module orthonormal(u, v, w=[0,0,0], p=undef)
     multmatrix(orthonormal(u, v, w, p)) children();
 
 function verticate_na(v) = let (
-    vn = v / norm(v),
+    vn = unit(v),
     x = vn.x,
     y = vn.y,
     z = vn.z,
@@ -152,6 +168,18 @@ function inverticate(v) = let (v = verticate(v)) transpose(v.x, v.y, v.z);
 // plane.
 module verticate(v, align=undef) multmatrix(verticate(v, align)) children();
 module inverticate(v) multmatrix(inverticate(v)) children();
+
+function flatinate(v) = let(
+    v = unit(v),
+    h = norm([v.x, v.y]),
+    c1 = h > 1e-6 ? v.x / h : 1,
+    s1 = h > 1e-6 ? v.y / h : 0)
+    [[h * c1, h * s1, v.z], [-s1, c1, 0], [-v.z * c1, -v.z * s1, h]];
+
+function unflatinate(v) = let (u = flatinate(v)) transpose(u.x, u.y, u.z);
+
+module flatinate(v) multmatrix(flatinate(v)) children();
+module unflatinate(v) multmatrix(unflatinate(v)) children();
 
 // Bring mean of face to vertical and align first edge.
 module verticate_align(f) {
@@ -199,7 +227,7 @@ module chamfer_pyramid(f, a=[0, 0, 0], chamfer=0.4, inset=0.3) {
         pyramid(f, a);
         for (i = [1:len(f)])
             chamfer_box(f[i-1],f[i%len(f)]);
-        for (p = f)
+        if (false) for (p = f)
             chamfer_side(p);
     }
     module chamfer_box(u, v) {
@@ -214,6 +242,11 @@ module chamfer_pyramid(f, a=[0, 0, 0], chamfer=0.4, inset=0.3) {
             cube([norm(p), inset*2, inset*2], center=true);
     }
 }
+
+// Project u onto v.
+function project(u, v) = (u * v) / (v * v) * v;
+// Scale projection of u onto v so that the back projection onto u is u.
+function copoject(u, v) = (u * u) / (u * v) * v;
 
 // Order 3 rotation of a vector.
 function pls(p) = [p.z, p.x, p.y];
@@ -323,6 +356,8 @@ function five(f) = [for (m = rotate5) [for (v = f) m * v]];
 
 // Construct a pentagon.
 function pentagon(v) = [for (m = rotate5) m * v];
+// Construct a decagon.
+function decagon(u, v) = [for (r = rotate5) each [r * u, r * v]];
 
 //function six(face) = [each three(face), for (f = three(face)) invert(f)];
 function six(face) = [each three(face), each three(rrx(face))];
@@ -340,6 +375,8 @@ function twenty(face) = [for (f = four(face)) each five(f)];
 
 // Close under three fold rotation and four fold rotation about each axis.
 function twentyfour(face) = [for (f = eight(face)) each three(f)];
+
+function fortyeight(f) = [each twentyfour(f), each twentyfour(invert(f))];
 
 // Given a face, generate 60 images, dodec. rotational symmetry.
 function sixty(f) = [for (ff = five(f)) each twelve(ff)];
@@ -362,3 +399,23 @@ module diffunion(uns) {
         children([uns : $children-1]);
     }
 }
+
+module raise(z) translate([0, 0, z]) children();
+
+// Return [x,y] such that a0 + x·a1 and b0 + y·b1 are as close as possible.
+function cross_params(a0, a1, b0, b1) = let(
+    // Solve [A B;C D][x;y] = [U;V].
+    A = a1 * a1,
+    B = -b1 * a1,
+    C = a1 * b1,
+    D = -b1 * b1,
+    U = (b0 - a0) * a1,
+    V = (b0 - a0) * b1,
+    det = A * D - B * C,
+    x = (D * U - B * V) / det,
+    y = (A * V - C * U) / det)
+    [x, y];
+
+// Return a point that is as close as possible to both lines.
+function cross_point(a0, a1, b0, b1) = let (p = cross_params(a0, a1, b0, b1))
+    ((a0 + p.x * a1) + (b0 + p.y * b1)) * 0.5;
