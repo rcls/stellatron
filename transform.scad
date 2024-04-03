@@ -3,7 +3,7 @@ use <functions.scad>
 include <numbers.scad>
 
 // Order of quotient group or sub-group.  When there are multiple with the same
-// order, then they are numbered sequentially from the order, e.g., 12, 23, 14.
+// order, then they are numbered sequentially from the order, e.g., 12, 13, 14.
 order = 3;
 // Normally we plot points.  Set to true to plot great circles.
 circles = false;

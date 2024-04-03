@@ -4,12 +4,15 @@ use <functions.scad>
 use <splitting.scad>
 use <stand.scad>
 
-$fn = 20;
-$join_diameter = 2.1;
-$join_depth = 5;
-$radius = 65;
-$stand_diameter = 8;
-$piece = 10;
+//$fn = 20;
+//$join_diameter = 2.1;
+//$join_depth = 5;
+//$radius = 65;
+//$stand_diameter = 8;
+//$piece = 1;
+
+//great_ditrigonal_icosidodecahedron();
+//icosidodecahedron_triangle_facetation(2);
 
 // Four rings of five, dodecahedral points.
 A = [for (r = rotate5) canonv(r * [0, gold-1, gold])];
@@ -40,16 +43,158 @@ module final_dual_peanut() scale(1/sqrt(3))
 module great_stellated_dodecahedron()
     scale(1 / sqrt(3)) twelve() star_pyramid(B);
 
-module great_dodecahedron()
-    scale(1 / norm(I0)) for (f = twelve(IA)) pyramid(f);
+module great_stellated_dodecahedron_piece() {
+    //twelve() star_pyramid(B);
+    //mark([1,1,1], c="black");
+    //mark([2-gold,0,gold-1], c="blue");
+    //mark([gold-1,2-gold,0], c="red");
+    mult = $radius / sqrt(3);
+    p = [gold-1,2-gold,0] * mult;
+    q = [2-gold,0,gold-1] * mult;
+    r = [1,1,1] * mult;
+    verticate(cross(r - p, r - q), r) translate(- (p+q) / 2) difference() {
+        trapezohedron_uncut([p, q, r], (p + q + r) / 3,
+                            [[[-8,-25],[-8,25]],
+                             [[-29,44], [-29,-44]],
+                             [[-29,-44], [-29,44]]]);
+        inverticate([1,1,1]) cube($radius * 2/3 - 10, center=true);
+    }
+}
 
-module small_stellated_dodecahedron()
-    scale(1 / norm(I0)) twelve() star_pyramid(IA);
+module great_dodecahedron() {
+    mult = $piece == 0 ? 1 : 1 / norm(I0);
+    if ($piece != 3)
+        scale($piece == 0 ? 1 : 1 / norm(I0))
+            for (f = twelve(IA)) pyramid(f);
+    //mark([1, 0, gold], "black");
+    //mark([0, gold, 1], "green");
+    //mark([1, 1, 1] * (gold-1), "purple");
+    if ($piece == 3) {
+        mult = $radius / sqrt(2 + gold);
+        p = [1, 0, gold] * mult;
+        q = [0, gold, 1] * mult;
+        r = [1, 1, 1] * (gold - 1) * mult;
+        c = (p + q) / 2;
+        verticate(cross(p - r, q - r)) difference() {
+            translate(-c) trapezohedron_uncut(
+                [p, q, r], (p + q + r) / 3,
+                [[[-14, 39], [-14, -39]],
+                 [[-4.5,  15], [-4.5, -35]],
+                 [[-4.5, -15], [-4.5,  35]]]);
+            inverticate(c) translate([0, 0, -$radius * 1.30558 - 3])
+                cube($radius*2, center=true);
+        }
+    }
+}
+
+module small_stellated_dodecahedron() {
+    if ($piece <= 2) scale(1 / norm(I0)) {
+        twelve() star_pyramid(IA);
+        if ($piece == 0) {
+            mark([1, 0, gold], "black");
+            mark([0, 2-gold,1], "red");
+            mark([0, gold-2,1], "green");
+        }
+    }
+    if ($piece == 3) {
+        mult = $radius / sqrt(2 + gold);
+        p = [1, 0, gold] * mult;
+        q = [0, gold-2, 1] * mult;
+        r = [0, 2-gold, 1] * mult;
+        c = [1/2, 0, gold/2 + 1/2] * mult;
+        intersection() {
+            verticate(cross(p-q, p-r)) translate(-(q+r)/2)
+                trapezohedron_uncut(
+                    [p,q,r], c,
+                    [[[-10,17],[-10,-38]],[[-8,14],[-8,-14]],[[-10,38],[-10,-17]]]);
+            translate([-0.75, -0.5, 0] * $radius)
+                cube([$radius, $radius, 8]);
+        }
+    }
+}
 
 module five_cubes() {
     cc = ["#8cf", "lightgreen", "yellow", "red", "orange"];
-    for (i = [0:4])
-        multmatrix(rotate5[i]) color(cc[i]) cube(2 / sqrt(3), center=true);
+    mult = $radius / sqrt(3);
+    if ($piece == 0) {
+        cube5(2);                       // Radius is sqrt(3).
+
+        // 1/φ = φ - 1
+        // 1/φ² = 2 - φ = 1 - 1/φ
+        // 1/φ³ = 2φ - 3
+        // 1/φ⁴ = 5 - 3φ
+        // 1 - 1/φ² = φ-1
+        // 1 - 1/φ³ = 4 - 2φ
+        // 1 - 1/φ⁴ = 3φ - 4
+        mark([1,1,1]);
+        mark([2 * gold - 3, 1 , 1], "blue");
+        mark([2 - gold,gold - 1,1], "green");
+        mark([0, gold - 1, gold], "grey"); // rot5_4 * [1,1,1]
+        mark([2 - gold, 1, 4 - 2*gold], "orange"); // On y face
+        mark([0, 3 * gold - 4, 1], "red");      // On top.
+        mark([0, 1, gold - 1], "purple");
+    }
+    if ($piece == 1)
+        cube5(2 * mult);
+
+    q = [1 - gold * 0.5, 2 * gold - 2.5, 1];
+
+    if ($piece == 5) {
+        p0 = [0, 1, gold - 1];
+        p1 = [2 * gold - 3, 1, 1];
+        p2 = [2 - gold, gold - 1, 1];
+        p3 = mx(p2);
+        p4 = mx(p1);
+        a = [0, 1, 1];
+        $flip = false;
+        intersection() {
+            rotate([180, 0, 0]) translate(-a * mult) difference() {
+                trapezohedron_uncut(
+                    [p0, p1, p2, p3, p4] * mult, a * mult,
+                    [[[-5, -19]], [[-7, 13]], [],
+                     [[-7, -13]], [[-5, 19]]]);
+                translate(q * mult) joiner_post();
+                translate(mx(q) * mult) joiner_post();
+            }
+            rotate([45, 0, 0])
+                cube([$radius, $radius * 0.3125 + 10, $radius *0.5], center=true);
+        }
+    }
+
+    if ($piece == 3) {
+        c = [1, 1, 1] * (gold - 1);
+        p0 = [2 * gold - 3, 1, 1] - c;
+        p1 = [2 - gold, 1, 4 - 2*gold] - c;
+        p2 = [1, 1, 1] - c;
+        p3 = [2 - gold, gold - 1, 1] - c;
+        a = (p0 + p2) / 2;
+        intersection() {
+            rotate([180, 0, 0]) translate(-a * mult) difference() {
+                trapezohedron_uncut(
+                    [p0, p1, p2, p3] * mult, a * mult,
+                    [[], [[-8, -10], [-13, 22]], [[-9, 10], [-9, -18]], []]);
+                translate(-c * mult) {
+                    multmatrix(rot5_2) rotate(180)
+                        translate(mx(q) * mult) joiner_post();
+                }
+            }
+            rotate([-30, 0, 0]) rotate([0, 19, 0])
+                cube([$radius, $radius*0.5, $radius*0.144+10], center=true);
+        }
+    }
+
+    if ($piece == 10) {
+        p = [2 - gold, gold - 1, 1] / sqrt(3);
+        stand_quad(p.x, p.y)
+            cube5(2 / sqrt(3));
+
+    }
+
+    module cube5(x)
+        for (i = [0:4])
+            multmatrix(rotate5[i]) color(cc[i]) cube(x, center=true);
+
+    module mark(p, c="black", r=0.05) translate(p) color(c) sphere(r);
 }
 
 module dual_c28() scale(1 / sqrt(3)) {
@@ -72,20 +217,122 @@ module stella_octangular_eighth() {
                   joiners=joiners);
 }
 
+module octahemioctahedron() {
+    mult = $piece == 0 ? 1 : $radius / sqrt(2);
+    face = mult * triangle([0,1,1]);
+    echo("Edge", norm(face[1] - face[0]));
+    if ($piece <= 1)
+        pyramids(eight(face));
+    center = sum(face) / 3;
+    apex = center * 0.75;
+    if ($piece == 3) {
+        difference() {
+            verticate(-center) translate(-center) difference() {
+                pyramid(face, apex);
+                joiners();
+            }
+            raise(7.5 + $radius) cube(2 * $radius, center=true);
+        }
+    }
+    if ($piece == 6) {
+        difference() {
+            verticate(cross(face[2], face[1])) difference() {
+                pyramid([[0,0,0],face[2],face[1]], apex);
+                joiners();
+            }
+            raise(7.5 + $radius) cube(2 * $radius, center=true);
+        }
+    }
+    module joiners() {
+        // Between face and hemi.
+        #double() three() {
+            e = unit(face[2] - face[1]);
+            f = unit(apex - (face[2] + face[1]) / 2);
+            n = unit(cross(e,f));
+            //translate(face[1] + 20 * e + 9.2 * f) inverticate(n) joiner_post();
+            skew_joiner_post(face[1] + 20 * e + 9.9 * f, n, center);
+        }
+        // Between two hemi.
+        #three() {
+            e = unit(face[2]);
+            n = unit(cross(face[2],apex));
+            f = unit(cross(n,e));
+            translate([0,0,0] + 20 * e + 9.3 * f) inverticate(n) joiner_post();
+            translate(face[2] - 20 * e + 9.3 * f) inverticate(n) joiner_post();
+            translate(3/4 * face[2]) inverticate(f) joiner_post_unchamfer(
+                $join_diameter=2.2);
+            translate(1/4 * face[2]) inverticate(f) joiner_post_unchamfer(
+                $join_diameter=2.2);
+        }
+    }
+    module double() {
+        children();
+        multmatrix([[0,1,0],[1,0,0],[0,0,1]]) children();
+    }
+}
+
 module tetrahemihexahedron() {
-    face = [[0,0,1],[0,1,0],[1,0,0]];
-    if ($piece == 0)
+    mult = $piece == 0 ? 1 : $radius;
+    face = mult * [[0,0,1],[0,1,0],[1,0,0]];
+    if ($piece <= 1)
         four() pyramid(face);
-    if ($piece == 1)
-        scale($radius) four() pyramid(face);
     if ($piece == 2) {
         raise($radius/sqrt(3)) verticate(-[1,1,1]) difference() {
-            scale($radius) pyramid(face);
+            pyramid(face);
             three() rotate([-45,0,0]) {
                 translate([$radius*3/4,0,0]) joiner_post_unchamfer();
                 translate([$radius/4,0,0]) joiner_post_unchamfer();
             }
         }
+    }
+    center = sum(face) / 3;
+    apex = center * 0.65;
+    if ($piece == 3) {
+        difference() {
+            pyramid([face[2], face[1], [0,0,0]], apex);
+            raise(7.5 + $radius) cube(2 * $radius, center=true);
+            #joiners();
+        }
+    }
+    if ($piece == 4) {
+        difference() {
+            verticate(-apex) translate(-center)
+                difference() {
+                    pyramid(face, a=apex);
+                #joiners();
+            }
+            raise(7.5 + $radius) cube(2 * $radius, center=true);
+        }
+    }
+    module joiners() {
+        p = [0, 10, $radius - 10];
+        q = [10, 0, $radius - 10];
+        pdir = unit(apex - p);
+        qdir = unit(apex - q);
+        three() {
+            // Outer triangles to inner quadrants.
+            translate(p + 20 * pdir)
+                inverticate(cross(pdir, face[0] - face[1]))
+                joiner_post();
+            translate(q + 20 * qdir)
+                inverticate(cross(qdir, face[0] - face[2]))
+                joiner_post();
+        }
+        three() rotate([-45,0,0]) {
+            // Hemi stitch.
+            $joinder_diameter = 2.2;
+            translate([$radius*3/4,0,0]) joiner_post_unchamfer();
+            translate([$radius/4,0,0]) joiner_post_unchamfer();
+        }
+        three() rotate([45,0,0]) {
+            // Quadrant triple.
+            translate([$radius - 25,7,0]) joiner_post();
+            translate([10,7,0]) joiner_post();
+        }
+    }
+    module double() {
+        children();
+        multmatrix([[0,1,0],[1,0,0],[0,0,1]]) children();
     }
 }
 
@@ -118,6 +365,40 @@ module dodecadodecahedron_pieces() {
                       $radius * (2 - gold) * [1,1,1],
                       $radius * (2 - gold) * sqrt(3) - 1,
                       joiners=joiners, span=2);
+}
+
+module medial_rhombic_triacontahedron() {
+    mult = $piece == 0 ? 1 : $radius / sqrt(1 + gold * gold);
+    p = [0, gold, 1] * mult;
+    q = [gold - 1, 0, 1] * mult;
+    r = [0, -gold, 1] * mult;
+    s = [1 - gold, 0, 1] * mult;
+
+    u = [2 - gold, gold - 1, 1] * mult;
+    v = [0, 2 - gold, 1] * mult;
+    w = [gold - 2, gold - 1, 1] * mult;
+
+    if ($piece <= 1) {
+        five_colors = ["lightgreen", "orange", "lightblue", "yellow", "red"];
+        faces = [for (f = six([p, q, r, s])) each five(f)];
+        for (i = [0:29]) {
+            pyramid(faces[i], topcolor = five_colors[i % 5]);
+        }
+        //mark(p * (2 - gold) + q * (gold - 1), "black");
+        mark(u, "black");
+        mark(v, "purple");
+        mark(w, "grey");
+    }
+    if ($piece == 2) {
+        c = [0, gold-1, 1] * mult;
+        intersection() {
+            rotate([0, 180, 0]) translate([0,-mult,-mult])
+                trapezohedron_uncut(
+                    [p, u, v, w], c,
+                    [[[-7.5,14],[-7.5,-25]], [[-4,0]], [[-4,0]]]);
+            translate([0,0,3]) cube([$radius, $radius, 6], center=true);
+        }
+    }
 }
 
 module great_ditrigonal_icosidodecahedron() scale(1 / sqrt(3)) {

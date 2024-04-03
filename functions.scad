@@ -301,7 +301,7 @@ function reorient(v) = [for (i = [len(v) : -1 : 1]) v[i % len(v)]];
 function invert(f) = -reorient(f);
 
 function cycle(v, from=1) = let (l = len(v))
-    [for (i = [from + l : from + 2 * l - 1]) v[i % l]];
+    [for (i = [from : from + l - 1]) v[i % l]];
 function cycles(v, froms) =
     [for (f = froms) each is_list(f) ? [cycles(v, f)] : cycle(v, f)];
 
@@ -353,6 +353,13 @@ function octogon(v) = [v, my(v), rmz(v), rmz(my(v)),
 
 // Give a face, generate 5 images, rotating about a dodec. face.
 function five(f) = [for (m = rotate5) [for (v = f) m * v]];
+
+module two() {
+    children();
+    multmatrix(-identity) children();
+}
+module five() for (m = rotate5) multmatrix(m) children();
+module ten() five() two() children();
 
 // Construct a pentagon.
 function pentagon(v) = [for (m = rotate5) m * v];
@@ -419,3 +426,5 @@ function cross_params(a0, a1, b0, b1) = let(
 // Return a point that is as close as possible to both lines.
 function cross_point(a0, a1, b0, b1) = let (p = cross_params(a0, a1, b0, b1))
     ((a0 + p.x * a1) + (b0 + p.y * b1)) * 0.5;
+
+function cross_point_v(a0, a1, b0, b1) = cross_point(a0, a1 - a0, b0, b1 - b0);

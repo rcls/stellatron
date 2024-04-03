@@ -72,21 +72,11 @@ p8 = [3 + 4 * gold, -1 - 2 * gold, -1 - 2 * gold];
 // edges have length 2.
 ico_faces = canonvvv(twenty(triangle([0, gold, 1])));
 
-$ico_color = [["green", for (i=[1:12]) undef, "green", for (i=[14:19]) undef]];
-five_colors = ["lightgreen", "orange", "#8cf", "yellow", "red"];
+$ico_colour = [["green", for (i=[1:12]) undef, "green", for (i=[14:19]) undef]];
+five_colors = ["lightgreen", "orange", "lightblue", "yellow", "red"];
+one_four_colors = cycles(five_colors, [[0, 0, 0, 0], [3, 1, 2, 4]]);
+four_one_colors = cycles(five_colors, [[3, 1, 2, 4], [0, 0, 0, 0]]);
 
-five_octa_color = [
-    [
-        "red", "green", "yellow", "blue", "orange",
-        "red", "green", "yellow", "blue", "orange",
-        "red", "green", "yellow", "blue", "orange",
-        "red", "green", "yellow", "blue", "orange"],
-    [
-        "blue", "orange", "red", "green", "yellow",
-        "green", "yellow", "blue", "orange", "red",
-        "yellow", "blue", "orange", "red", "green",
-        "orange", "red", "green", "yellow", "blue"],
-    ];
 // STELLATION LIBRARY
 
 module wedge(tri, stellation, anchor=[0, 0, 0], c=undef) {
@@ -115,10 +105,10 @@ module wedge(tri, stellation, anchor=[0, 0, 0], c=undef) {
 }
 
 module stellate_sym(stellations) {
-    cl = len($ico_color);
+    cl = len($ico_colour);
     for (i = [0:len(stellations) - 1])
         for (j = [0:19])
-            wedge(ico_faces[j], stellations[i], c = $ico_color[i%cl][j]);
+            wedge(ico_faces[j], stellations[i], c = $ico_colour[i%cl][j]);
 }
 
 module stellate(stellations) {
@@ -135,9 +125,9 @@ module stellate1(stellation, weights=[], normal=0) {
     anchor = anchorw + anchorn;
     for (i = [0:19]) {
         f = ico_faces[i];
-        wedge(f, stellation, anchor, c=$ico_color[0][i]);
-        wedge([f.y, f.z, f.x], stellation, anchor, c=$ico_color[0][i]);
-        wedge([f.z, f.x, f.y], stellation, anchor, c=$ico_color[0][i]);
+        wedge(f, stellation, anchor, c=$ico_colour[0][i]);
+        wedge([f.y, f.z, f.x], stellation, anchor, c=$ico_colour[0][i]);
+        wedge([f.z, f.x, f.y], stellation, anchor, c=$ico_colour[0][i]);
     }
 }
 
@@ -251,15 +241,21 @@ module cell_g2() {
 
 module c1() scale(1/radius1) full_A();  // Icosahedron.
 
-module c2()                      // Small triambic / first stellation / triakis.
+module c2() {                    // Small triambic / first stellation / triakis.
+    c2_colors = ["yellow", "lightgreen", "lightblue", "orange", "red"];
+    $ico_colour = cycles(c2_colors, [[0, 0, 0, 0], [3, 1, 2, 4]]);
     scale(1/radius2) full_B();
+}
 
 module c3() {                           // Compound of five octohedra
-    $ico_color = cycles(five_colors, [[0, 0, 0, 0], [3, 1, 2, 4]]);
+    $ico_colour = one_four_colors;
     scale(1/radius3) full_C();
 }
 
-module c4() scale(1/radius4) full_D();
+module c4() {
+    $ico_colour = cycles(five_colors, [[0,0,0,0]]);
+    scale(1/radius4) full_D();
+}
 
 module c5() scale(1/radius6) full_E();
 
@@ -325,7 +321,7 @@ module c20() scale(1/radius7)     // Fifth stellation, star spikes, point joins.
 
 module c21() scale(1/radius6) {
     // Seventh stellation, great dodecaisocron, 20 hex spikes.
-    $ico_color = cycles(five_colors, [[3, 1, 2, 4], [0, 0, 0, 0]]);
+    $ico_colour = four_one_colors;
     full_D();
     full_e1();
 }
@@ -333,7 +329,7 @@ module c21() scale(1/radius6) {
 module c22() scale(1/radius6) {         // Ten tetrahedra.
     // We split the kite in two, and color, so it's easiest to skip the cell
     // definitions (E f1).
-    $ico_color = cycles(five_colors, [[3, 1, 2, 4], [0, 0, 0, 0]]);
+    $ico_colour = four_one_colors;
     stellate([
                  [p1, p5, p6a],
                  [p6b, p5, p1],
@@ -482,7 +478,7 @@ module c46() scale(1/radius6) {         // Hollow hex spikes, solid support.
 }
 
 module c47() {                          // Five tetrahedra.
-    $ico_color = [cycles(["yellow", "pink", "red", "green", "purple"],
+    $ico_colour = [cycles(["yellow", "pink", "red", "green", "purple"],
                          [3, 1, 2, 4])];
     scale(1/radius6) stellate_sym([[p6a, pls(p6a), mns(p6a)]]); // E f1a
 }
@@ -520,7 +516,7 @@ module c52() scale(1/radius7) {         // 12 + 20 spikes, some hollow.
 }
 
 module c53() scale(1/radius7) {         // No hollows, crazy!
-    $ico_color = [cycles(five_colors, [3, 1, 2, 4])];
+    $ico_colour = [cycles(five_colors, [3, 1, 2, 4])];
     full_E();
     cell_f1a();
     cell_f2();
@@ -598,4 +594,62 @@ module five_octahedron_thirtieth() {
         q3a, $radius / gold - 3,
         [[[-3, -11], [-3, 19]],
          [[-3, 11], [-3, -19]]]);
+}
+
+module triakis_icosahedron_piece() {
+    // Icosohedron triangle: i,
+    // [0, 1, gold].
+    p0 = [1,0,gold];
+    q0 = rz(p0);
+    r0 = (0.4 * gold - 0.2) * (p0 + q0 + mns(p0));
+    p = $radius / norm(r0) * p0;
+    q = $radius / norm(r0) * q0;
+    r = $radius / norm(r0) * r0;
+    echo(norm(r));
+    verticate(cross(q - p, r - p)) translate(-(p + q + r) / 3) difference() {
+        trapezohedron_uncut([p, q, r], (p+q+r)/3, // $radius * 0.8423 - 5,
+                            [[[-3,31],[-3,-31]],
+                             [[-6,15],[-6,-24]],
+                             [[-6,-15],[-6,24]],
+                             []]);
+        inverticate(p+q+r) cube($radius * 1.5801 - 10, center=true);
+    }
+}
+
+module ten_tetrahedra_piece() {
+    if ($piece == 5) {
+        ten() polyhedron(
+            [[1,1,1],[-1,-1,1],[-1,1,-1],[1,-1,-1]],
+            [[0,1,2],[3,1,0],[0,2,3],[3,2,1]]);
+        mark([0,gold-1,gold], c="green");
+        //mark([1,1,1], c="green");
+        mark([0.6 * gold - 0.8,0,0.6*gold + 0.2], c="black");
+        mark([0,0,1], c="blue");
+        mark([2-gold,0,gold-1], c="red");
+        echo(norm([gold - 1, gold]));
+    }
+    if ($piece == 2) {
+        mult = $radius / sqrt(3);
+        p = mult * [0, gold - 1, gold];
+        q = mult * [0.6 * gold - 0.8, 0, 0.6 * gold + 0.2];
+        r = mult * [0, 0, 1];
+        s = mult * [2 - gold, 0, gold - 1];
+        //trapezohedron_verticate([p, s, q, r], p, $radius / 3 - 3, align=q)
+        center = (p + q + s) / 3;
+        normal = cross(s - p, q - p);
+        intersection() {
+            // Lie on the larger face.
+            verticate(normal, p - center) translate(-center)
+            // Get the p-r line horizontal, and the p-r-origin plane vertical.
+            //raise(3) verticate(cross(p - q, cross(q, p)), p) translate(-q / gold)
+            //verticate(cross(r - p, s - p), p) translate(16 * unit(p) - p)
+                trapezohedron_uncut(
+                    [p, s, q, r], (p + q) / 2,
+                    // Long, short, short, long.
+                    [[[-6,-29.5],[-9,30]],[[-7,0]],[[-6,16]],[[-8,-15],[-6,34]]]);
+            rotate([0, -30, 0]) raise(3-$radius*0.837884) cube(2 * $radius, true);
+        }
+    }
+
+    module mark(v, c="gold", r=0.05) color(c) translate(v) sphere(r);
 }

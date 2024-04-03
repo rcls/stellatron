@@ -23,9 +23,6 @@ module dodeca_single() {
 }
 
 module dodeca_spikey(post=0.1, inset=0, raise = (2 * gold - 1) / 5) {
-    if ($piece == 0) {
-        children();
-    }
     if ($piece == 1) {
         difference() {
             translate([0, 0, -$extra_z_remove])
@@ -33,12 +30,15 @@ module dodeca_spikey(post=0.1, inset=0, raise = (2 * gold - 1) / 5) {
             translate([0,0,-1.1 * $radius]) cube(2.2 * $radius, center=true);
         }
     }
-    if ($piece == 2) {
+    else if ($piece == 2) {
         difference() {
             translate([0,0, -$extra_z_remove]) rotate([0,180,0])
                 dodeca_pointup(post=post, inset=inset, raise=raise) children();
             translate([0,0,-1.1 * $radius]) cube(2.2 * $radius, center=true);
         }
+    }
+    else {
+        children();
     }
 }
 
@@ -338,10 +338,11 @@ module trapezohedron(points, vertex, cut_radius, joiners=[[]], span=1,
         trapezohedron_uncut(points, vertex, joiners, span, chamfer);
 }
 
-module trapezohedron_verticate(points, vertex, cut_radius) {
+module trapezohedron_verticate(points, vertex, cut_radius, align=undef) {
+    a = align ? align: points[0];
     if ($flip) {
         intersection() {
-            verticate(-vertex, align=points[0])
+            verticate(-vertex, align=a)
                 translate(-vertex) children();
             translate([0,0, norm(vertex) - cut_radius - $radius])
                 cube(2 * $radius, center=true);
@@ -349,7 +350,7 @@ module trapezohedron_verticate(points, vertex, cut_radius) {
     }
     else {
         intersection() {
-            translate([0, 0, -cut_radius]) verticate(vertex, align=points[0])
+            translate([0, 0, -cut_radius]) verticate(vertex, align=a)
                 children();
             translate([0,0,$radius])
                 cube(2 * $radius, center=true);
@@ -387,9 +388,13 @@ module trapezohedron_uncut(points, vertex, joiners=[[]], span=1,
                 vertical = points[e1 % l] + points[s1 % l];
                 horizontal = points[e % l] - points[s];
 
-                #jpost(a, b, v_inset, h_inset, vertical, horizontal);
+                if (span == 1)
+                    #jpost(a, b, v_inset, h_inset, vertical, horizontal);
+                else
+                    #jpost(a, b, v_inset, h_inset, vertical, horizontal);
             }
         }
+        children();
     }
 
     module jpost(a, b, jv_mm, jh_mm, vertical, horizontal) {
@@ -408,12 +413,17 @@ module trapezohedron_uncut(points, vertex, joiners=[[]], span=1,
         skew1 = trans1 - (trans1*normal)/(depth*normal) * depth;
         skew2 = trans2 - (trans2*normal)/(depth*normal) * depth;
 
-        intersection() {
-            multmatrix(transpose(trans1, trans2, depth, p=p))
-                cube($join_depth * 2, center=true);
-            let ($join_depth = $join_depth + 2)
-                multmatrix(transpose(skew1, skew2, depth, p=p))
-                joiner_post();
+        if (span == 1) {
+            translate(p) inverticate(normal) joiner_post();
+        }
+        else {
+            intersection() {
+                multmatrix(transpose(trans1, trans2, depth, p=p))
+                    cube($join_depth * 2, center=true);
+                let ($join_depth = $join_depth + 2)
+                    multmatrix(transpose(skew1, skew2, depth, p=p))
+                    joiner_post();
+            }
         }
     }
 

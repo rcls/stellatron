@@ -14,7 +14,7 @@ crennell = 1;
 $piece = 1;
 
 // The overall radius in mm from the center of the piece to its extremities.
-$radius = 65;
+$radius = 65.00001;
 
 // When cutting into pieces, remove this much extra in the z direction (mm).
 $extra_z_remove=0.001;
@@ -30,7 +30,7 @@ $join_diameter=2.1;
 // little.
 
 // Diameter in mm of the stand posts.
-$stand_diameter = 6;
+$stand_diameter = 6.000001;
 
 $flip = true;
 
@@ -55,14 +55,24 @@ module main() {
                                      top=radius1*sqrt(inscribe)) c1();
         if ($piece == 6) two_twelfths() c1();
     }
-    if (crennell == 2) c2();
+    if (crennell == 2) {
+        if ($piece == 0)
+            c2();
+        if ($piece == 1)
+            scale($radius) c2();
+        if ($piece == 2)
+            triakis_icosahedron_piece();
+    }
     if (crennell == 3) {
         icosa_top_bottom(radius3, post=1/2) c3();
         if ($piece == 3) five_octahedron_thirtieth();
         if ($piece == 10)
             stand_rhombus(x=2-gold, y=(3 - gold)/5) c3();
     }
-    if (crennell == 4) c4();
+    if (crennell == 4) {
+        if ($piece == 0) c4();
+        if ($piece == 1) scale($radius) c4();
+    }
     if (crennell == 5) c5();
     if (crennell == 6) {
         icosa_top_bottom(radius7, post=-1/3) c6();
@@ -121,7 +131,16 @@ module main() {
             }
         }
     }
-    if (crennell == 22) c22();
+    if (crennell == 22) {
+        if ($piece == 0)
+            c22();
+        if ($piece == 1)
+            scale($radius) c22();
+        if ($piece == 2)
+            ten_tetrahedra_piece();
+
+        stand_tripod(strut=-0.254645, base=0.2, hole=1) c22();
+    }
     if (crennell == 23) {
         icosa_top_bottom(radius7, post=-1/3, inset=5) c23();
         stand_tripod(height=inscribe,strut=-1/ico_scale/6, base=$radius/5) c23();
@@ -177,7 +196,15 @@ module main() {
         stand_tripod(height=inscribe,strut=1/6, base=1/4, hole=1) c30();
         stand_pentapod(strut=gold * 5 / 7 - 1, base=1/4, hole=2, p=9)
             c30();
+        if ($piece == 8) {
+            scale(radius7) c30();
+            mark([2*gold+1,0, 2 + 3*gold]);
+            mark([0,0,gold+1], r=0.1, c="red");
+            mark(rot5*[0,0,gold+1], r=0.1, c="pink");
+            mark(rot5_4 * [1,1,1] * (1 + 3*gold)/5, c="lightblue");
+        }
     }
+    module mark(p, r=0.1, c="black") translate(p) color(c) sphere(r);
     if (crennell == 31) c31();
     if (crennell == 32) c32();
     if (crennell == 33) c33();
@@ -326,16 +353,23 @@ module main() {
         if ($piece == 2) stella_octangular_eighth();
         if ($piece == 3) mirror([1, 0, 0]) stella_octangular_eighth();
     }
-    if (crennell == 204) {
+    if (crennell == 203)
+        octahemioctahedron();
+
+    if (crennell == 204)
         tetrahemihexahedron();
-    }
+
     if (crennell == 234) {
         dodeca_spikey(post=(gold-3)/5, inset=5) small_stellated_dodecahedron();
         stand_pentapod(strut=(gold-3)/5) small_stellated_dodecahedron();
     }
     if (crennell == 235) {
-        dodeca_spikey(post=-2/sqrt(5), inset=15) great_dodecahedron();
-        stand_pentapod(strut=(6 * gold - 8) / 5) great_dodecahedron();
+        if ($piece <= 2)
+            dodeca_spikey(post=-2/sqrt(5), inset=15) great_dodecahedron();
+        if ($piece == 3)
+            great_dodecahedron();
+        stand_pentapod(strut=(6 * gold - 8) / 5,
+                       base=0, hole=1) #great_dodecahedron();
     }
     if (crennell == 236) {
         if ($piece == 0)
@@ -348,17 +382,20 @@ module main() {
     }
     // The 30th stellation can be taken to be either the medial- or the great-
     // triambic icosahedron, the duals of which are visibly different.
-    if (crennell == 241) {
+    if (crennell == 241)
         dodeca_tri_split() ditrigonal_dodecadodecahedron();
-    }
-    if (crennell == 247) {
+
+    if (crennell == 247)
         great_ditrigonal_icosidodecahedron();
-    }
+
     if (crennell == 252) {
-        dodeca_spikey(post=0.3, inset=3, raise=(2 * gold - 3)*inscribe)
-            great_stellated_dodecahedron();
+        if ($piece == 1 || $piece == 2)
+            dodeca_spikey(post=0.3, inset=3, raise=(2 * gold - 3)*inscribe)
+                great_stellated_dodecahedron();
         stand_tripod(strut=(0.6 - 0.2 * gold) * inscribe / sqrt(3), hole=2)
             great_stellated_dodecahedron();
+        if ($piece == 3)
+            great_stellated_dodecahedron_piece();
     }
     if (crennell == 254)
         great_icosidodecahedron();
@@ -371,4 +408,7 @@ module main() {
 
     if (crennell == 266)
         great_stellated_truncated_dodecahedron();
+
+    if (crennell == 336)
+        medial_rhombic_triacontahedron();
 }

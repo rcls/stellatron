@@ -7,18 +7,21 @@ cut=0.2;
 gap=1.5;
 base=5;
 rise=1;
+slope = 0;
 
-epsilon=1/3 * (1 - sqrt(3)/2);
-
-//$fn=20;
-$fn = 60;
+$fn=20;
+//$fn = 60;
 
 radius = width/2;
+
+x1 = outer - width + rise;
+
+o_m_r = outer - rise;
 
 intersection() {
     union() {
         difference() {
-            rotate_extrude() {
+            rotate_extrude($fn = $fn * 3) {
                 hull() {
                     translate([outer - radius, radius * sqrt(3) / 2]) circle(radius);
                     translate([outer - radius, height - radius]) circle(radius);
@@ -28,11 +31,20 @@ intersection() {
         }
 
         hull() {
-            for (z = [0, base - rise])
+            for (z = [0, base - rise]) {
                 for (y = (outer - rise) * [-1, 1])
-                    translate([outer - width + rise, y, z]) sphere(rise);
+                    translate([x1, y, z]) sphere(rise);
+                if (slope != 0) {
+                    y = o_m_r;
+                    translate([x1 + 2 * y * sin(slope), y, z]) sphere(rise);
+                }
+            }
         }
     }
 
-    translate([-2 * outer - width + rise, -1.5 * outer, 0]) cube(3 * outer);
+    #linear_extrude(1 * outer) polygon(
+        [[x1 - 2 * outer, -1.5 * o_m_r],
+         [x1 - 2 * outer, 1.5 * o_m_r],
+         [x1 + 2.5 * sin(slope) * o_m_r, 1.5 * o_m_r],
+         [x1 - 0.5 * sin(slope) * o_m_r, -1.5 * o_m_r]]);
 }
