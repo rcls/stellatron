@@ -29,7 +29,7 @@ module stand_tripod(strut, strut_mm=0, base=0,
 }
 
 module stand_pentapod(strut, strut_mm=0, base=0,
-                      length=1, height=1, hole=0, mink=0, p=10) {
+                      length=1, height=1, hole=1, mink=0, p=10) {
     stand_generic(
         5, strut, strut_mm, base, length, height, hole, mink, p=p)
         pointup() children();
@@ -82,6 +82,7 @@ module stand_rhombus(x, y, length=1, height=1) {
 module stand_ring(base, hole, strut_mm) {
     outer = max(base * $radius, abs(strut_mm)) + $stand_diameter / 2;
     inner = min(hole * $radius, abs(strut_mm)) - $stand_diameter / 2;
+    echo(outer, inner, base, hole, strut_mm);
     rounded_ring(outer, inner, n = $fn * 6);
 }
 

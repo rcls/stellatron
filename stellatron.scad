@@ -78,11 +78,15 @@ module main() {
         icosa_top_bottom(radius7, post=-1/3) c6();
         stand_tripod(height=inscribe, strut=-1/ico_scale/6, base=$radius/5) c6();
     }
-    if (crennell == 7) {
-        dodeca_spikey(post=0.1) c7();
-        stand_pentapod(strut=-0.153) c7();
+    if (crennell == 7) {                // Great icosahedron.
+        if ($piece < 5)
+            dodeca_spikey(post=0.1) c7();
+        else if ($piece == 10)
+            stand_pentapod(strut=-0.153) c7();
+        else
+            great_icosahedron();
     }
-    if (crennell == 8) {
+    if (crennell == 8) {                // Final stellation.
         if ($piece == 0) c8();
         if ($piece == 1)
             one_twelfth(cut = 0.23,

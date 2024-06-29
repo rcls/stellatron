@@ -177,7 +177,10 @@ module full_F() stellate_sym(
      each triple([p1, p7, pls(p1), mns(p1)]),
         ]);
 
-module full_G() stellate_sym([[p7, pls(p7), mns(p7)]]);
+module full_G() {
+    //$ico_colour = cycles(c10, [[0, 2]]);
+    stellate_sym([[p7, pls(p7), mns(p7)]]);
+}
 
 module full_H() stellate(
     [[p8, p6a, p6b],
@@ -261,7 +264,15 @@ module c5() scale(1/radius6) full_E();
 
 module c6() scale(1/radius7) full_F();  // Second stellation.
 
-module c7() scale(1/radius7) full_G();  // Great.
+module c7() {
+    $ico_colour = [[
+            "yellow", "deepskyblue", "chocolate", "red", "lightgreen",
+            "indigo", "gold", "mediumpurple", "hotpink", "crimson",
+            "chocolate", "red", "lightgreen", "yellow", "deepskyblue",
+            "crimson", "indigo", "gold", "mediumpurple", "hotpink",
+            ]];
+    scale(1/radius7) full_G();  // Great.
+}
 
 module c8() scale(1/radius8) full_H();  // The mighty final stellation.
 
@@ -564,6 +575,98 @@ module c59() scale(1/radius7) {         // Hex spikes, chunks out.
     cell_f1a();
     cell_f2();
     cell_g2();
+}
+
+module great_icosahedron() {
+    // Do the interior icosahedron in dark grey.
+    a = [1, 0, gold];
+    // b = [gold, 1, 0];
+    // c = [gold, -1, 0];
+    // for (f = twenty([a, b, c])) pyramid(canonvv(f), topcolor="darkgrey");
+
+    // φ² = 1+φ
+    // φ³ = 1+2φ
+    // φ⁴ = 2+3φ
+    gold2 = 1 + gold;
+    gold3 = 1 + 2*gold;
+    gold4 = 2 + 3*gold;
+    // [1,0,gold]*gold3.
+    // (2+gold)*gold3
+
+    mult = $piece < 5 || $piece > 6 ? 1 : $radius / (gold3 * sqrt(2 + gold));
+
+    p = [gold3, 0, gold4] * mult;
+    p2 = [-gold4, -gold3, 0] * mult;
+    p3 = [0, gold4, -gold3] * mult;
+    q = [0, gold, gold3] * mult;
+    r = [0, -gold, gold3] * mult;
+    s = a * mult;
+    //d = [0.2 + 0.6 * gold, 0.2 + 0.6 * gold, 1 + gold] * mult;
+    d = [0.4 * gold - 0.2, 0, 0.8 + 1.4 * gold] * mult;
+    mark(p);
+    mark(p2, c="red");
+    mark(p3, c="green");
+    mark(q, c="black");
+    mark(r, c="purple");
+    //mark([-1,0,gold], c="green");
+    mark(d, c="blue");
+    //mark([0.2 + 0.6 * gold, 0.2 + 0.6 * gold, 1 + gold], c="blue");
+
+    u = [0, 0, gold3] * mult;
+    v = [0, 0, 0.8 + 1.4 * gold] * mult;
+    mark(u, "orange");
+    mark(v, "pink");
+
+    nml = cross(d - q, d - r);
+
+    module common_joiners() {
+        delta = 15 * s.x / (q.z - s.z) * unit(q).z;
+        $join_depth = delta+5;
+        //j = q - 15 * unit(q);
+        translate(q - 15 * unit(q) - [0,8,0]) inverticate([1,0,0])
+            #joiner_post();
+        translate(r - 15 * unit(r) + [0,8,0]) inverticate([1,0,0])
+            #joiner_post();
+        joiner_post_skew_chamfer(q - 15 * unit(q) + [delta,-8,0],
+                                 cross(q - s, r - s), [1, 0, 0]);
+        #joiner_post_skew_chamfer(r - 15 * unit(r) + [delta,8,0],
+                                 cross(q - s, r - s), [1, 0, 0]);
+    }
+
+    if ($piece == 5)
+        verticate(cross(q-d, p-d)) translate(-d) difference() {
+            $join_depth = 3;
+            translate(s) trapezohedron_uncut(
+                [p-s, d-s, q-s], (p + d + q) / 3 - s,
+                [[[-15,20], [-15,-60]], [], [[-30,44], [-30,-30]]]);
+            common_joiners();
+    }
+    else if ($piece == 6)
+        verticate(cross(r-s, q-s)) translate(-s) difference() {
+            $join_depth = 4.3;
+            color("lightgreen")
+                trapezohedron_uncut(
+                    [q, s, r], (q + s + r) / 3,
+                    [[[-12, -27]], [[-12, 27]], [[-27,0]]]);
+            inverticate(s) cube(2 * norm(s) - 6, center=true);
+            common_joiners();
+        }
+    else if ($piece == 7) {
+        difference() {
+            $join_depth = 16;
+            cube([20, 10, 10]);
+            translate([0,5,5]) rotate([0,90,0]) #joiner_post();
+        }
+    }
+    else if ($piece < 5) {
+        color("red") for (f = twenty([p, p2, p3])) pyramid(f);
+    }
+
+
+    module mark(v, c="gold", r=0.2) {
+        if (false)
+            color(c) translate(v) sphere(r);
+    }
 }
 
 module five_tetrahedron_twentieth() {

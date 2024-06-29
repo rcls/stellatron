@@ -305,6 +305,13 @@ module skew_joiner_post(p, face, direction) {
     translate(p)
         multmatrix(transpose(ortho1, ortho2, udirection))
         joiner_post_unchamfer();
+    joiner_post_skew_chamfer(p, face, direction);
+}
+
+module joiner_post_skew_chamfer(p, face, direction) {
+    udirection = unit(direction);
+    ortho1 = unit(cross(udirection, p));
+    ortho2 = unit(cross(udirection, ortho1));
     // Now project ortho1 & 2 parallel to direction to lie in the face,
     // i.e., we want
     // (ortho1 + x*direction) . face = 0.
